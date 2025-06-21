@@ -996,6 +996,7 @@ body {
     cursor: pointer;
     margin-top: 10px;
     transition: background 0.2s, transform 0.2s;
+    text-decoration: none;
 }
 
     .auth-btn:hover {
@@ -2261,3 +2262,9 @@ input:checked + .slider:before {
     .btn-cancel:hover {
         background-color: #545b62;
     }
+
+.navbar-nav {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
