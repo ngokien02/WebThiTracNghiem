@@ -4,7 +4,6 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-
 @if (SignInManager.IsSignedIn(User))
 {
 	<div class="notification">
@@ -15,8 +14,19 @@
 	<div class="user-profile">
 		<img src="/Images/logo.png" alt="Avatar" class="avatar">
 		<div class="user-info">
-			<span class="user-name">@UserManager.GetUserName(User)</span>
-			<span class="user-id">MSSV: 2023001</span>
+			@{
+				var currentUser = await UserManager.GetUserAsync(User);
+				var hoTen = currentUser?.HoTen;
+			}
+			@if (!string.IsNullOrEmpty(hoTen))
+			{
+				<span class="user-name">@hoTen</span>
+			}
+			else
+			{
+				<span class="user-name">User</span>
+			}
+			<span class="user-id">@UserManager.GetUserName(User)</span>
 		</div>
 		<div class="dropdown-menu">
 			<a id="manage" asp-area="Identity" asp-page="/Account/Manage/Index"
