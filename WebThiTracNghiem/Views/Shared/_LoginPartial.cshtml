@@ -4,22 +4,40 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-<ul class="navbar-nav">
-	@if (SignInManager.IsSignedIn(User))
-	{
-		<li class="nav-item">
-			<a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
-		</li>
-		<li class="nav-item">
-			<form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-				<button id="logout" type="submit" class="nav-link btn btn-link text-dark border-0">Logout</button>
+
+@if (SignInManager.IsSignedIn(User))
+{
+	<div class="notification">
+		<i class="fas fa-bell"></i>
+		<span class="notification-badge">2</span>
+	</div>
+
+	<div class="user-profile">
+		<img src="/Images/logo.png" alt="Avatar" class="avatar">
+		<div class="user-info">
+			<span class="user-name">@UserManager.GetUserName(User)</span>
+			<span class="user-id">MSSV: 2023001</span>
+		</div>
+		<div class="dropdown-menu">
+			<a id="manage" asp-area="Identity" asp-page="/Account/Manage/Index"
+			   title="Manage"><i class="fas fa-user"></i>Thông tin cá nhân</a>
+			<a href="settings.html"><i class="fas fa-cog"></i> Cài đặt</a>
+			<form id="logoutForm" method="post"
+				  asp-area="Identity" asp-page="/Account/Logout"
+				  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
 			</form>
-		</li>
-	}
-	else
-	{
-		<li class="nav-item">
-			<a class="auth-btn" id="loginBtn" asp-area="Identity" asp-page="/Account/Login">Đăng nhập</a>
-		</li>
-	}
-</ul>
+			<a href="javascript:{}" onclick="document.getElementById('logoutForm').submit();">
+				<i class="fas fa-sign-out-alt"></i> Đăng xuất
+			</a>
+		</div>
+	</div>
+}
+else
+{
+	<div>
+		<a class="auth-btn" id="loginBtn" asp-area="Identity" asp-page="/Account/Login">Đăng nhập</a>
+	</div>
+}
+
+
+

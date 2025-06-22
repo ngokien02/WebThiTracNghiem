@@ -1390,12 +1390,12 @@ body {
 
 .user-name {
     font-weight: 500;
-    color: #2c3e50;
+    color: white;
 }
 
 .user-id, .user-role {
     font-size: 0.9rem;
-    color: #666;
+    color: white;
 }
 
 .dropdown-menu {
@@ -2267,4 +2267,8 @@ input:checked + .slider:before {
     list-style: none;
     padding-left: 0;
     margin: 0;
+}
+
+.text-danger {
+    color:red;
 }

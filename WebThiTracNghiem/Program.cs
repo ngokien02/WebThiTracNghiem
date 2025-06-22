@@ -53,4 +53,10 @@ app.MapRazorPages();
 
 app.UseSession();
 
+using (var scope = app.Services.CreateScope())
+{
+	var services = scope.ServiceProvider;
+	await ApplicationUser.SeedAdminAsync(services);
+}
+
 app.Run();
