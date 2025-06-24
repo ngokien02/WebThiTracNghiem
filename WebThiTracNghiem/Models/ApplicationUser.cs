@@ -6,7 +6,7 @@ namespace WebThiTracNghiem.Models
     public class ApplicationUser : IdentityUser
     {
         public string? HoTen { get; set; }
-		public static async Task SeedAdminAsync(IServiceProvider serviceProvider)
+		public static async Task SeedUserAsync(IServiceProvider serviceProvider)
 		{
 			var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 			var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();

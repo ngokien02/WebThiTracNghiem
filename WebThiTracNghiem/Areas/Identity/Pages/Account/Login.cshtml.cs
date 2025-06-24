@@ -109,13 +109,30 @@ namespace WebThiTracNghiem.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == Input.Username);
-                if (user == null || !(await _userManager.CheckPasswordAsync(user, Input.Password)))
+                
+				if (user == null || !(await _userManager.CheckPasswordAsync(user, Input.Password)))
                 {
 					ModelState.AddModelError(string.Empty, "Thông tin đăng nhập không hợp lệ.");
 					return Page();
 				}
 				await _signInManager.SignInAsync(user, Input.RememberMe);
-				return LocalRedirect(returnUrl);
+
+                var roles = await _userManager.GetRolesAsync(user);
+				var userRole = roles.FirstOrDefault();
+				switch (userRole)
+				{
+					case SD.Role_Admin:
+						return RedirectToAction("Index", "Home", new { area = "Admin" });
+
+					case SD.Role_Teach:
+						return RedirectToAction("Index", "Home", new { area = "Teacher" });
+
+					case SD.Role_Stu:
+						return RedirectToAction("Index", "Home", new { area = "Student" });
+
+					default:
+						return LocalRedirect(returnUrl); 
+				}
 			}
 
 			// If we got this far, something failed, redisplay form
