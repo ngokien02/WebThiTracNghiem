@@ -1,40 +1,141 @@
-﻿<!-- Banner Section -->
-<section class="banner">
-	<div class="banner-content">
-		<h1>Hệ thống Quản lý Thi trắc nghiệm</h1>
-		<p>Công cụ hỗ trợ giảng viên trong việc tạo đề thi, quản lý và đánh giá kết quả học tập</p>
-		<a href="teacher/exams/create.html" class="start-btn">Tạo đề thi mới</a>
-	</div>
-</section>
+﻿<!-- Side Menu -->
+<nav class="side-menu">
+    <ul>
+        <li>
+            <a href="teacher-dashboard.html" class="side-link active">
+                <i class="fas fa-home"></i>
+                <span>Trang chủ</span>
+            </a>
+        </li>
+        <li>
+            <a href="teacher/exams/active.html" class="side-link">
+                <i class="fas fa-clock"></i>
+                <span>Kỳ thi đang diễn ra</span>
+            </a>
+        </li>
+        <li>
+            <a href="teacher/exams/create.html" class="side-link">
+                <i class="fas fa-plus-circle"></i>
+                <span>Tạo kỳ thi mới</span>
+            </a>
+        </li>
+        <li>
+            <a href="teacher/question-bank/index.html" class="side-link">
+                <i class="fas fa-book"></i>
+                <span>Ngân hàng câu hỏi</span>
+            </a>
+        </li>
+        <li>
+            <a href="teacher/results/index.html" class="side-link">
+                <i class="fas fa-chart-bar"></i>
+                <span>Kết quả thi</span>
+            </a>
+        </li>
+        <li>
+            <a href="teacher/students/index.html" class="side-link">
+                <i class="fas fa-user-graduate"></i>
+                <span>Quản lý sinh viên</span>
+            </a>
+        </li>
+        <li>
+            <a href="teacher/reports/index.html" class="side-link">
+                <i class="fas fa-file-alt"></i>
+                <span>Báo cáo thống kê</span>
+            </a>
+        </li>
+        <li>
+            <a href="teacher/guide.html" class="side-link">
+                <i class="fas fa-question-circle"></i>
+                <span>Hướng dẫn</span>
+            </a>
+        </li>
+    </ul>
+</nav>
 
-<!-- Statistics Overview -->
-<section class="stats-grid">
-	<div class="stat-card">
-		<i class="fas fa-file-alt"></i>
-		<div class="stat-info">
-			<h3>Đề thi đang hoạt động</h3>
-			<p class="stat-number">5</p>
-		</div>
-	</div>
-	<div class="stat-card">
-		<i class="fas fa-users"></i>
-		<div class="stat-info">
-			<h3>Sinh viên tham gia</h3>
-			<p class="stat-number">128</p>
-		</div>
-	</div>
-	<div class="stat-card">
-		<i class="fas fa-check-circle"></i>
-		<div class="stat-info">
-			<h3>Bài thi đã hoàn thành</h3>
-			<p class="stat-number">96</p>
-		</div>
-	</div>
-	<div class="stat-card">
-		<i class="fas fa-clock"></i>
-		<div class="stat-info">
-			<h3>Đang chờ chấm điểm</h3>
-			<p class="stat-number">12</p>
-		</div>
-	</div>
-</section>
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Banner Section -->
+    <section class="banner">
+        <div class="banner-content">
+            <h1>Hệ thống Quản lý Thi trắc nghiệm</h1>
+            <p>Công cụ hỗ trợ giảng viên trong việc tạo đề thi, quản lý và đánh giá kết quả học tập</p>
+            <a href="teacher/exams/create.html" class="start-btn">Tạo đề thi mới</a>
+        </div>
+    </section>
+
+    <!-- Statistics Overview -->
+    <section class="stats-grid">
+        <div class="stat-card">
+            <i class="fas fa-file-alt"></i>
+            <div class="stat-info">
+                <h3>Đề thi đang hoạt động</h3>
+                <p class="stat-number">5</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-users"></i>
+            <div class="stat-info">
+                <h3>Sinh viên tham gia</h3>
+                <p class="stat-number">128</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-check-circle"></i>
+            <div class="stat-info">
+                <h3>Bài thi đã hoàn thành</h3>
+                <p class="stat-number">96</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-clock"></i>
+            <div class="stat-info">
+                <h3>Đang chờ chấm điểm</h3>
+                <p class="stat-number">12</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Section -->
+    <section class="news-section">
+        <div class="section-header">
+            <h2>Tin tức</h2>
+            <a href="teacher/news/index.html" class="view-all">Xem tất cả <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <div class="news-grid">
+            <!-- Featured News -->
+            <a href="teacher/news/index.html" class="news-item featured">
+                <div class="news-image">
+                    <img src="../assets/exam-banner.jpg" alt="Hội nghị">
+                </div>
+                <div class="news-content">
+                    <h3>Hội nghị đổi mới phương pháp giảng dạy và đánh giá 2024</h3>
+                    <p class="news-time">Ngày đăng: 10/05/2024</p>
+                </div>
+            </a>
+
+            <!-- Regular News -->
+            <a href="teacher/news/index.html" class="news-item">
+                <div class="news-image">
+                    <img src="../assets/traffic-law.jpg" alt="Đào tạo">
+                </div>
+                <div class="news-content">
+                    <h3>Chương trình bồi dưỡng chuyên môn cho giảng viên</h3>
+                    <p class="news-time">Ngày đăng: 08/05/2024</p>
+                </div>
+            </a>
+
+            <a href="teacher/news/index.html" class="news-item">
+                <div class="news-image">
+                    <img src="../assets/mechanics.jpg" alt="Nghiên cứu">
+                </div>
+                <div class="news-content">
+                    <h3>Thông báo đăng ký đề tài nghiên cứu khoa học năm 2024</h3>
+                    <p class="news-time">Ngày đăng: 05/05/2024</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+
+</main>

@@ -7,6 +7,7 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
     {
         public IActionResult Index()
         {
+            ViewData["Title"] = "Trang chủ Giảng viên";
             return View();
         }
     }

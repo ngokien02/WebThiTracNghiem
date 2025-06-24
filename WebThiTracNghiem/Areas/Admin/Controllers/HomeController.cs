@@ -7,6 +7,7 @@ namespace WebThiTracNghiem.Areas.Admin.Controllers
 	{
 		public IActionResult Index()
 		{
+			ViewData["Title"] = "Trang Quản trị";
 			return View();
 		}
 	}

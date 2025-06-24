@@ -15,6 +15,7 @@ namespace WebThiTracNghiem.Areas.Student.Controllers
 		}
 		public IActionResult Index()
 		{
+			ViewData["Title"] = "Trang chủ Sinh viên";
 			return View();
 		}
 	}

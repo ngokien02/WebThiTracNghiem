@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using WebThiTracNghiem.Models;
@@ -22,6 +22,7 @@ namespace WebThiTracNghiem.Controllers
             var hoTen = user?.HoTen;
 
             ViewBag.HoTen = hoTen;
+            @ViewData["Title"] = "Trang chủ";
             return View();
         }
 
