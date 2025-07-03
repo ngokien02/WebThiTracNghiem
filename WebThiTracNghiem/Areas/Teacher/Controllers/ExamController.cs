@@ -41,7 +41,7 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
                 {
                     var paragraphs = doc.Paragraphs;
                     CauHoi currentCauHoi = null;
-                    char[] optionLetters = new[] { 'A', 'B', 'C', 'D' };
+                    char[] optionLetters = { 'A', 'B', 'C', 'D' };
                     int answerIndex = 0;
 
                     foreach (var paragraph in paragraphs)

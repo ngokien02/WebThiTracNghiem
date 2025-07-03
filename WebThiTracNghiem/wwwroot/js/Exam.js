@@ -112,7 +112,7 @@
                     questionModal.css('display', 'flex');
                 },
                 error: function () {
-                    alert("Lỗi xử lý file, vui lòng thử lại!");
+                    alert("Định dạng file lỗi hoặc không hỗ trợ, vui lòng thử lại!");
                 }
             });
         }, 2000);
