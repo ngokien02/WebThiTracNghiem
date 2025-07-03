@@ -550,90 +550,7 @@ body {
     color: var(--white);
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-    .footer-container {
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-    }
 
-    .footer-right {
-        grid-column: 1 / -1;
-    }
-
-    .stats-list {
-        flex-direction: row;
-        justify-content: center;
-        gap: 20px;
-    }
-
-    .stats-item {
-        flex: 1;
-        max-width: 250px;
-    }
-}
-
-@media (max-width: 768px) {
-    .footer-container {
-        grid-template-columns: 1fr;
-        gap: 30px;
-    }
-
-    .footer-left,
-    .footer-center,
-    .footer-right {
-        text-align: center;
-    }
-
-    .address-item,
-    .contact-item {
-        justify-content: center;
-    }
-
-        .address-item i,
-        .contact-item i {
-            margin-top: 3px;
-        }
-
-    .stats-list {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .stats-item {
-        width: 100%;
-        max-width: 300px;
-    }
-
-    .footer-logo {
-        display: flex;
-        justify-content: center;
-    }
-
-        .footer-logo img {
-            height: 75px;
-        }
-
-    .side-link {
-        padding: 1rem;
-    }
-}
-
-@media (max-width: 900px) {
-    .footer-info-row {
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
-    }
-
-    .footer-logo img {
-        height: 70px;
-    }
-
-    .footer-address-block h3 {
-        font-size: 16px;
-    }
-}
 
 /* Page Header Styles */
 .page-header {
@@ -837,47 +754,6 @@ body {
         border-color: var(--primary-color);
     }
 
-/* Responsive Styles */
-@media (max-width: 768px) {
-    .filter-section {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .exam-card {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
-    }
-
-    .exam-details {
-        flex-direction: column;
-        gap: 0.75rem;
-        align-items: center;
-    }
-
-    .exam-list {
-        grid-template-columns: 1fr;
-    }
-
-    .exam-item-footer {
-        flex-direction: column;
-    }
-
-    .exam-item-header h3 {
-        font-size: 1rem;
-    }
-
-    .exam-item-details {
-        font-size: 0.85rem;
-    }
-
-    .start-exam-btn {
-        font-size: 0.9rem;
-        padding: 0.7rem;
-    }
-}
-
 /* Side Menu Link Styles */
 .side-menu a {
     text-decoration: none;
@@ -1022,21 +898,6 @@ body {
             text-decoration: underline;
         }
 
-@media (max-width: 500px) {
-    .auth-container {
-        padding: 24px 8px 16px 8px;
-        max-width: 98vw;
-    }
-
-    .auth-logo img {
-        height: 50px;
-    }
-
-    .auth-title {
-        font-size: 1.1rem;
-    }
-}
-
 /* Account Type Group Styles */
 .account-type-group {
     align-items: flex-start;
@@ -1077,17 +938,6 @@ body {
         height: 16px;
     }
 
-@media (max-width: 500px) {
-    .account-type-radio-row {
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-
-    .account-type-label {
-        font-size: 0.95rem;
-    }
-}
-
 /* Contact Floating Action Button */
 .contact-fab {
     position: fixed;
@@ -1121,16 +971,6 @@ body {
     .contact-fab i {
         pointer-events: none;
     }
-
-@media (max-width: 600px) {
-    .contact-fab {
-        right: 16px;
-        bottom: 16px;
-        width: 48px;
-        height: 48px;
-        font-size: 1.5rem;
-    }
-}
 
 /* Dashboard Styles */
 .welcome-section {
@@ -1433,45 +1273,6 @@ body {
     color: #4a90e2;
 }
 
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .exam-list {
-        grid-template-columns: 1fr;
-    }
-
-    .exam-card {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .exam-details {
-        justify-content: center;
-    }
-
-    .start-exam-btn, .view-exam-btn {
-        margin-top: 1rem;
-        width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .welcome-section {
-        text-align: center;
-    }
-
-    .results-table {
-        overflow-x: auto;
-    }
-}
-
 /* Exam Management & Exam Bank Page Styles */
 
 /* Page Header */
@@ -1696,33 +1497,6 @@ body {
         cursor: not-allowed;
     }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .exam-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .exam-filters {
-        flex-direction: column;
-    }
-
-    .filter-select {
-        width: 100%;
-    }
-
-    .exam-actions, .template-actions {
-        flex-wrap: wrap;
-    }
-
-    .action-btn {
-        flex: 1;
-    }
-
-    .header-actions {
-        flex-direction: column;
-    }
-}
-
 /* Guide Page Styles */
 .guide-container {
     max-width: 1000px;
@@ -1872,25 +1646,6 @@ body {
 .support-details p {
     color: #666;
     margin: 0;
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-    .guide-section {
-        padding: 1.5rem;
-    }
-
-    .guide-step {
-        padding-left: 1rem;
-    }
-
-    .support-contacts {
-        grid-template-columns: 1fr;
-    }
-
-    .support-item {
-        padding: 1rem;
-    }
 }
 
 /* Profile Page Styles */

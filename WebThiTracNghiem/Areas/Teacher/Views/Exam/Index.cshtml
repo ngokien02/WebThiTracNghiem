@@ -1,0 +1,105 @@
+﻿<div class="page-header">
+	<h1>Tạo đề thi mới</h1>
+</div>
+
+<div class="form-section form-section--main" style="background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(25,118,210,0.08);padding:2.5rem 2rem;max-width:900px;margin:2rem auto;">
+	<form class="exam-form" id="exam-form">
+		<h2>Thông tin cơ bản</h2>
+		<div class="form-group">
+			<label for="TieuDe">Tên đề thi:</label>
+			<input type="text" id="TieuDe" name="TieuDe" placeholder="Nhập tên đề thi...">
+		</div>
+		<div class="form-group">
+			<label for="DeThiId">Mã đề thi:</label>
+			<input type="text" id="DeThiId" name="DeThiId" placeholder="Nhập mã đề thi...">
+			<span id="errDeThiId" class="text-danger small"></span>
+		</div>
+
+		<h2>Phương thức tạo đề thi</h2>
+		<div class="form-group">
+			<label><input type="radio" name="exam-create-method" value="upload" checked> Nhập file Word/PDF</label>
+			<span id="errDeThiFile" class="text-danger small"></span>
+			<label><input type="radio" name="exam-create-method" value="manual"> Tạo thủ công</label>
+		</div>
+		<div id="upload-section">
+			<div class="form-group">
+				<label for="exam-file">Chọn file đề thi (.doc, .docx, .pdf):</label>
+				<input type="file" id="exam-file" accept=".doc,.docx,.pdf">
+			</div>
+		</div>
+		<div id="manual-section" style="display:none;">
+			<div id="questions-list"></div>
+			<button type="button" class="btn secondary" id="add-question-btn">+ Thêm câu hỏi</button>
+		</div>
+
+		<h2>Thời gian thi</h2>
+		<div class="form-row">
+			<div class="form-group">
+				<label for="start-date">Ngày bắt đầu:</label>
+				<input type="date" id="start-date" name="start_date" required>
+			</div>
+			<div class="form-group">
+				<label for="start-time">Giờ bắt đầu:</label>
+				<input type="time" id="start-time" name="start_time" required>
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group">
+				<label for="end-date">Ngày kết thúc:</label>
+				<input type="date" id="end-date" name="end_date" required>
+			</div>
+			<div class="form-group">
+				<label for="end-time">Giờ kết thúc:</label>
+				<input type="time" id="end-time" name="end_time" required>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="DiemToiDa">Thời gian làm bài (phút):</label>
+			<input type="number" id="DiemToiDa" name="DiemToiDa" required min="1">
+		</div>
+
+		<h2>Tùy chọn nâng cao:</h2>
+		<div class="form-group">
+			<div class="form-group">
+				<label for="DiemToiDa">Số điểm tối đa:</label>
+				<input type="number" id="DiemToiDa" name="DiemToiDa" required min="1">
+			</div>
+			<div class="checkbox-group">
+				<label>
+					<input type="checkbox" id="RandomCauHoi" name="RandomCauHoi">
+					Xáo trộn thứ tự câu hỏi
+				</label>
+				<label>
+					<input type="checkbox" id="RandomDapAn" name="RandomDapAn">
+					Xáo trộn thứ tự đáp án
+				</label>
+				<label>
+					<input type="checkbox" id="ShowKQ" name="ShowKQ">
+					Hiển thị kết quả ngay sau khi nộp bài
+				</label>
+			</div>
+		</div>
+
+		<div class="form-actions">
+			<button type="submit" class="btn primary">Tạo kỳ thi</button>
+			<button type="reset" class="btn btn-danger">Huỷ bỏ</button>
+		</div>
+	</form>
+</div>
+
+<div id="question-modal">
+	<div class="modal-content">
+		<h3><span style="color:#1976D2;"><i class="fas fa-list-alt"></i></span> Danh sách câu hỏi & đáp án</h3>
+		<div id="modal-question-list"></div>
+		<div class="modal-actions">
+			<button id="modal-accept-btn" class="btn primary">Chấp nhận</button>
+			<button id="modal-cancel-btn" class="btn secondary">Hủy</button>
+		</div>
+	</div>
+</div>
+<div id="loading-overlay">
+	<div class="loading-box">
+		<div class="spinner"></div>
+		<div style="font-size:1.1rem;color:#1976D2;font-weight:500;">Đang phân tích file...</div>
+	</div>
+</div>

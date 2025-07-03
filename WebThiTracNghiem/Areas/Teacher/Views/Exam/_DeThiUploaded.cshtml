@@ -1,0 +1,19 @@
+﻿@model List<CauHoi>
+
+@foreach (var cauHoi in Model.Select((q, i) => new { Q = q, Index = i + 1 }))
+{
+    <p><strong>@cauHoi.Index. @cauHoi.Q.NoiDung</strong></p>
+    @foreach (var da in cauHoi.Q.DapAnList.Select((d, idx) => new { D = d, Key = (char)('A' + idx) }))
+    {
+        <p>@da.Key. @da.D.NoiDung</p>
+    }
+    <p>
+        <strong>
+            Đáp án đúng: @(cauHoi.Q.DapAnList.Select((d, idx) => new { d.DungSai, idx })
+        .Where(x => x.DungSai)
+        .Select(x => ((char)('A' + x.idx)).ToString())
+        .FirstOrDefault() ?? "-")
+        </strong>
+    </p>
+    <hr />
+}

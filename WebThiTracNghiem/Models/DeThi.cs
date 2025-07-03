@@ -1,0 +1,22 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WebThiTracNghiem.Models
+{
+    public class DeThi
+    {
+        public string Id { get; set; }
+        public string TieuDe {  get; set; }
+        public DateTime GioBD { get; set; }
+        public DateTime GioKT { get; set; }
+        public int SoCauHoi { get; set; }
+        public double DiemToiDa { get; set; }
+        public Boolean RandomCauHoi { get; set; }
+        public Boolean RandomDapAn {  get; set; }
+        public Boolean ShowKQ { get; set; }
+        public string IdGiangVien {  get; set; }
+        [ForeignKey("IdGiangVien")]
+        public virtual ApplicationUser GiangVien { get; set; }
+        public ICollection<CauHoi> CauHoiList { get; set; }
+    }
+}

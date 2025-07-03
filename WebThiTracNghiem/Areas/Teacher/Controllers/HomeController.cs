@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using WebThiTracNghiem.Models;
 
 namespace WebThiTracNghiem.Areas.Teacher.Controllers
 {
     [Area("Teacher")]
-    public class HomeController : Controller
+	[Authorize(Roles = VaiTro.Role_Teach)]
+	public class HomeController : Controller
     {
         public IActionResult Index()
         {

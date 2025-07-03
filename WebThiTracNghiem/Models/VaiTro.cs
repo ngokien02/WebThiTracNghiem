@@ -1,6 +1,6 @@
 ﻿namespace WebThiTracNghiem.Models
 {
-    public class SD
+    public class VaiTro
     {
         public const string Role_Admin = "Admin";
         public const string Role_Teach = "Teacher";

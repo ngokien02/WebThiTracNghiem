@@ -13,9 +13,9 @@ namespace WebThiTracNghiem.Models
 
 			var users = new List<(string username, string email, string password, string role)>
 			{
-				("Admin", "admin@admin", "Admin@123", SD.Role_Admin),
-				("Teacher", "teacher@teacher", "Teacher@123", SD.Role_Teach),
-				("Student", "student@student", "Student@123", SD.Role_Stu)
+				("Admin", "admin@admin", "Admin@123", VaiTro.Role_Admin),
+				("Teacher", "teacher@teacher", "Teacher@123", VaiTro.Role_Teach),
+				("Student", "student@student", "Student@123", VaiTro.Role_Stu)
 			};
 
 			foreach (var (userName, email, password, role) in users)

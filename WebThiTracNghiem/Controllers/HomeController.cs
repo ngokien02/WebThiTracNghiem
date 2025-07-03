@@ -5,36 +5,49 @@ using WebThiTracNghiem.Models;
 
 namespace WebThiTracNghiem.Controllers
 {
-    public class HomeController : Controller
-    {
-        private readonly ILogger<HomeController> _logger;
+	public class HomeController : Controller
+	{
+		private readonly ILogger<HomeController> _logger;
 		private readonly UserManager<ApplicationUser> _userManager;
 
 		public HomeController(ILogger<HomeController> logger, UserManager<ApplicationUser> userManager)
-        {
-            _logger = logger;
-            _userManager = userManager;
-        }
+		{
+			_logger = logger;
+			_userManager = userManager;
+		}
 
-        public async Task<IActionResult> Index()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            var hoTen = user?.HoTen;
+		public async Task<IActionResult> Index()
+		{
+			var user = await _userManager.GetUserAsync(User);
+			var hoTen = user?.HoTen;
 
-            ViewBag.HoTen = hoTen;
-            @ViewData["Title"] = "Trang chủ";
-            return View();
-        }
+			if (User.Identity.IsAuthenticated)
+			{
+				var roles = await _userManager.GetRolesAsync(user);
+				if (roles.Contains(VaiTro.Role_Admin))
+					return RedirectToAction("Index", "Home", new { area = "Admin" });
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+				if (roles.Contains(VaiTro.Role_Teach))
+					return RedirectToAction("Index", "Home", new { area = "Teacher" });
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-    }
+				if (roles.Contains(VaiTro.Role_Stu))
+					return RedirectToAction("Index", "Home", new { area = "Student" });
+			}
+
+			ViewBag.HoTen = hoTen;
+			@ViewData["Title"] = "Trang chủ";
+			return View();
+		}
+
+		public IActionResult Privacy()
+		{
+			return View();
+		}
+
+		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+		public IActionResult Error()
+		{
+			return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+		}
+	}
 }

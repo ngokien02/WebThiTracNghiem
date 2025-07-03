@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebThiTracNghiem.Models;
 
@@ -11,9 +12,11 @@ using WebThiTracNghiem.Models;
 namespace WebThiTracNghiem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250702082333_AddDeThiModels")]
+    partial class AddDeThiModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -280,9 +283,6 @@ namespace WebThiTracNghiem.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<double>("DiemToiDa")
-                        .HasColumnType("float");
-
                     b.Property<DateTime>("GioBD")
                         .HasColumnType("datetime2");
 
@@ -292,15 +292,6 @@ namespace WebThiTracNghiem.Migrations
                     b.Property<string>("IdGiangVien")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("RandomCauHoi")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("RandomDapAn")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("ShowKQ")
-                        .HasColumnType("bit");
 
                     b.Property<int>("SoCauHoi")
                         .HasColumnType("int");
@@ -369,13 +360,11 @@ namespace WebThiTracNghiem.Migrations
 
             modelBuilder.Entity("WebThiTracNghiem.Models.CauHoi", b =>
                 {
-                    b.HasOne("WebThiTracNghiem.Models.DeThi", "DeThi")
+                    b.HasOne("WebThiTracNghiem.Models.DeThi", null)
                         .WithMany("CauHoiList")
                         .HasForeignKey("DeThiId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("DeThi");
                 });
 
             modelBuilder.Entity("WebThiTracNghiem.Models.DapAn", b =>

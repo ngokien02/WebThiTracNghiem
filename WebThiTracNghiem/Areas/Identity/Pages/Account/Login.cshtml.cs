@@ -79,11 +79,11 @@ namespace WebThiTracNghiem.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-			if (!_roleManager.RoleExistsAsync(SD.Role_Admin).GetAwaiter().GetResult())
+			if (!_roleManager.RoleExistsAsync(VaiTro.Role_Admin).GetAwaiter().GetResult())
 			{
-				_roleManager.CreateAsync(new IdentityRole(SD.Role_Stu)).GetAwaiter().GetResult();
-				_roleManager.CreateAsync(new IdentityRole(SD.Role_Admin)).GetAwaiter().GetResult();
-				_roleManager.CreateAsync(new IdentityRole(SD.Role_Teach)).GetAwaiter().GetResult();
+				_roleManager.CreateAsync(new IdentityRole(VaiTro.Role_Stu)).GetAwaiter().GetResult();
+				_roleManager.CreateAsync(new IdentityRole(VaiTro.Role_Admin)).GetAwaiter().GetResult();
+				_roleManager.CreateAsync(new IdentityRole(VaiTro.Role_Teach)).GetAwaiter().GetResult();
 
 			}
 
@@ -121,13 +121,13 @@ namespace WebThiTracNghiem.Areas.Identity.Pages.Account
 				var userRole = roles.FirstOrDefault();
 				switch (userRole)
 				{
-					case SD.Role_Admin:
+					case VaiTro.Role_Admin:
 						return RedirectToAction("Index", "Home", new { area = "Admin" });
 
-					case SD.Role_Teach:
+					case VaiTro.Role_Teach:
 						return RedirectToAction("Index", "Home", new { area = "Teacher" });
 
-					case SD.Role_Stu:
+					case VaiTro.Role_Stu:
 						return RedirectToAction("Index", "Home", new { area = "Student" });
 
 					default:
