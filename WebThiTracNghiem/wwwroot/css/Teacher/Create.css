@@ -162,6 +162,7 @@
 }
 
 /* Modal */
+/* Style cho question modal */
 #question-modal {
     display: none;
     position: fixed;
@@ -169,65 +170,88 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0,0,0,0.4);
-    z-index: 9999;
+    background: rgba(0,0,0,0.35);
+    z-index: 11000;
     align-items: center;
     justify-content: center;
-    animation: fadeIn 0.2s;
 }
 
     #question-modal .modal-content {
         background: #fff;
-        padding: 2.5rem 2rem 2rem 2rem;
-        border-radius: 18px;
-        max-width: 600px;
-        width: 95vw;
+        border-radius: 14px;
         box-shadow: 0 8px 32px rgba(25, 118, 210, 0.18), 0 1.5px 8px rgba(0,0,0,0.08);
+        padding: 2.2rem 2rem 1.5rem 2rem;
+        min-width: 600px;
+        max-width: 95vw;
+        max-height: 90vh;
+        overflow-y: auto;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        position: relative;
-        border: 1.5px solid #e3eafc;
-        animation: slideDown 0.25s;
+        animation: slideDown 0.22s;
     }
 
     #question-modal h3 {
-        margin-bottom: 1.2rem;
-        text-align: center;
-        font-size: 1.35rem;
         color: #1976D2;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        display: flex;
+        margin-bottom: 1.5rem;
+        font-size: 1.2rem;
+        text-align: center;
+    }
+
+    #question-modal .question-item {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    #question-modal .question-content {
+        margin-bottom: 1rem;
+    }
+
+        #question-modal .question-content input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+    #question-modal .answers-grid {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.8rem;
         align-items: center;
-        gap: 0.5rem;
     }
 
-#modal-question-list {
-    width: 100%;
-    resize: vertical;
-    margin-bottom: 1.5rem;
-    border-radius: 8px;
-    border: 1.5px solid #b6c6e3;
-    background: #f8fbff;
-    font-size: 1rem;
-    padding: 1rem;
-    font-family: 'Consolas', 'Menlo', 'monospace';
-    box-shadow: 0 1px 4px rgba(25,118,210,0.04);
-    transition: border-color 0.2s;
-}
-
-    #modal-question-list:focus {
-        border-color: #1976D2;
-        outline: none;
+    #question-modal .answer-row {
+        display: contents;
     }
 
-#question-modal .modal-actions {
-    display: flex;
-    gap: 1.2rem;
-    width: 100%;
-    justify-content: center;
-}
+    #question-modal .answer-checkbox {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    #question-modal .answer-input {
+        padding: 0.6rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        width: 100%;
+    }
+
+    #question-modal .modal-actions {
+        display: flex;
+        gap: 1.2rem;
+        justify-content: center;
+        margin-top: 1.5rem;
+    }
+
+    #question-modal .btn {
+        min-width: 110px;
+    }
 
 #modal-accept-btn {
     background: #1976D2;
@@ -342,4 +366,71 @@
 
     .btn-danger:hover {
         background: #b71c1c;
+    }
+
+#confirm-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.35);
+    z-index: 11000;
+    align-items: center;
+    justify-content: center;
+}
+
+    #confirm-modal .modal-content {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 8px 32px rgba(25, 118, 210, 0.18), 0 1.5px 8px rgba(0,0,0,0.08);
+        padding: 2.2rem 2rem 1.5rem 2rem;
+        min-width: 340px;
+        max-width: 95vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: slideDown 0.22s;
+    }
+
+    #confirm-modal h3 {
+        color: #1976D2;
+        margin-bottom: 1.2rem;
+        font-size: 1.2rem;
+        text-align: center;
+    }
+
+    #confirm-modal .modal-info {
+        width: 100%;
+        margin-bottom: 1.2rem;
+        font-size: 1.05rem;
+    }
+
+    #confirm-modal .modal-info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        gap: 1.5rem;
+    }
+
+    #confirm-modal .modal-info-label {
+        color: #333;
+        font-weight: 500;
+    }
+
+    #confirm-modal .modal-info-value {
+        color: #1976D2;
+        font-weight: 600;
+    }
+
+    #confirm-modal .modal-actions {
+        display: flex;
+        gap: 1.2rem;
+        width: 100%;
+        justify-content: center;
+    }
+
+    #confirm-modal .btn {
+        min-width: 110px;
     }

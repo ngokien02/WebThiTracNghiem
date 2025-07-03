@@ -82,7 +82,7 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
                             foreach (var run in paragraph.MagicText)
                             {
                                 if (run?.formatting?.FontColor.HasValue == true &&
-                                    run.formatting.FontColor.Value.ToArgb() == System.Drawing.ColorTranslator.FromHtml("#EE0000").ToArgb())
+                                    run.formatting.FontColor.Value.ToArgb() == ColorTranslator.FromHtml("#EE0000").ToArgb())
                                 {
                                     isCorrect = true;
                                     break;
@@ -94,7 +94,7 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 
                             currentCauHoi.DapAnList.Add(new DapAn
                             {
-                                NoiDung = content, // chỉ chứa nội dung thuần
+                                NoiDung = content,
                                 DungSai = isCorrect
                             });
 

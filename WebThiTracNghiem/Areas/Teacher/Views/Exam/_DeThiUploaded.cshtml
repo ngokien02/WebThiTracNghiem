@@ -1,19 +1,29 @@
 ﻿@model List<CauHoi>
 
-@foreach (var cauHoi in Model.Select((q, i) => new { Q = q, Index = i + 1 }))
+@for (int i = 0; i < Model.Count; i++)
 {
-    <p><strong>@cauHoi.Index. @cauHoi.Q.NoiDung</strong></p>
-    @foreach (var da in cauHoi.Q.DapAnList.Select((d, idx) => new { D = d, Key = (char)('A' + idx) }))
-    {
-        <p>@da.Key. @da.D.NoiDung</p>
-    }
-    <p>
-        <strong>
-            Đáp án đúng: @(cauHoi.Q.DapAnList.Select((d, idx) => new { d.DungSai, idx })
-        .Where(x => x.DungSai)
-        .Select(x => ((char)('A' + x.idx)).ToString())
-        .FirstOrDefault() ?? "-")
-        </strong>
-    </p>
-    <hr />
+    var cauHoi = Model[i];
+    <div class="question-item" data-question="@i">
+        <div class="question-content">
+            <input type="text" value="@($"{i + 1}. {cauHoi.NoiDung}")" readonly>
+        </div>
+        <div class="answers-grid">
+            @for (int j = 0; j < cauHoi.DapAnList.Count; j++)
+            {
+                var da = cauHoi.DapAnList[j];
+                var answerKey = (char)('A' + j);
+                <div class="answer-row">
+                    <input type="checkbox"
+                           class="answer-checkbox"
+                           data-question="@i"
+                           data-answer="@j"
+                    @(da.DungSai ? "checked" : "") />
+                    <input type="text"
+                           class="answer-input"
+                           value="@($"{answerKey}. {da.NoiDung}")"
+                           readonly />
+                </div>
+            }
+        </div>
+    </div>
 }

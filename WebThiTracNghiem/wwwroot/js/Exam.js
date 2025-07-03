@@ -128,4 +128,91 @@
         $('#question-modal').hide();
         // Xử lý sau khi hủy
     });
+
+    // Xử lý nút Huỷ bỏ trong form tạo đề thi
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('.btnHuyDeThi')) {
+            const form = document.getElementById('exam-form');
+            if (form) {
+                form.reset();
+                // Nếu có phần nhập thủ công, xóa hết câu hỏi động
+                const questionsList = document.getElementById('questions-list');
+                if (questionsList) questionsList.innerHTML = '';
+                // Nếu có upload file, reset input file
+                const examFile = document.getElementById('exam-file');
+                if (examFile) examFile.value = '';
+                // Focus lại vào tiêu đề
+                const tieuDe = document.getElementById('TieuDe');
+                if (tieuDe) tieuDe.focus();
+            }
+            e.preventDefault();
+        }
+    });
+
+    let pendingSubmit = false;
+
+    document.addEventListener('submit', function (e) {
+        const form = e.target;
+
+        if (form && form.matches('#exam-form') && !pendingSubmit) {
+            e.preventDefault();
+
+            // Sinh mã đề ngẫu nhiên (6 ký tự)
+            const examCode = 'MD' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+            // Lấy ngày và giờ từ input
+            const startDate = document.getElementById('start_date')?.value || '';
+            const startTime = document.getElementById('start_time')?.value || '';
+            const endDate = document.getElementById('end_date')?.value || '';
+            const endTime = document.getElementById('end_time')?.value || '';
+            const startDateTime = `${startDate} ${startTime}`;
+            const endDateTime = `${endDate} ${endTime}`;
+
+            // Lấy các giá trị khác từ form
+            const totalQuestions = form.querySelector('[name="total_questions"]')?.value || '';
+            const maxScore = 10;
+            const shuffleQuestions = form.querySelector('[name="RandomCauHoi"]')?.checked;
+            const shuffleAnswers = form.querySelector('[name="RandomDapAn"]')?.checked;
+            const showResults = form.querySelector('[name="ShowKQ"]')?.checked;
+
+            // Hiển thị thông tin lên modal
+            const modalExamInfo = document.getElementById('modal-exam-info');
+            if (modalExamInfo) {
+                modalExamInfo.innerHTML = `
+                <div class='modal-info-row'><span class='modal-info-label'>Mã đề:</span><span class='modal-info-value'>${examCode}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Giờ bắt đầu:</span><span class='modal-info-value'>${startDateTime}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Giờ kết thúc:</span><span class='modal-info-value'>${endDateTime}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Tổng số câu hỏi:</span><span class='modal-info-value'>${totalQuestions}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Điểm tối đa:</span><span class='modal-info-value'>${maxScore}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Random câu hỏi:</span><span class='modal-info-value'>${shuffleQuestions ? '✅' : '❌'}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Random đáp án:</span><span class='modal-info-value'>${shuffleAnswers ? '✅' : '❌'}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Hiển thị kết quả:</span><span class='modal-info-value'>${showResults ? '✅' : '❌'}</span></div>
+            `;
+            }
+
+            const confirmModal = document.getElementById('confirm-modal');
+            if (confirmModal) confirmModal.style.display = 'flex';
+        }
+    });
+
+    // DOM delegated cho các nút trong modal
+    document.addEventListener('click', function (e) {
+        const target = e.target;
+
+        if (target.closest('#modal-confirm-btn')) {
+            const confirmModal = document.getElementById('confirm-modal');
+            if (confirmModal) confirmModal.style.display = 'none';
+
+            pendingSubmit = true;
+            const form = document.getElementById('exam-form');
+            if (form) form.requestSubmit();
+            pendingSubmit = false;
+        }
+
+        if (target.closest('#modal-cancel-btn')) {
+            const confirmModal = document.getElementById('confirm-modal');
+            if (confirmModal) confirmModal.style.display = 'none';
+        }
+    });
+
 })
