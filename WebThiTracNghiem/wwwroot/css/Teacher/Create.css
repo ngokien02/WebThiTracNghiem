@@ -434,3 +434,8 @@
     #confirm-modal .btn {
         min-width: 110px;
     }
+
+.errMessage {
+    color:red;
+    font-size:medium;
+}

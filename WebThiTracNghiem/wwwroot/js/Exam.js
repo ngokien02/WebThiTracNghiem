@@ -108,6 +108,10 @@
                 processData: false,
                 contentType: false,
                 success: function (data) {
+                    if (data.trim() === "") {
+                        alert("Định dạng file lỗi hoặc không hỗ trợ, vui lòng thử lại!");
+                        return;
+                    }
                     modalQuestionList.html(data);
                     questionModal.css('display', 'flex');
                 },
@@ -151,48 +155,26 @@
 
     let pendingSubmit = false;
 
-    document.addEventListener('submit', function (e) {
-        const form = e.target;
-
-        if (form && form.matches('#exam-form') && !pendingSubmit) {
-            e.preventDefault();
-
-            // Sinh mã đề ngẫu nhiên (6 ký tự)
-            const examCode = 'MD' + Math.random().toString(36).substring(2, 8).toUpperCase();
-
-            // Lấy ngày và giờ từ input
-            const startDate = document.getElementById('start_date')?.value || '';
-            const startTime = document.getElementById('start_time')?.value || '';
-            const endDate = document.getElementById('end_date')?.value || '';
-            const endTime = document.getElementById('end_time')?.value || '';
-            const startDateTime = `${startDate} ${startTime}`;
-            const endDateTime = `${endDate} ${endTime}`;
-
-            // Lấy các giá trị khác từ form
-            const totalQuestions = form.querySelector('[name="total_questions"]')?.value || '';
-            const maxScore = 10;
-            const shuffleQuestions = form.querySelector('[name="RandomCauHoi"]')?.checked;
-            const shuffleAnswers = form.querySelector('[name="RandomDapAn"]')?.checked;
-            const showResults = form.querySelector('[name="ShowKQ"]')?.checked;
-
-            // Hiển thị thông tin lên modal
-            const modalExamInfo = document.getElementById('modal-exam-info');
-            if (modalExamInfo) {
-                modalExamInfo.innerHTML = `
-                <div class='modal-info-row'><span class='modal-info-label'>Mã đề:</span><span class='modal-info-value'>${examCode}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Giờ bắt đầu:</span><span class='modal-info-value'>${startDateTime}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Giờ kết thúc:</span><span class='modal-info-value'>${endDateTime}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Tổng số câu hỏi:</span><span class='modal-info-value'>${totalQuestions}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Điểm tối đa:</span><span class='modal-info-value'>${maxScore}</span></div>
+    $(document).on('submit', '#exam-form', function (e) {
+        e.preventDefault();
+        // Hiển thị thông tin lên modal
+        const modalExamInfo = document.getElementById('modal-exam-info');
+        var shuffleQuestions = true;
+        if (modalExamInfo) {
+            modalExamInfo.innerHTML = `
+                <div class='modal-info-row'><span class='modal-info-label'>Mã đề:</span><span class='modal-info-value'></span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Giờ bắt đầu:</span><span class='modal-info-value'></span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Giờ kết thúc:</span><span class='modal-info-value'></span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Tổng số câu hỏi:</span><span class='modal-info-value'></span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Điểm tối đa:</span><span class='modal-info-value'></span></div>
                 <div class='modal-info-row'><span class='modal-info-label'>Random câu hỏi:</span><span class='modal-info-value'>${shuffleQuestions ? '✅' : '❌'}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Random đáp án:</span><span class='modal-info-value'>${shuffleAnswers ? '✅' : '❌'}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Hiển thị kết quả:</span><span class='modal-info-value'>${showResults ? '✅' : '❌'}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Random đáp án:</span><span class='modal-info-value'>${shuffleQuestions ? '✅' : '❌'}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Hiển thị kết quả:</span><span class='modal-info-value'>${shuffleQuestions ? '✅' : '❌'}</span></div>
             `;
-            }
-
-            const confirmModal = document.getElementById('confirm-modal');
-            if (confirmModal) confirmModal.style.display = 'flex';
         }
+
+        const confirmModal = document.getElementById('confirm-modal');
+        if (confirmModal) confirmModal.style.display = 'flex';
     });
 
     // DOM delegated cho các nút trong modal
@@ -215,4 +197,89 @@
         }
     });
 
+    //xử lý tạo đề thi hoàn chỉnh
+    $(document).on('click', '#modal-confirm-btn', function (e) {
+
+        e.preventDefault();
+
+        const fd = new FormData();
+
+        const giangVienId = $('#IdGiangVien').val();
+        fd.append('IdGiangVien', giangVienId);
+
+        $('[name]').each(function () {
+            const name = $(this).attr('name');
+            const type = $(this).attr('type');
+
+            if (name === 'exam-create-method' && type === 'radio') {
+                return; 
+            }
+
+            if (type === 'file') {
+                const files = $(this)[0].files;
+                if (files.length > 0) {
+                    fd.append(name, files[0]);
+                }
+            } else {
+                fd.append(name, $(this).val());
+            }
+        });
+
+        const gioBD = `${$('#start-date').val()}T${$('#start-time').val()}`;
+        const gioKT = `${$('#end-date').val()}T${$('#end-time').val()}`;
+
+        fd.append('GioBD', gioBD);
+        fd.append('GioKT', gioKT);
+
+        const cauHoiObj = [];
+
+        $('.question-item').each(function () {
+            const noiDungCH = $(this).find('#contentQuestion').val()?.split('. ').slice(1).join('. ').trim() || '';
+            const isMultipleChoice = $(this).find('#questionType').prop('checked');
+
+            const cauHoi = {
+                NoiDung: noiDungCH,
+                Loai: isMultipleChoice ? "NhieuDapAn" : "TracNghiem",
+                DapAnList: []
+            };
+
+            $(this).find('.answer-row').each(function () {
+                const answerText = $(this).find('.answer-input').val()?.split('. ').slice(1).join('. ').trim() || '';
+                const isCorrect = $(this).find('.answer-checkbox').prop('checked');
+
+                cauHoi.DapAnList.push({
+                    NoiDung: answerText,
+                    DungSai: isCorrect
+                });
+            });
+
+            cauHoiObj.push(cauHoi);
+        });
+
+        const soCauHoi = $('.question-item').length;
+        fd.append("SoCauHoi", soCauHoi);
+
+        fd.append("cauHoiObj", JSON.stringify(cauHoiObj));
+
+        // Gửi về server
+        $.ajax({
+            url: '/teacher/exam/CreateExam',
+            type: 'POST',
+            data: fd,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                if (data) {
+                    alert("Thành công");
+                }
+                else {
+                    alert("Thất bại");
+                }
+            },
+            error: function (xhr) {
+                console.error("Lỗi:", xhr.responseText);
+                alert("Gửi thất bại: " + xhr.responseText);
+            }
+        });
+    });
 })

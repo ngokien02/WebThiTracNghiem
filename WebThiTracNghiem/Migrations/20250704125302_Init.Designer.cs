@@ -12,8 +12,8 @@ using WebThiTracNghiem.Models;
 namespace WebThiTracNghiem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250702143848_AddMaxGrade")]
-    partial class AddMaxGrade
+    [Migration("20250704125302_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -234,9 +234,8 @@ namespace WebThiTracNghiem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("DeThiId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("DeThiId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Loai")
                         .IsRequired()
@@ -280,8 +279,11 @@ namespace WebThiTracNghiem.Migrations
 
             modelBuilder.Entity("WebThiTracNghiem.Models.DeThi", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<double>("DiemToiDa")
                         .HasColumnType("float");
@@ -295,6 +297,19 @@ namespace WebThiTracNghiem.Migrations
                     b.Property<string>("IdGiangVien")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("MaDe")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("RandomCauHoi")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("RandomDapAn")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ShowKQ")
+                        .HasColumnType("bit");
 
                     b.Property<int>("SoCauHoi")
                         .HasColumnType("int");

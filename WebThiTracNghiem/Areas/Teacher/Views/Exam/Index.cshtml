@@ -1,18 +1,21 @@
-﻿<div class="page-header">
+﻿@using System.Security.Claims
+<div class="page-header">
 	<h1>Tạo đề thi mới</h1>
 </div>
 
 <div class="form-section form-section--main" style="background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(25,118,210,0.08);padding:2.5rem 2rem;max-width:900px;margin:2rem auto;">
 	<form class="exam-form" id="exam-form">
+		<input type="hidden" id="IdGiangVien" value="@User.FindFirstValue(ClaimTypes.NameIdentifier)" />
 		<h2>Thông tin cơ bản</h2>
 		<div class="form-group">
 			<label for="TieuDe">Tên đề thi:</label>
 			<input type="text" id="TieuDe" name="TieuDe" placeholder="Nhập tên đề thi...">
+			<span id="errTenDeThi" class="errMessage"></span>
 		</div>
 		<div class="form-group">
-			<label for="Id">Mã đề thi:</label>
-			<input type="text" id="Id" name="Id" placeholder="Nhập mã đề thi...">
-			<span id="errDeThiId" class="text-danger small"></span>
+			<label for="MaDe">Mã đề thi:</label>
+			<input type="text" id="MaDe" name="MaDe" placeholder="Nhập mã đề thi...">
+			<span id="errMaDeThi" class="errMessage"></span>
 		</div>
 
 		<h2>Phương thức tạo đề thi</h2>
@@ -23,8 +26,9 @@
 		</div>
 		<div id="upload-section">
 			<div class="form-group">
-				<label for="exam-file">Chọn file đề thi (.doc, .docx, .pdf):</label>
-				<input type="file" id="exam-file" accept=".doc,.docx,.pdf">
+				<label for="exam-file">Chọn file đề thi (.doc, .docx):</label>
+				<input type="file" id="exam-file" accept=".doc,.docx">
+				<span id="errFile" class="errMessage"></span>
 			</div>
 		</div>
 		<div id="manual-section" style="display:none;">
@@ -37,20 +41,24 @@
 			<div class="form-group">
 				<label for="start-date">Ngày bắt đầu:</label>
 				<input type="date" id="start-date">
+				<span id="errStartDate" class="errMessage"></span>
 			</div>
 			<div class="form-group">
 				<label for="start-time">Giờ bắt đầu:</label>
 				<input type="time" id="start-time">
+				<span id="errStartTime" class="errMessage"></span>
 			</div>
 		</div>
 		<div class="form-row">
 			<div class="form-group">
 				<label for="end-date">Ngày kết thúc:</label>
 				<input type="date" id="end-date">
+				<span id="errEndDate" class="errMessage"></span>
 			</div>
 			<div class="form-group">
 				<label for="end-time">Giờ kết thúc:</label>
 				<input type="time" id="end-time">
+				<span id="errEndTime" class="errMessage"></span>
 			</div>
 		</div>
 
@@ -59,6 +67,7 @@
 			<div class="form-group">
 				<label for="DiemToiDa">Số điểm tối đa:</label>
 				<input type="number" id="DiemToiDa" name="DiemToiDa" min="1">
+				<span id="errMaxScore" class="errMessage"></span>
 			</div>
 			<div class="checkbox-group">
 				<label>
@@ -77,8 +86,8 @@
 		</div>
 
 		<div class="form-actions">
-			<button type="submit" class="btn primary">Tạo kỳ thi</button>
-			<button type="reset" class="btn btn-danger btnHuyDeThi">Huỷ bỏ</button>
+			<button type="submit" class="btn primary btnTaoDeThi">Tạo kỳ thi</button>
+			<button class="btn btn-danger btnHuyDeThi">Huỷ bỏ</button>
 		</div>
 	</form>
 </div>

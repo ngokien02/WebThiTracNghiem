@@ -231,9 +231,8 @@ namespace WebThiTracNghiem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("DeThiId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("DeThiId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Loai")
                         .IsRequired()
@@ -277,8 +276,11 @@ namespace WebThiTracNghiem.Migrations
 
             modelBuilder.Entity("WebThiTracNghiem.Models.DeThi", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<double>("DiemToiDa")
                         .HasColumnType("float");
@@ -292,6 +294,10 @@ namespace WebThiTracNghiem.Migrations
                     b.Property<string>("IdGiangVien")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("MaDe")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("RandomCauHoi")
                         .HasColumnType("bit");

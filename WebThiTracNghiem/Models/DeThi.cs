@@ -5,8 +5,11 @@ namespace WebThiTracNghiem.Models
 {
     public class DeThi
     {
-        public string Id { get; set; }
+		[Key]
+		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+		public int Id { get; set; }
         public string TieuDe {  get; set; }
+        public string MaDe { get; set; }
         public DateTime GioBD { get; set; }
         public DateTime GioKT { get; set; }
         public int SoCauHoi { get; set; }

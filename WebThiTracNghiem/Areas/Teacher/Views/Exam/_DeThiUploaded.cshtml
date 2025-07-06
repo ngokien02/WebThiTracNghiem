@@ -2,28 +2,34 @@
 
 @for (int i = 0; i < Model.Count; i++)
 {
-    var cauHoi = Model[i];
-    <div class="question-item" data-question="@i">
-        <div class="question-content">
-            <input type="text" value="@($"{i + 1}. {cauHoi.NoiDung}")" readonly>
-        </div>
-        <div class="answers-grid">
-            @for (int j = 0; j < cauHoi.DapAnList.Count; j++)
-            {
-                var da = cauHoi.DapAnList[j];
-                var answerKey = (char)('A' + j);
-                <div class="answer-row">
-                    <input type="checkbox"
-                           class="answer-checkbox"
-                           data-question="@i"
-                           data-answer="@j"
-                    @(da.DungSai ? "checked" : "") />
-                    <input type="text"
-                           class="answer-input"
-                           value="@($"{answerKey}. {da.NoiDung}")"
-                           readonly />
-                </div>
-            }
-        </div>
-    </div>
+	var cauHoi = Model[i];
+	<div class="question-item" data-question="@i">
+		<div class="question-content">
+			<input id="contentQuestion" type="text" value="@($"{i + 1}. {cauHoi.NoiDung}")" readonly>
+		</div>
+		<div class="answers-grid">
+			@for (int j = 0; j < cauHoi.DapAnList.Count; j++)
+			{
+				var da = cauHoi.DapAnList[j];
+				var answerKey = (char)('A' + j);
+				<div class="answer-row">
+					<input type="checkbox"
+						   class="answer-checkbox"
+						   data-question="@i"
+						   data-answer="@j"
+					@(da.DungSai ? "checked" : "") />
+					<input type="text"
+						   class="answer-input"
+						   value="@($"{answerKey}. {da.NoiDung}")"
+						   readonly />
+				</div>
+			}
+		</div>
+		<div>
+			<label>
+				<input id="questionType" class="answer-checkbox" type="checkbox" style="margin-top:20px;" />
+				Cho phép chọn nhiều đáp án
+			</label>
+		</div>
+	</div>
 }
