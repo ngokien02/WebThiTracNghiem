@@ -5,7 +5,9 @@
         var url = $(this).attr("href");
         $.get(url, function (data) {
             $(".main-content").html(data);
-        })
+        });
+        $('a').removeClass('active');
+        $(this).addClass('active');
     })
 
     // Chuyển đổi giữa upload file và tạo thủ công
@@ -134,29 +136,156 @@
     });
 
     // Xử lý nút Huỷ bỏ trong form tạo đề thi
+
+    function resetExamForm() {
+        const form = document.getElementById('exam-form');
+        if (form) {
+            form.reset();
+
+            // Xóa hết câu hỏi động nếu có
+            const questionsList = document.getElementById('questions-list');
+            if (questionsList) questionsList.innerHTML = '';
+
+            // Reset input file nếu có
+            const examFile = document.getElementById('exam-file');
+            if (examFile) examFile.value = '';
+
+            // Focus lại vào tiêu đề
+            const tieuDe = document.getElementById('TieuDe');
+            if (tieuDe) tieuDe.focus();
+        }
+    }
+
+
     document.addEventListener('click', function (e) {
         if (e.target.closest('.btnHuyDeThi')) {
-            const form = document.getElementById('exam-form');
-            if (form) {
-                form.reset();
-                // Nếu có phần nhập thủ công, xóa hết câu hỏi động
-                const questionsList = document.getElementById('questions-list');
-                if (questionsList) questionsList.innerHTML = '';
-                // Nếu có upload file, reset input file
-                const examFile = document.getElementById('exam-file');
-                if (examFile) examFile.value = '';
-                // Focus lại vào tiêu đề
-                const tieuDe = document.getElementById('TieuDe');
-                if (tieuDe) tieuDe.focus();
-            }
+            resetExamForm();
             e.preventDefault();
         }
     });
 
-    let pendingSubmit = false;
+    // Xử lý hiện/ẩn modal confirm
+    function hideModalById(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
 
+    function showModalById(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+
+    // Xử lý submit
+    let pendingSubmit = false;
     $(document).on('submit', '#exam-form', function (e) {
         e.preventDefault();
+
+        //Kiểm tra dữ liệu ở đây
+        $('.errMessage, .text-danger').text('');
+        let hasError = false;
+        let firstErrorElement = null;
+
+        // 1. Kiểm tra Tên đề thi
+        const tieuDe = $('#TieuDe').val().trim();
+        if (!tieuDe) {
+            $('#errTenDeThi').text('Vui lòng nhập tên đề thi.');
+            hasError = true;
+            firstErrorElement = firstErrorElement || $('#TieuDe');
+        }
+
+        // 2. Kiểm tra Mã đề thi
+        const maDe = $('#MaDe').val().trim();
+        if (!maDe) {
+            $('#errMaDeThi').text('Vui lòng nhập mã đề thi.');
+            hasError = true;
+            firstErrorElement = firstErrorElement || $('#MaDe');
+        }
+
+        // 3. Kiểm tra phương thức tạo đề thi
+        const method = $('input[name="exam-create-method"]:checked').val();
+        if (method === 'upload') {
+            const file = $('#exam-file')[0].files[0];
+            if (!file) {
+                $('#errFile').text('Vui lòng chọn file đề thi.');
+                hasError = true;
+                firstErrorElement = firstErrorElement || $('#exam-file');
+            } else if (!file.name.endsWith('.doc') && !file.name.endsWith('.docx')) {
+                $('#errFile').text('Chỉ chấp nhận file .doc hoặc .docx.');
+                hasError = true;
+                firstErrorElement = firstErrorElement || $('#exam-file');
+            }
+        } else {
+            const soCauHoi = $('.question-item').length;
+            if (soCauHoi === 0) {
+                $('#errDeThiFile').text('Vui lòng thêm ít nhất một câu hỏi.');
+                hasError = true;
+            }
+        }
+
+        // 4. Kiểm tra ngày giờ bắt đầu/kết thúc
+        const startDate = $('#start-date').val();
+        const startTime = $('#start-time').val();
+        const endDate = $('#end-date').val();
+        const endTime = $('#end-time').val();
+
+        if (!startDate) {
+            $('#errStartDate').text('Vui lòng chọn ngày bắt đầu.');
+            hasError = true;
+            firstErrorElement = firstErrorElement || $('#start-date');
+        }
+        if (!startTime) {
+            $('#errStartTime').text('Vui lòng chọn giờ bắt đầu.');
+            hasError = true;
+            firstErrorElement = firstErrorElement || $('#start-time');
+        }
+        if (!endDate) {
+            $('#errEndDate').text('Vui lòng chọn ngày kết thúc.');
+            hasError = true;
+            firstErrorElement = firstErrorElement || $('#end-date');
+        }
+        if (!endTime) {
+            $('#errEndTime').text('Vui lòng chọn giờ kết thúc.');
+            hasError = true;
+            firstErrorElement = firstErrorElement || $('#end-time');
+        }
+
+        if (!hasError) {
+            const gioBD = new Date(`${startDate}T${startTime}`);
+            const gioKT = new Date(`${endDate}T${endTime}`);
+            const now = new Date();
+
+            if (isNaN(gioBD) || isNaN(gioKT)) {
+                $('#errEndTime').text('Ngày giờ không hợp lệ.');
+                hasError = true;
+            }
+            else {
+                if (gioBD < now) {
+                    $('#errStartDate').text('Ngày bắt đầu phải từ hôm nay trở đi.');
+                    hasError = true;
+                }
+                if (gioBD >= gioKT) {
+                    $('#errEndTime').text('Thời gian kết thúc phải sau thời gian bắt đầu.');
+                    hasError = true;
+                }
+            }
+        }
+        // 5. Kiểm tra Số điểm tối đa
+        const diemToiDa = $('#DiemToiDa').val();
+        if (!diemToiDa || parseInt(diemToiDa) < 1) {
+            $('#errMaxScore').text('Vui lòng nhập số điểm tối đa hợp lệ (ít nhất 1).');
+            hasError = true;
+            firstErrorElement = firstErrorElement || $('#DiemToiDa');
+        }
+
+        if (hasError) {
+            if (firstErrorElement) firstErrorElement.focus();
+            return;
+        }
+
         // Hiển thị thông tin lên modal
         const modalExamInfo = document.getElementById('modal-exam-info');
         var shuffleQuestions = true;
@@ -173,8 +302,7 @@
             `;
         }
 
-        const confirmModal = document.getElementById('confirm-modal');
-        if (confirmModal) confirmModal.style.display = 'flex';
+        showModalById('confirm-modal');
     });
 
     // DOM delegated cho các nút trong modal
@@ -182,8 +310,8 @@
         const target = e.target;
 
         if (target.closest('#modal-confirm-btn')) {
-            const confirmModal = document.getElementById('confirm-modal');
-            if (confirmModal) confirmModal.style.display = 'none';
+
+            hideModalById('confirm-modal');
 
             pendingSubmit = true;
             const form = document.getElementById('exam-form');
@@ -192,8 +320,7 @@
         }
 
         if (target.closest('#modal-cancel-btn')) {
-            const confirmModal = document.getElementById('confirm-modal');
-            if (confirmModal) confirmModal.style.display = 'none';
+            hideModalById('confirm-modal');
         }
     });
 
@@ -270,7 +397,9 @@
             processData: false,
             success: function (data) {
                 if (data) {
-                    alert("Thành công");
+                    alert("Tạo đề thi thành công");
+                    hideModalById('confirm-modal');
+                    resetExamForm();
                 }
                 else {
                     alert("Thất bại");

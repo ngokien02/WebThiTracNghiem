@@ -12,6 +12,7 @@ namespace WebThiTracNghiem.Models
         public string MaDe { get; set; }
         public DateTime GioBD { get; set; }
         public DateTime GioKT { get; set; }
+        public int ThoiGian { get; set; }
         public int SoCauHoi { get; set; }
         public double DiemToiDa { get; set; }
         public Boolean RandomCauHoi { get; set; }

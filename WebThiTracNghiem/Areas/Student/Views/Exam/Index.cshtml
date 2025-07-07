@@ -1,0 +1,70 @@
+﻿@model List<DeThi>
+
+<div class="page-header">
+	<h1>Danh sách Bài thi</h1>
+</div>
+
+<!-- Exam Filters -->
+<div class="exam-filters">
+	<select class="filter-select">
+		<option value="">Tất cả môn học</option>
+		<option value="auto">Kỹ thuật Sửa chữa Ô tô</option>
+		<option value="safety">An toàn Giao thông</option>
+		<option value="logistics">Quản lý Kho vận</option>
+	</select>
+	<select class="filter-select">
+		<option value="">Tất cả học kỳ</option>
+		<option value="20242">HK2 (2024-2025)</option>
+		<option value="20241">HK1 (2024-2025)</option>
+	</select>
+	<div class="search-box">
+		<input type="text" placeholder="Tìm kiếm bài thi...">
+		<button><i class="fas fa-search"></i></button>
+	</div>
+</div>
+
+<!-- Exam List -->
+<div class="exam-grid">
+	<!-- Exam Card 1 -->
+	@foreach (var deThi in Model)
+	{
+		<div class="exam-management-card">
+			<div class="exam-header">
+				<h3>@deThi.TieuDe</h3>
+				<span class="exam-code">@deThi.MaDe</span>
+				<span class="exam-status @(deThi.GioBD > DateTime.Now ? "upcoming" : "active")">@(deThi.GioBD > DateTime.Now ? "Sắp diễn ra" : "Đang diễn ra")</span>
+			</div>
+			<div class="exam-details">
+				<p><i class="fas fa-calendar"></i> Bắt đầu: @deThi.GioBD</p>
+				<p><i class="fas fa-calendar-check"></i> Kết thúc: @deThi.GioKT</p>
+				<p><i class="fas fa-clock"></i> Thời gian: @deThi.ThoiGian phút</p>
+				<p><i class="fas fa-star"></i> Điểm tối đa: @deThi.DiemToiDa</p>
+				<p class="full-width"><i class="fas fa-chalkboard-teacher"></i> GV: @deThi.GiangVien.HoTen</p>
+			</div>
+			<div class="exam-actions">
+				<button class="action-btn view"><i class="fas fa-play-circle"></i> Bắt đầu làm bài</button>
+			</div>
+		</div>
+	}
+
+	@* <!-- Exam Card 2 -->
+	<div class="exam-management-card">
+	<div class="exam-header">
+	<h3>An toàn Giao thông</h3>
+	<span class="exam-code">MD2024A2</span>
+	<span class="exam-status upcoming">Sắp diễn ra</span>
+	</div>
+	<div class="exam-details">
+	<p><i class="fas fa-calendar"></i> Bắt đầu: 20/05/2025 (13:30)</p>
+	<p><i class="fas fa-calendar-check"></i> Kết thúc: 20/05/2025 (14:30)</p>
+	<p><i class="fas fa-clock"></i> Thời gian: 60 phút</p>
+	<p><i class="fas fa-star"></i> Điểm tối đa: 10</p>
+	<p class="full-width"><i class="fas fa-chalkboard-teacher"></i> GV: TS. Lê Thị Hướng</p>
+	<p class="full-width"><i class="fas fa-book"></i> Hình thức: Cuối kỳ</p>
+	</div>
+	<div class="exam-actions">
+	<button class="action-btn view" disabled><i class="fas fa-clock"></i> Chưa đến giờ thi</button>
+	</div>
+	</div> *@
+
+</div>
