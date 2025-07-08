@@ -7,7 +7,7 @@
             $(".main-content").html(data);
         });
         $('a').removeClass('active');
-        $(this).addClass('active');
+        $('a.CreateExam').addClass('active');
     })
 
     // Chuyển đổi giữa upload file và tạo thủ công
@@ -207,6 +207,7 @@
 
         // 3. Kiểm tra phương thức tạo đề thi
         const method = $('input[name="exam-create-method"]:checked').val();
+        const soCauHoi = $('.question-item').length;
         if (method === 'upload') {
             const file = $('#exam-file')[0].files[0];
             if (!file) {
@@ -219,7 +220,6 @@
                 firstErrorElement = firstErrorElement || $('#exam-file');
             }
         } else {
-            const soCauHoi = $('.question-item').length;
             if (soCauHoi === 0) {
                 $('#errDeThiFile').text('Vui lòng thêm ít nhất một câu hỏi.');
                 hasError = true;
@@ -231,6 +231,22 @@
         const startTime = $('#start-time').val();
         const endDate = $('#end-date').val();
         const endTime = $('#end-time').val();
+        const gioBD = new Date(`${startDate}T${startTime}`);
+        const gioKT = new Date(`${endDate}T${endTime}`);
+        const now = new Date();
+
+        function formatDateTime(date) {
+            if (!(date instanceof Date) || isNaN(date)) return "";
+
+            const dd = String(date.getDate()).padStart(2, '0');
+            const mm = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+            const yyyy = date.getFullYear();
+
+            const hh = String(date.getHours()).padStart(2, '0');
+            const min = String(date.getMinutes()).padStart(2, '0');
+
+            return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+        }
 
         if (!startDate) {
             $('#errStartDate').text('Vui lòng chọn ngày bắt đầu.');
@@ -254,17 +270,13 @@
         }
 
         if (!hasError) {
-            const gioBD = new Date(`${startDate}T${startTime}`);
-            const gioKT = new Date(`${endDate}T${endTime}`);
-            const now = new Date();
-
             if (isNaN(gioBD) || isNaN(gioKT)) {
                 $('#errEndTime').text('Ngày giờ không hợp lệ.');
                 hasError = true;
             }
             else {
                 if (gioBD < now) {
-                    $('#errStartDate').text('Ngày bắt đầu phải từ hôm nay trở đi.');
+                    $('#errStartDate').text('Thời gian bắt đầu phải lớn hơn thời gian hiện tại.');
                     hasError = true;
                 }
                 if (gioBD >= gioKT) {
@@ -288,17 +300,21 @@
 
         // Hiển thị thông tin lên modal
         const modalExamInfo = document.getElementById('modal-exam-info');
-        var shuffleQuestions = true;
+        const shuffleQuestions = document.getElementById('RandomCauHoi').checked;;
+        const shuffleAnswer = document.getElementById('RandomDapAn').checked;;
+        const showResult = document.getElementById('ShowKQ').checked;;
+
         if (modalExamInfo) {
             modalExamInfo.innerHTML = `
-                <div class='modal-info-row'><span class='modal-info-label'>Mã đề:</span><span class='modal-info-value'></span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Giờ bắt đầu:</span><span class='modal-info-value'></span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Giờ kết thúc:</span><span class='modal-info-value'></span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Tổng số câu hỏi:</span><span class='modal-info-value'></span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Điểm tối đa:</span><span class='modal-info-value'></span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Tên đề thi:</span><span class='modal-info-value'>${tieuDe}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Mã đề:</span><span class='modal-info-value'>${maDe}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Giờ bắt đầu:</span><span class='modal-info-value'>${formatDateTime(gioBD)}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Giờ kết thúc:</span><span class='modal-info-value'>${formatDateTime(gioKT)}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Tổng số câu hỏi:</span><span class='modal-info-value'>${soCauHoi}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Điểm tối đa:</span><span class='modal-info-value'>${diemToiDa}</span></div>
                 <div class='modal-info-row'><span class='modal-info-label'>Random câu hỏi:</span><span class='modal-info-value'>${shuffleQuestions ? '✅' : '❌'}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Random đáp án:</span><span class='modal-info-value'>${shuffleQuestions ? '✅' : '❌'}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Hiển thị kết quả:</span><span class='modal-info-value'>${shuffleQuestions ? '✅' : '❌'}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Random đáp án:</span><span class='modal-info-value'>${shuffleAnswer ? '✅' : '❌'}</span></div>
+                <div class='modal-info-row'><span class='modal-info-label'>Hiển thị kết quả:</span><span class='modal-info-value'>${showResult ? '✅' : '❌'}</span></div>
             `;
         }
 

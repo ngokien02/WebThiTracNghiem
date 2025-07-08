@@ -21,5 +21,9 @@ namespace WebThiTracNghiem.Areas.Student.Controllers
 				.ToList();
 			return PartialView("Index", dsDeThi);
 		}
+		public IActionResult StartExam()
+		{
+			return PartialView("_DoExam");
+		}
 	}
 }
