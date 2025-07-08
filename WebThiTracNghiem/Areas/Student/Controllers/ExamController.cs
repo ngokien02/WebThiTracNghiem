@@ -21,9 +21,19 @@ namespace WebThiTracNghiem.Areas.Student.Controllers
 				.ToList();
 			return PartialView("Index", dsDeThi);
 		}
-		public IActionResult StartExam()
+		public IActionResult StartExam(int id)
 		{
-			return PartialView("_DoExam");
+			var deThi = _db.DeThi
+				.Include(d => d.CauHoiList)
+				.ThenInclude(ch => ch.DapAnList)
+				.FirstOrDefault(d => d.Id == id && d.GioKT >= DateTime.Now);
+
+			if (deThi == null)
+			{
+				return NotFound("Không tìm thấy đề thi.");
+			}
+
+			return PartialView("_DoExam", deThi);
 		}
 	}
 }

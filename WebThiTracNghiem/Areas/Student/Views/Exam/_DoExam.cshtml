@@ -1,68 +1,62 @@
-﻿<!-- Header với thông tin tiến độ và thời gian -->
+﻿@model DeThi
+
+<!-- Header với thông tin tiến độ và thời gian -->
 <div class="exam-page-header">
-    <div class="exam-page-progress">0 / 15 câu</div>
-    <div class="exam-page-timer">45 phút 30 giây</div>
+	<div class="exam-page-progress">0 / 15 câu</div>
+	<div class="exam-page-timer">45 phút 30 giây</div>
 </div>
 
 <div class="exam-page-container">
-    <!-- Nội dung bài thi bên trái -->
-    <div class="exam-page-content">
-        <div class="exam-page-question">
-            <div class="exam-page-question-text">
-                <strong>Câu 1</strong>
-                <p>Trong quá trình vận hành và bảo dưỡng động cơ ô tô, khi phát hiện hiện tượng động cơ nổ không đều, có thể do nguyên nhân nào sau đây?</p>
-            </div>
-            <div class="exam-page-answers">
-                <label class="exam-page-answer-option">
-                    <input type="radio" name="q1" class="exam-page-answer-radio">
-                    <span class="exam-page-answer-text">A. Bugi bị bẩn hoặc khe hở điện cực không đúng.</span>
-                </label>
-                <label class="exam-page-answer-option">
-                    <input type="radio" name="q1" class="exam-page-answer-radio">
-                    <span class="exam-page-answer-text">B. Bộ lọc nhiên liệu bị tắc nghẽn.</span>
-                </label>
-                <label class="exam-page-answer-option">
-                    <input type="radio" name="q1" class="exam-page-answer-radio">
-                    <span class="exam-page-answer-text">C. Hệ thống phun nhiên liệu hoạt động không ổn định.</span>
-                </label>
-                <label class="exam-page-answer-option">
-                    <input type="radio" name="q1" class="exam-page-answer-radio">
-                    <span class="exam-page-answer-text">D. Tất cả các nguyên nhân trên.</span>
-                </label>
-            </div>
-        </div>
+	<!-- Nội dung bài thi bên trái -->
+	@{
+		var cauHoi1 = Model.CauHoiList.ToList()[0];
+	}
+	<div class="exam-page-content">
+		<div class="exam-page-question">
+			<div class="exam-page-question-text">
+				<strong>Câu 1:</strong>
+				<p>@cauHoi1.NoiDung</p>
+			</div>
+			<div class="exam-page-answers">
+				@{
+					string[] ABCD = { "A", "B", "C", "D" };
+					int i = 0;
+					foreach (var dapAn in cauHoi1.DapAnList)
+					{
+						<label class="exam-page-answer-option">
+							<input type="radio" name="q1" class="exam-page-answer-radio">
+							<span class="exam-page-answer-text">@ABCD[i]. @dapAn.NoiDung</span>
+						</label>
+						i++;
+					}
+				}
+			</div>
+		</div>
 
-        <div class="exam-page-navigation">
-            <button class="exam-page-nav-btn prev" disabled>
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="exam-page-nav-btn next">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>
+		<div class="exam-page-navigation">
+			<button class="exam-page-nav-btn prev" disabled>
+				<i class="fas fa-chevron-left"></i>
+			</button>
+			<button class="exam-page-nav-btn next">
+				<i class="fas fa-chevron-right"></i>
+			</button>
+		</div>
+	</div>
 
-    <!-- Sidebar bên phải -->
-    <div class="exam-page-sidebar">
-        <button class="exam-page-submit-btn">NỘP BÀI</button>
-        <div class="exam-page-question-grid">
-            <div class="exam-page-question-numbers">
-                <div class="exam-page-question-number current">1</div>
-                <div class="exam-page-question-number">2</div>
-                <div class="exam-page-question-number">3</div>
-                <div class="exam-page-question-number">4</div>
-                <div class="exam-page-question-number">5</div>
-                <div class="exam-page-question-number">6</div>
-                <div class="exam-page-question-number">7</div>
-                <div class="exam-page-question-number">8</div>
-                <div class="exam-page-question-number">9</div>
-                <div class="exam-page-question-number">10</div>
-                <div class="exam-page-question-number">11</div>
-                <div class="exam-page-question-number">12</div>
-                <div class="exam-page-question-number">13</div>
-                <div class="exam-page-question-number">14</div>
-                <div class="exam-page-question-number">15</div>
-            </div>
-        </div>
-    </div>
+	<!-- Sidebar bên phải -->
+	<div class="exam-page-sidebar">
+		<button class="exam-page-submit-btn">NỘP BÀI</button>
+		<div class="exam-page-question-grid">
+			<div class="exam-page-question-numbers">
+				@{
+					int sttCauHoi = 1;
+					foreach (var cauHoi in Model.CauHoiList)
+					{
+						<div class="exam-page-question-number current">@sttCauHoi</div>
+						sttCauHoi++;
+					}
+				}
+			</div>
+		</div>
+	</div>
 </div>

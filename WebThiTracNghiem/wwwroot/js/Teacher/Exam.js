@@ -355,7 +355,7 @@
             const type = $(this).attr('type');
 
             if (name === 'exam-create-method' && type === 'radio') {
-                return; 
+                return;
             }
 
             if (type === 'file') {
@@ -418,7 +418,7 @@
                     resetExamForm();
                 }
                 else {
-                    alert("Thất bại");
+                    alert("Tạo đề thi thất bại, thầy/cô vui lòng xem lại định dạng file đề thi.");
                 }
             },
             error: function (xhr) {
@@ -427,4 +427,4 @@
             }
         });
     });
-})
+});
