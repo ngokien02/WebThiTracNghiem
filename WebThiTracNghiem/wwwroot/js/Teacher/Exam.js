@@ -179,6 +179,21 @@
         }
     }
 
+    // Hàm chuyển chuỗi ngày và giờ thành đối tượng Date
+    function parseDateTime(dateStr, timeStr) {
+        const parts = dateStr.trim().split("/");
+        if (parts.length !== 3) return null;
+
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1; // Tháng tính từ 0
+        const year = parseInt(parts[2], 10);
+
+        const [hour, minute] = timeStr.trim().split(":").map(Number);
+        if (isNaN(day) || isNaN(month) || isNaN(year) || isNaN(hour) || isNaN(minute)) return null;
+
+        return new Date(year, month, day, hour, minute);
+    }
+
     // Xử lý submit
     let pendingSubmit = false;
     $(document).on('submit', '#exam-form', function (e) {
@@ -204,11 +219,14 @@
             hasError = true;
             firstErrorElement = firstErrorElement || $('#MaDe');
         }
-
         // 3. Kiểm tra phương thức tạo đề thi
         const method = $('input[name="exam-create-method"]:checked').val();
         const soCauHoi = $('.question-item').length;
-        if (method === 'upload') {
+
+        if (!method) {
+            $('#errFile').text('Vui lòng chọn phương thức tạo đề thi.');
+            hasError = true;
+        } else if (method === 'upload') {
             const file = $('#exam-file')[0].files[0];
             if (!file) {
                 $('#errFile').text('Vui lòng chọn file đề thi.');
@@ -219,72 +237,170 @@
                 hasError = true;
                 firstErrorElement = firstErrorElement || $('#exam-file');
             }
-        } else {
+        }
+        else if (method === 'manual') {
+            $('#errDeThiFile').text(''); // Xóa lỗi cũ
             if (soCauHoi === 0) {
                 $('#errDeThiFile').text('Vui lòng thêm ít nhất một câu hỏi.');
                 hasError = true;
+            } else {
+                let hasEmptyField = false;
+
+                $('.question-item').each(function (index) {
+                    const questionText = $(this).find('.question-content').val()?.trim();
+                    const answers = $(this).find('.answer');
+                    const correctAnswer = $(this).find('select[name^="correct"]').val();
+
+                    // Kiểm tra nội dung câu hỏi
+                    if (!questionText) {
+                        $('#errDeThiFile').text(`Câu hỏi số ${index + 1} chưa có nội dung.`);
+                        $(this).find('.question-content').focus();
+                        hasEmptyField = true;
+                        return false;
+                    }
+
+                    // Kiểm tra các đáp án
+                    let missingAnswer = false;
+                    answers.each(function () {
+                        if (!$(this).val()?.trim()) {
+                            missingAnswer = true;
+                            $(this).focus();
+                            return false;
+                        }
+                    });
+
+                    if (missingAnswer) {
+                        $('#errDeThiFile').text(`Câu hỏi số ${index + 1} thiếu nội dung đáp án.`);
+                        hasEmptyField = true;
+                        return false;
+                    }
+
+                    // Kiểm tra đáp án đúng đã chọn chưa
+                    if (!correctAnswer) {
+                        $('#errDeThiFile').text(`Câu hỏi số ${index + 1} chưa chọn đáp án đúng.`);
+                        $(this).find('select[name^="correct"]').focus();
+                        hasEmptyField = true;
+                        return false;
+                    }
+                });
+
+                if (hasEmptyField) {
+                    hasError = true;
+                }
             }
         }
 
+
         // 4. Kiểm tra ngày giờ bắt đầu/kết thúc
+        // Hàm kiểm tra ngày hợp lệ định dạng dd/mm/yyyy
+        function isDate(inputId, errorId) {
+            const input = document.getElementById(inputId);
+            const error = document.getElementById(errorId);
+            const value = input.value.trim();
+
+            if (value === "") {
+                error.innerText = "Ngày không được để trống.";
+                return false;
+            }
+
+            const parts = value.split("/");
+            if (parts.length !== 3) {
+                error.innerText = " Vui lòng nhập đúng định dạng dd/mm/yyyy.";
+                return false;
+            }
+
+            const day = Number(parts[0]);
+            const month = Number(parts[1]);
+            const year = Number(parts[2]);
+
+            if (isNaN(day) || isNaN(month) || isNaN(year)) {
+                error.innerText = " Ngày, tháng, năm phải là số.";
+                return false;
+            }
+
+            const testDate = new Date(`${month}/${day}/${year}`);
+            if (isNaN(testDate.getTime())) {
+                error.innerText = " Ngày tháng năm không hợp lệ.";
+                return false;
+            }
+
+            if (
+                testDate.getDate() !== day ||
+                testDate.getMonth() + 1 !== month ||
+                testDate.getFullYear() !== year
+            ) {
+                error.innerText = " Ngày không tồn tại.";
+                return false;
+            }
+
+            const currentYear = new Date().getFullYear();
+            if (year > currentYear + 10) {
+                error.innerText = ` Năm không được lớn hơn ${currentYear + 10}.`;
+                return false;
+            }
+
+            error.innerText = "";
+            return true;
+        }
+
+        // Lấy giá trị từ input
         const startDate = $('#start-date').val();
         const startTime = $('#start-time').val();
         const endDate = $('#end-date').val();
         const endTime = $('#end-time').val();
-        const gioBD = new Date(`${startDate}T${startTime}`);
-        const gioKT = new Date(`${endDate}T${endTime}`);
         const now = new Date();
 
-        function formatDateTime(date) {
-            if (!(date instanceof Date) || isNaN(date)) return "";
-
-            const dd = String(date.getDate()).padStart(2, '0');
-            const mm = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
-            const yyyy = date.getFullYear();
-
-            const hh = String(date.getHours()).padStart(2, '0');
-            const min = String(date.getMinutes()).padStart(2, '0');
-
-            return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
-        }
-
-        if (!startDate) {
-            $('#errStartDate').text('Vui lòng chọn ngày bắt đầu.');
+        // Kiểm tra ngày bắt đầu
+        if (!isDate('start-date', 'errStartDate')) {
             hasError = true;
             firstErrorElement = firstErrorElement || $('#start-date');
         }
-        if (!startTime) {
-            $('#errStartTime').text('Vui lòng chọn giờ bắt đầu.');
-            hasError = true;
-            firstErrorElement = firstErrorElement || $('#start-time');
-        }
-        if (!endDate) {
-            $('#errEndDate').text('Vui lòng chọn ngày kết thúc.');
+
+        // Kiểm tra ngày kết thúc
+        if (!isDate('end-date', 'errEndDate')) {
             hasError = true;
             firstErrorElement = firstErrorElement || $('#end-date');
         }
-        if (!endTime) {
-            $('#errEndTime').text('Vui lòng chọn giờ kết thúc.');
+
+        // Kiểm tra giờ bắt đầu
+        if (!startTime) {
+            $('#errStartTime').text(' Vui lòng nhập giờ bắt đầu.');
             hasError = true;
-            firstErrorElement = firstErrorElement || $('#end-time');
+            firstErrorElement = firstErrorElement || $('#start-time');
+        } else {
+            $('#errStartTime').text('');
         }
 
+        // Kiểm tra giờ kết thúc
+        if (!endTime) {
+            $('#errEndTime').text(' Vui lòng nhập giờ kết thúc.');
+            hasError = true;
+            firstErrorElement = firstErrorElement || $('#end-time');
+        } else {
+            $('#errEndTime').text('');
+        }
+
+        // Nếu không có lỗi ban đầu, tiến hành so sánh ngày giờ
         if (!hasError) {
-            if (isNaN(gioBD) || isNaN(gioKT)) {
-                $('#errEndTime').text('Ngày giờ không hợp lệ.');
+            const gioBD = parseDateTime(startDate, startTime);
+            const gioKT = parseDateTime(endDate, endTime);
+
+            if (!gioBD || !gioKT || isNaN(gioBD.getTime()) || isNaN(gioKT.getTime())) {
+                $('#errEndTime').text(' Ngày giờ không hợp lệ.');
                 hasError = true;
-            }
-            else {
+            } else {
                 if (gioBD < now) {
-                    $('#errStartDate').text('Thời gian bắt đầu phải lớn hơn thời gian hiện tại.');
+                    $('#errStartDate').text(' Thời gian bắt đầu phải lớn hơn hiện tại.');
                     hasError = true;
                 }
-                if (gioBD >= gioKT) {
-                    $('#errEndTime').text('Thời gian kết thúc phải sau thời gian bắt đầu.');
+                if (gioKT <= gioBD) {
+                    $('#errEndTime').text(' Thời gian kết thúc phải sau thời gian bắt đầu.');
                     hasError = true;
                 }
             }
         }
+
+
         // 5. Kiểm tra Số điểm tối đa
         const diemToiDa = $('#DiemToiDa').val();
         if (!diemToiDa || parseInt(diemToiDa) < 1) {
@@ -292,31 +408,54 @@
             hasError = true;
             firstErrorElement = firstErrorElement || $('#DiemToiDa');
         }
+        // Kiểm tra khi người dùng gõ vào ô ThoiGian
+        // Khi gõ:
+        $('#ThoiGian').on('input', function () {
+            const value = parseInt($(this).val(), 10);
+            if (isNaN(value) || value < 1) {
+                $(this).val('');
+                $('#errTime').text('Thời gian làm bài phải lớn hơn 0 phút.');
+            } else {
+                $('#errTime').text('');
+            }
+        });
 
+        // Khi submit:
+        const thoiGianLamBai = parseInt($('#ThoiGian').val(), 10);
+        if (isNaN(thoiGianLamBai) || thoiGianLamBai <= 0) {
+            $('#errTime').text('Vui lòng nhập thời gian làm bài hợp lệ (lớn hơn 0 phút).');
+            hasError = true;
+            firstErrorElement = firstErrorElement || $('#ThoiGian');
+        } else {
+            $('#errTime').text('');
+        }
+
+
+        // Cuộn đến lỗi đầu tiên nếu có
         if (hasError) {
-            if (firstErrorElement) firstErrorElement.focus();
+            if (firstErrorElement && firstErrorElement.length) {
+                $('html, body').animate({
+                    scrollTop: firstErrorElement.offset().top - 100
+                }, 500, function () {
+                    firstErrorElement.focus();
+                });
+            }
             return;
         }
 
-        // Hiển thị thông tin lên modal
-        const modalExamInfo = document.getElementById('modal-exam-info');
-        const shuffleQuestions = document.getElementById('RandomCauHoi').checked;;
-        const shuffleAnswer = document.getElementById('RandomDapAn').checked;;
-        const showResult = document.getElementById('ShowKQ').checked;;
+        // ✅ Không có lỗi, hiển thị modal
+        $('#modal-exam-info').html(`
+        <div class='modal-info-row'><span class='modal-info-label'>Mã đề:</span><span>${tieuDe}</span></div>
+        <div class='modal-info-row'><span class='modal-info-label'>Mã đề:</span><span>${maDe}</span></div>
+        <div class='modal-info-row'><span class='modal-info-label'>Giờ bắt đầu:</span><span>${startDate} ${startTime}</span></div>
+        <div class='modal-info-row'><span class='modal-info-label'>Giờ kết thúc:</span><span>${endDate} ${endTime}</span></div>
+        <div class='modal-info-row'><span class='modal-info-label'>Thời gian làm bài:</span><span>${thoiGianLamBai} phút</span></div>
+        <div class='modal-info-row'><span class='modal-info-label'>Điểm tối đa:</span><span>${diemToiDa}</span></div>
+        <div class='modal-info-row'><span class='modal-info-label'>Random câu hỏi:</span><span>${$('#RandomCauHoi').is(':checked') ? '✅' : '❌'}</span></div>
+        <div class='modal-info-row'><span class='modal-info-label'>Random đáp án:</span><span>${$('#RandomDapAn').is(':checked') ? '✅' : '❌'}</span></div>
+        <div class='modal-info-row'><span class='modal-info-label'>Hiển thị kết quả:</span><span>${$('#ShowKQ').is(':checked') ? '✅' : '❌'}</span></div>
 
-        if (modalExamInfo) {
-            modalExamInfo.innerHTML = `
-                <div class='modal-info-row'><span class='modal-info-label'>Tên đề thi:</span><span class='modal-info-value'>${tieuDe}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Mã đề:</span><span class='modal-info-value'>${maDe}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Giờ bắt đầu:</span><span class='modal-info-value'>${formatDateTime(gioBD)}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Giờ kết thúc:</span><span class='modal-info-value'>${formatDateTime(gioKT)}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Tổng số câu hỏi:</span><span class='modal-info-value'>${soCauHoi}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Điểm tối đa:</span><span class='modal-info-value'>${diemToiDa}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Random câu hỏi:</span><span class='modal-info-value'>${shuffleQuestions ? '✅' : '❌'}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Random đáp án:</span><span class='modal-info-value'>${shuffleAnswer ? '✅' : '❌'}</span></div>
-                <div class='modal-info-row'><span class='modal-info-label'>Hiển thị kết quả:</span><span class='modal-info-value'>${showResult ? '✅' : '❌'}</span></div>
-            `;
-        }
+    `);
 
         showModalById('confirm-modal');
     });
@@ -368,11 +507,16 @@
             }
         });
 
-        const gioBD = `${$('#start-date').val()}T${$('#start-time').val()}`;
-        const gioKT = `${$('#end-date').val()}T${$('#end-time').val()}`;
+        const startDate = $('#start-date').val();
+        const startTime = $('#start-time').val();
+        const endDate = $('#end-date').val();
+        const endTime = $('#end-time').val();
 
-        fd.append('GioBD', gioBD);
-        fd.append('GioKT', gioKT);
+        const gioBD = parseDateTime(startDate, startTime);
+        const gioKT = parseDateTime(endDate, endTime);
+
+        fd.append('GioBD', gioBD.toISOString());
+        fd.append('GioKT', gioKT.toISOString());
 
         const cauHoiObj = [];
 
