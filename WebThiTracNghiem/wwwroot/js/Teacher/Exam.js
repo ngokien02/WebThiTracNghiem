@@ -10,6 +10,16 @@
         $('a.CreateExam').addClass('active');
     })
 
+    // Hiển thị thông báo swal
+    function showAlert(title, message, icon = "info") {
+        Swal.fire({
+            title: title,
+            text: message,
+            icon: icon,
+            confirmButtonColor: "#0963a3"
+        });
+    }
+
     // Chuyển đổi giữa upload file và tạo thủ công
     $(document).on('change', 'input[name="exam-create-method"]', function () {
         if ($(this).val() === 'upload') {
@@ -557,12 +567,12 @@
             processData: false,
             success: function (data) {
                 if (data) {
-                    alert("Tạo đề thi thành công");
+                    showAlert('Thành công!', 'Tạo đề thi thành công', 'success');
                     hideModalById('confirm-modal');
                     resetExamForm();
                 }
                 else {
-                    alert("Tạo đề thi thất bại, thầy/cô vui lòng xem lại định dạng file đề thi.");
+                    showAlert("Thất bại", "Tạo đề thi thất bại, thầy/cô vui lòng xem lại định dạng file đề thi.", "error");
                 }
             },
             error: function (xhr) {
