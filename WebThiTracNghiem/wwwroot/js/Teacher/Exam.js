@@ -36,41 +36,42 @@
 
     function createQuestionItem(idx) {
         const div = $(`
-        <div class="manual-question" style="border:1px solid #eee;padding:1rem;margin-bottom:1rem;border-radius:6px;">
-            <div class="form-group">
-                <label>Câu hỏi ${idx + 1}:</label>
-                <input type="text" name="question-${idx}" required placeholder="Nhập nội dung câu hỏi...">
-            </div>
-            <div class="form-row" style="display:flex; gap:1rem;">
-                <div class="form-group" style="flex:1;">
-                    <label>Đáp án A:</label>
-                    <input type="text" name="answerA-${idx}" required>
-                </div>
-                <div class="form-group" style="flex:1;">
-                    <label>Đáp án B:</label>
-                    <input type="text" name="answerB-${idx}" required>
-                </div>
-                <div class="form-group" style="flex:1;">
-                    <label>Đáp án C:</label>
-                    <input type="text" name="answerC-${idx}" required>
-                </div>
-                <div class="form-group" style="flex:1;">
-                    <label>Đáp án D:</label>
-                    <input type="text" name="answerD-${idx}" required>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Đáp án đúng:</label>
-                <select name="correct-${idx}" required>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                </select>
-            </div>
-            <button type="button" class="btn secondary remove-question-btn">Xóa câu hỏi</button>
-        </div>
-    `);
+      <div class="manual-question question-item" style="border:1px solid #eee;padding:1rem;margin-bottom:1rem;border-radius:6px;">
+          <div class="form-group">
+              <label>Câu hỏi ${idx + 1}:</label>
+              <input type="text" name="question-${idx}" class="question-content" placeholder="Nhập nội dung câu hỏi...">
+          </div>
+          <div class="form-row" style="display:flex; gap:1rem;">
+              <div class="form-group" style="flex:1;">
+                  <label>Đáp án A:</label>
+                  <input type="text" name="answerA-${idx}" class="answer">
+              </div>
+              <div class="form-group" style="flex:1;">
+                  <label>Đáp án B:</label>
+                  <input type="text" name="answerB-${idx}" class="answer">
+              </div>
+              <div class="form-group" style="flex:1;">
+                  <label>Đáp án C:</label>
+                  <input type="text" name="answerC-${idx}" class="answer">
+              </div>
+              <div class="form-group" style="flex:1;">
+                  <label>Đáp án D:</label>
+                  <input type="text" name="answerD-${idx}" class="answer">
+              </div>
+          </div>
+          <div class="form-group">
+              <label>Đáp án đúng:</label>
+              <select name="correct-${idx}">
+                  <option value="">-- Chọn đáp án đúng --</option>
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+              </select>
+          </div>
+          <button type="button" class="btn secondary remove-question-btn">Xóa câu hỏi</button>
+      </div>
+  `);
         return div;
     }
 
