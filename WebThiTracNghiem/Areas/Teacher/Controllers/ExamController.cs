@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using Xceed.Document.NET;
 using Newtonsoft.Json;
 using System.Security.Claims;
+using System.Globalization;
 
 namespace WebThiTracNghiem.Areas.Teacher.Controllers
 {
@@ -139,7 +140,7 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 					SoCauHoi = int.Parse(form["SoCauHoi"]),
 					ThoiGian = int.TryParse(form["ThoiGian"], out var thoiGian) ? thoiGian : 0,
 					IdGiangVien = idGiangVien,
-					DiemToiDa = int.TryParse(form["DiemToiDa"], out var diem) ? diem : 10,
+					DiemToiDa = double.TryParse(form["DiemToiDa"], NumberStyles.Any, CultureInfo.InvariantCulture, out var diem) ? diem : 10.0,
 					RandomCauHoi = bool.TryParse(form["RandomCauHoi"], out var rc) && rc,
 					RandomDapAn = bool.TryParse(form["RandomDapAn"], out var rd) && rd,
 					ShowKQ = bool.TryParse(form["ShowKQ"], out var skq) && skq,
