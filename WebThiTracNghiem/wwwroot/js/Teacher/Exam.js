@@ -558,7 +558,6 @@
         fd.append('GioBD', gioBD.toISOString());
         fd.append('GioKT', gioKT.toISOString());
         fd.append('DiemToiDa', $('#DiemToiDa').val());
-        fd.append('ThoiGianLamBai', $('#ThoiGian').val());
         // Append lên FormData
         fd.append('RandomCauHoi', $('#RandomCauHoi').is(':checked') ? 'true' : 'false');
         fd.append('RandomDapAn', $('#RandomDapAn').is(':checked') ? 'true' : 'false');
@@ -604,7 +603,6 @@
                 confirmButtonColor: "#0963a3"
             });
         }
-
         // Gửi về server
         $.ajax({
             url: '/teacher/exam/CreateExam',

@@ -137,7 +137,7 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 					GioBD = DateTime.Parse(form["GioBD"]),
 					GioKT = DateTime.Parse(form["GioKT"]),
 					SoCauHoi = int.Parse(form["SoCauHoi"]),
-					ThoiGian = int.TryParse(form["ThoiGianLamBai"], out var thoiGian) ? thoiGian : 0,
+					ThoiGian = int.TryParse(form["ThoiGian"], out var thoiGian) ? thoiGian : 0,
 					IdGiangVien = idGiangVien,
 					DiemToiDa = int.TryParse(form["DiemToiDa"], out var diem) ? diem : 10,
 					RandomCauHoi = bool.TryParse(form["RandomCauHoi"], out var rc) && rc,
