@@ -616,12 +616,12 @@
                 confirmButtonColor: "#0963a3"
             });
         }
-            //// In ra FormData trước khi gửi
-            //let msg = '';
-            //for (var pair of fd.entries()) {
-            //    msg += pair[0] + ': ' + pair[1] + '\n';
-            ////}
-            //alert("Dữ liệu gửi đi:\n\n" + msg);
+        //// In ra FormData trước khi gửi
+        //let msg = '';
+        //for (var pair of fd.entries()) {
+        //    msg += pair[0] + ': ' + pair[1] + '\n';
+        //}
+        alert("Dữ liệu gửi đi:\n\n" + msg);
         // Gửi về server
         $.ajax({
             url: '/teacher/exam/CreateExam',
