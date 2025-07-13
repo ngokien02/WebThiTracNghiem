@@ -59,16 +59,28 @@
                   <input type="text" name="answerD-${idx}" class="answer">
               </div>
           </div>
-          <div class="form-group">
-              <label>Đáp án đúng:</label>
-              <select name="correct-${idx}">
-                  <option value="">-- Chọn đáp án đúng --</option>
-                  <option value="A">A</option>
-                  <option value="B">B</option>
-                  <option value="C">C</option>
-                  <option value="D">D</option>
-              </select>
-          </div>
+        <div class="form-group">
+    <label>Đáp án đúng:</label>
+    <div class="correct-answers">
+        <label>
+            <input type="checkbox" name="correct-${idx}" value="A">
+            A
+        </label>
+        <label>
+            <input type="checkbox" name="correct-${idx}" value="B">
+            B
+        </label>
+        <label>
+            <input type="checkbox" name="correct-${idx}" value="C">
+            C
+        </label>
+        <label>
+            <input type="checkbox" name="correct-${idx}" value="D">
+            D
+        </label>
+    </div>
+    </div>
+
           <button type="button" class="btn secondary remove-question-btn">Xóa câu hỏi</button>
       </div>
   `);
@@ -165,6 +177,66 @@
             const tieuDe = document.getElementById('TieuDe');
             if (tieuDe) tieuDe.focus();
         }
+    }
+    function isDate(inputId, errorId) {
+        const input = document.getElementById(inputId);
+        const error = document.getElementById(errorId);
+        const value = input.value.trim();
+
+        if (value === "") {
+            error.innerText = "Ngày không được để trống.";
+            return false;
+        }
+
+        const parts = value.split("/");
+        if (parts.length !== 3) {
+            error.innerText = " Vui lòng nhập đúng định dạng dd/mm/yyyy.";
+            return false;
+        }
+
+        let [dayStr, monthStr, yearStr] = parts;
+
+        const day = parseInt(dayStr, 10);
+        const month = parseInt(monthStr, 10);
+        const year = parseInt(yearStr, 10);
+
+        if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900) {
+            error.innerText = " Ngày, tháng, năm không hợp lệ.";
+            return false;
+        }
+        // Kiểm tra xem ngày, tháng, năm có phải là số không
+
+        if (isNaN(day) || isNaN(month) || isNaN(year)) {
+            error.innerText = " Ngày, tháng, năm phải là số.";
+            return false;
+        }
+
+        const testDate = new Date(`${month}/${day}/${year}`);
+        if (isNaN(testDate.getTime())) {
+            error.innerText = " Ngày tháng năm không hợp lệ.";
+            return false;
+        }
+
+        if (
+            testDate.getDate() !== day ||
+            testDate.getMonth() + 1 !== month ||
+            testDate.getFullYear() !== year
+        ) {
+            error.innerText = " Ngày không tồn tại.";
+            return false;
+        }
+
+        const currentYear = new Date().getFullYear();
+        if (year > currentYear + 10) {
+            error.innerText = ` Năm không được lớn hơn ${currentYear + 10}.`;
+            return false;
+        }
+        // ✅ Format lại input thành dd/mm/yyyy có đủ 2 chữ số
+        const formatted = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+        input.value = formatted;
+
+        error.innerText = "";
+        return true;
     }
 
 
@@ -304,62 +376,6 @@
 
         // 4. Kiểm tra ngày giờ bắt đầu/kết thúc
         // Hàm kiểm tra ngày hợp lệ định dạng dd/mm/yyyy
-        function isDate(inputId, errorId) {
-            const input = document.getElementById(inputId);
-            const error = document.getElementById(errorId);
-            const value = input.value.trim();
-
-            if (value === "") {
-                error.innerText = "Ngày không được để trống.";
-                return false;
-            }
-
-            const parts = value.split("/");
-            if (parts.length !== 3) {
-                error.innerText = " Vui lòng nhập đúng định dạng dd/mm/yyyy.";
-                return false;
-            }
-
-            const day = Number(parts[0]);
-            const month = Number(parts[1]);
-            const year = Number(parts[2]);
-
-            if (isNaN(day) || isNaN(month) || isNaN(year)) {
-                error.innerText = " Ngày, tháng, năm phải là số.";
-                return false;
-            }
-
-            const testDate = new Date(`${month}/${day}/${year}`);
-            if (isNaN(testDate.getTime())) {
-                error.innerText = " Ngày tháng năm không hợp lệ.";
-                return false;
-            }
-
-            if (
-                testDate.getDate() !== day ||
-                testDate.getMonth() + 1 !== month ||
-                testDate.getFullYear() !== year
-            ) {
-                error.innerText = " Ngày không tồn tại.";
-                return false;
-            }
-
-            const currentYear = new Date().getFullYear();
-            if (year > currentYear + 10) {
-                error.innerText = ` Năm không được lớn hơn ${currentYear + 10}.`;
-                return false;
-            }
-
-            error.innerText = "";
-            return true;
-        }
-
-        // Lấy giá trị từ input
-        const startDate = $('#start-date').val();
-        const startTime = $('#start-time').val();
-        const endDate = $('#end-date').val();
-        const endTime = $('#end-time').val();
-        const now = new Date();
 
         // Kiểm tra ngày bắt đầu
         if (!isDate('start-date', 'errStartDate')) {
@@ -372,7 +388,12 @@
             hasError = true;
             firstErrorElement = firstErrorElement || $('#end-date');
         }
-
+        // Lấy giá trị từ input
+        const startDate = $('#start-date').val();
+        const startTime = $('#start-time').val();
+        const endDate = $('#end-date').val();
+        const endTime = $('#end-time').val();
+        const now = new Date();
         // Kiểm tra giờ bắt đầu
         if (!startTime) {
             $('#errStartTime').text(' Vui lòng nhập giờ bắt đầu.');
@@ -392,9 +413,10 @@
         }
 
         // Nếu không có lỗi ban đầu, tiến hành so sánh ngày giờ
+        const gioBD = parseDateTime(startDate, startTime);
+        const gioKT = parseDateTime(endDate, endTime);
         if (!hasError) {
-            const gioBD = parseDateTime(startDate, startTime);
-            const gioKT = parseDateTime(endDate, endTime);
+
 
             if (!gioBD || !gioKT || isNaN(gioBD.getTime()) || isNaN(gioKT.getTime())) {
                 $('#errEndTime').text(' Ngày giờ không hợp lệ.');
@@ -421,27 +443,41 @@
         }
         // Kiểm tra khi người dùng gõ vào ô ThoiGian
         // Khi gõ:
-        $('#ThoiGian').on('input', function () {
-            const value = parseInt($(this).val(), 10);
-            if (isNaN(value) || value < 1) {
-                $(this).val('');
-                $('#errTime').text('Thời gian làm bài phải lớn hơn 0 phút.');
-            } else {
-                $('#errTime').text('');
+        const thoiGianLamBai = $('#ThoiGian').val().trim();
+        function validateExamTime(gioBD, gioKT, showError = true) {
+
+            if (thoiGianLamBai === '') {
+                if (showError) $('#errTime').text('');
+                return true; // Không kiểm tra nếu trống
             }
+
+            const intValue = parseInt(thoiGianLamBai, 10);
+            if (isNaN(intValue) || intValue < 1) {
+                if (showError) {
+                    $('#ThoiGian').val('');
+                    $('#errTime').text('Thời gian làm bài phải lớn hơn 0 phút.');
+                }
+                return false;
+            } else if (gioKT && gioBD && intValue > ((gioKT.getTime() - gioBD.getTime()) / (1000 * 60))) {
+                if (showError) {
+                    $('#errTime').text('Thời gian làm bài không được lớn hơn thời gian kết thúc - bắt đầu.');
+                }
+                return false;
+            } else {
+                if (showError) $('#errTime').text('');
+                return true;
+            }
+        }
+        // Gọi khi nhập vào input:
+        $('#ThoiGian').on('input', function () {
+            validateExamTime(gioBD, gioKT); // Kiểm tra hợp lệ nếu có
         });
 
-        // Khi submit:
-        const thoiGianLamBai = parseInt($('#ThoiGian').val(), 10);
-        if (isNaN(thoiGianLamBai) || thoiGianLamBai <= 0) {
-            $('#errTime').text('Vui lòng nhập thời gian làm bài hợp lệ (lớn hơn 0 phút).');
+        // Gọi khi submit:
+        if (!validateExamTime(gioBD, gioKT, true)) {
             hasError = true;
             firstErrorElement = firstErrorElement || $('#ThoiGian');
-        } else {
-            $('#errTime').text('');
         }
-
-
         // Cuộn đến lỗi đầu tiên nếu có
         if (hasError) {
             if (firstErrorElement && firstErrorElement.length) {
@@ -456,7 +492,7 @@
 
         // ✅ Không có lỗi, hiển thị modal
         $('#modal-exam-info').html(`
-        <div class='modal-info-row'><span class='modal-info-label'>Mã đề:</span><span>${tieuDe}</span></div>
+        <div class= 'modal-info-row'><span class='modal-info-label'>Tiêu đề:</span><span>${tieuDe}</span></div >
         <div class='modal-info-row'><span class='modal-info-label'>Mã đề:</span><span>${maDe}</span></div>
         <div class='modal-info-row'><span class='modal-info-label'>Giờ bắt đầu:</span><span>${startDate} ${startTime}</span></div>
         <div class='modal-info-row'><span class='modal-info-label'>Giờ kết thúc:</span><span>${endDate} ${endTime}</span></div>
@@ -505,29 +541,40 @@
             const type = $(this).attr('type');
 
             if (name === 'exam-create-method' && type === 'radio') {
+                return; 
+            }
+            if (name === 'DiemToiDa') {
                 return;
             }
-
             if (type === 'file') {
                 const files = $(this)[0].files;
                 if (files.length > 0) {
                     fd.append(name, files[0]);
                 }
+            } else if (type === 'checkbox') {
+                return; 
             } else {
                 fd.append(name, $(this).val());
             }
         });
-
         const startDate = $('#start-date').val();
         const startTime = $('#start-time').val();
         const endDate = $('#end-date').val();
         const endTime = $('#end-time').val();
-
+        const randomCauHoi = $('#RandomCauHoi').prop('checked');
+        const randomDapAn = $('#RandomDapAn').prop('checked');
+        const showKQ = $('#ShowKQ').prop('checked');
         const gioBD = parseDateTime(startDate, startTime);
         const gioKT = parseDateTime(endDate, endTime);
+        const diemToiDa = parseFloat($('#DiemToiDa').val());
 
         fd.append('GioBD', gioBD.toISOString());
         fd.append('GioKT', gioKT.toISOString());
+        fd.append('DiemToiDa', isNaN(diemToiDa) ? '0' : diemToiDa.toString());
+        fd.append('RandomCauHoi', $('#RandomCauHoi').is(':checked') ? 'true' : 'false');
+        fd.append('RandomDapAn', $('#RandomDapAn').is(':checked') ? 'true' : 'false');
+        fd.append('ShowKQ', $('#ShowKQ').is(':checked') ? 'true' : 'false');
+
 
         const cauHoiObj = [];
 
@@ -559,6 +606,16 @@
 
         fd.append("cauHoiObj", JSON.stringify(cauHoiObj));
 
+        // Hiển thị thông báo swal
+        function showAlert(title, message, icon = "info") {
+            Swal.fire({
+                title: title,
+                text: message,
+                icon: icon,
+                confirmButtonColor: "#0963a3"
+            });
+        }
+
         // Gửi về server
         $.ajax({
             url: '/teacher/exam/CreateExam',
@@ -568,8 +625,8 @@
             processData: false,
             success: function (data) {
                 if (data) {
-                    showAlert('Thành công!', 'Tạo đề thi thành công', 'success');
                     hideModalById('confirm-modal');
+                    showAlert('Thành công!', 'Tạo đề thi thành công', 'success');
                     resetExamForm();
                 }
                 else {

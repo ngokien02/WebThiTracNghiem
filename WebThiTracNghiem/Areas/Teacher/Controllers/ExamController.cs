@@ -137,15 +137,16 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 					GioBD = DateTime.Parse(form["GioBD"]),
 					GioKT = DateTime.Parse(form["GioKT"]),
 					SoCauHoi = int.Parse(form["SoCauHoi"]),
+					ThoiGian = int.TryParse(form["ThoiGian"], out var thoiGian) ? thoiGian : 0,
 					IdGiangVien = idGiangVien,
 					DiemToiDa = int.TryParse(form["DiemToiDa"], out var diem) ? diem : 10,
-					RandomCauHoi = form["RandomCauHoi"] == "true",
-					RandomDapAn = form["RandomDapAn"] == "true",
-					ShowKQ = form["ShowKQ"] == "true"
+					RandomCauHoi = bool.TryParse(form["RandomCauHoi"], out var rc) && rc,
+					RandomDapAn = bool.TryParse(form["RandomDapAn"], out var rd) && rd,
+					ShowKQ = bool.TryParse(form["ShowKQ"], out var skq) && skq,
 				};
 
 				_db.DeThi.Add(deThi);
-				_db.SaveChanges(); 
+				_db.SaveChanges();
 
 				// Lấy danh sách câu hỏi từ form
 				var cauHoiListRaw = form["cauHoiObj"];
@@ -154,8 +155,8 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 				foreach (var cauHoi in cauHoiList)
 				{
 					cauHoi.DeThiId = deThi.Id;
-					var dapAnList = cauHoi.DapAnList; 
-					cauHoi.DapAnList = null; 
+					var dapAnList = cauHoi.DapAnList;
+					cauHoi.DapAnList = null;
 
 					_db.CauHoi.Add(cauHoi);
 					_db.SaveChanges();

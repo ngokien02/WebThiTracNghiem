@@ -2,6 +2,9 @@
 
 <!-- Header với thông tin tiến độ và thời gian -->
 <div class="exam-page-header">
+	@{
+		var min = Model.ThoiGian;
+	}
 	<div class="exam-page-progress">0 / 15 câu</div>
 	<div class="exam-page-timer">45 phút 30 giây</div>
 </div>
@@ -11,21 +14,22 @@
 	@{
 		var cauHoi1 = Model.CauHoiList.ToList()[0];
 	}
+	<input type="hidden" id="IdCauHoi" value="@cauHoi1.Id" />
 	<div class="exam-page-content">
 		<div class="exam-page-question">
 			<div class="exam-page-question-text">
-				<strong>Câu 1:</strong>
-				<p>@cauHoi1.NoiDung</p>
+				<strong>Câu 1 (@ViewData["diem"] điểm) :</strong>
+				<p id="question-content">@cauHoi1.NoiDung @(cauHoi1.Loai == "NhieuDapAn" ? "(Có thể chọn nhiều đáp án)" : "")</p>
 			</div>
-			<div class="exam-page-answers">
+			<div class="exam-page-answers" id="exam-page-answers">
 				@{
 					string[] ABCD = { "A", "B", "C", "D" };
 					int i = 0;
 					foreach (var dapAn in cauHoi1.DapAnList)
 					{
 						<label class="exam-page-answer-option">
-							<input type="radio" name="q1" class="exam-page-answer-radio">
-							<span class="exam-page-answer-text">@ABCD[i]. @dapAn.NoiDung</span>
+							<input type="@(cauHoi1.Loai == "NhieuDapAn" ? "checkbox" : "radio")" name="dapan" class="exam-page-answer-radio">
+							<span class="exam-page-answer-text" data-id-dapan="@dapAn.Id">@ABCD[i]. @dapAn.NoiDung</span>
 						</label>
 						i++;
 					}
@@ -52,7 +56,7 @@
 					int sttCauHoi = 1;
 					foreach (var cauHoi in Model.CauHoiList)
 					{
-						<div class="exam-page-question-number current">@sttCauHoi</div>
+						<div class="exam-page-question-number" data-id-cauhoi="@cauHoi.Id" data-quest-index="@sttCauHoi">@sttCauHoi</div>
 						sttCauHoi++;
 					}
 				}

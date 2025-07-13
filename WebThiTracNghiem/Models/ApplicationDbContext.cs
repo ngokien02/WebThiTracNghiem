@@ -11,5 +11,6 @@ namespace WebThiTracNghiem.Models
         public DbSet<DeThi> DeThi { get; set; }
         public DbSet<CauHoi> CauHoi { get; set; }
         public DbSet<DapAn> DapAn { get; set; }
+        public DbSet<KetQua> KetQua { get; set; }
 	}
 }

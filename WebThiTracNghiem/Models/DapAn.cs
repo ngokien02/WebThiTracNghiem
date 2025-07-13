@@ -1,4 +1,6 @@
-﻿namespace WebThiTracNghiem.Models
+﻿using Newtonsoft.Json;
+
+namespace WebThiTracNghiem.Models
 {
 	public class DapAn
 	{
@@ -6,6 +8,7 @@
 		public string NoiDung { get; set; }
 		public Boolean DungSai { get; set; }
 		public int CauHoiId { get; set; }
+		[JsonIgnore]
 		public virtual CauHoi CauHoi { get; set; }
 	}
 }
