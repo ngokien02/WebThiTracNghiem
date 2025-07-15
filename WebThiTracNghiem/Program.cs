@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using WebThiTracNghiem.Models;
+using WebThiTracNghiem.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.S
 
 builder.Services.AddRazorPages();
 
-builder.Services.AddScoped<IEmailSender, EmailSender>();
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
+
+builder.Services.AddMemoryCache();
 
 builder.Services.AddSession();
 
@@ -34,9 +37,9 @@ if (!app.Environment.IsDevelopment())
 {
 	app.UseExceptionHandler("/Home/Error");
 }
-app.UseStaticFiles();
-
 app.UseRouting();
+
+app.UseStaticFiles();
 
 app.UseAuthentication();
 

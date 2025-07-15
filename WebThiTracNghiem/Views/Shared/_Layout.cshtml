@@ -4,12 +4,19 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>@ViewData["Title"] - CTQuiz</title>
+
+	<!-- CSS chung của hệ thống -->
 	<link rel="stylesheet" href="~/css/Styles.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/admin/Dashboard.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/teacher/Create.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/student/exam.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/student/DoExam.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+	<!-- 📌 Style riêng của từng trang -->
+	@RenderSection("Styles", required: false)
+
+	<!-- Thư viện ngoài -->
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -122,6 +129,7 @@
 	<a href="#" class="contact-fab" title="Liên hệ với nhà trường">
 		<i class="fas fa-comments"></i>
 	</a>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using WebThiTracNghiem.Migrations;
 using WebThiTracNghiem.Models;
 
 namespace WebThiTracNghiem.Areas.Identity.Pages.Account.Manage
@@ -56,42 +57,52 @@ namespace WebThiTracNghiem.Areas.Identity.Pages.Account.Manage
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
+            public string Id { get; set; }
+
+            [Display(Name = "Họ tên")]
+            public string HoTen { get; set; }
+
+            [Display(Name = "Ngày sinh")]
+            [DataType(DataType.Date)]
+            public DateTime? NgaySinh { get; set; }
+
+            [Display(Name = "Lớp học")]
+            public string LopHoc { get; set; }
+
+            [Display(Name = "Ảnh đại diện (URL)")]
+            public string AvatarUrl { get; set; }
+
+            [EmailAddress]
+            public string Email { get; set; }
+
             [Phone]
-            [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            public string Username { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
         {
-            var userName = await _userManager.GetUserNameAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
-            Username = userName;
-
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                Id = user.Id,
+                Username = user.UserName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                HoTen = user.HoTen,
+                NgaySinh = user.NgaySinh,
+                LopHoc = user.LopHoc,
+                AvatarUrl = user.AvatarUrl
             };
         }
 
-        public async Task<IActionResult> OnGetAsync()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
-
-            await LoadAsync(user);
-            return Page();
-        }
 
         public async Task<IActionResult> OnPostAsync()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                return NotFound($"Không tìm thấy người dùng với ID '{_userManager.GetUserId(User)}'.");
             }
 
             if (!ModelState.IsValid)
@@ -100,20 +111,60 @@ namespace WebThiTracNghiem.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
+            // Cập nhật
+            user.HoTen = Input.HoTen;
+            user.NgaySinh = Input.NgaySinh;
+            user.LopHoc = Input.LopHoc;
+            user.AvatarUrl = Input.AvatarUrl;
+            user.PhoneNumber = Input.PhoneNumber;
+            user.Email = Input.Email;
+
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
             {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
+                foreach (var error in result.Errors)
                 {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
-                    return RedirectToPage();
+                    ModelState.AddModelError(string.Empty, error.Description);
                 }
+                return Page();
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            StatusMessage = "✅ Hồ sơ đã được cập nhật.";
             return RedirectToPage();
         }
+        public async Task<IActionResult> OnGetAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Không tìm thấy người dùng với ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            await LoadAsync(user); // ✅ BẮT BUỘC PHẢI GỌI DÒNG NÀY
+
+            return Page();
+        }
+        public async Task<IActionResult> OnPostUpdateAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return new JsonResult(new { success = false, message = "Không tìm thấy người dùng" });
+
+            user.HoTen = Input.HoTen;
+            user.NgaySinh = Input.NgaySinh;
+            user.LopHoc = Input.LopHoc;
+            user.PhoneNumber = Input.PhoneNumber;
+            user.AvatarUrl = Input.AvatarUrl;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+                return new JsonResult(new { success = false, message = "Lỗi khi cập nhật" });
+
+            await _signInManager.RefreshSignInAsync(user);
+            return new JsonResult(new { success = true, message = "Thông tin đã được cập nhật!" });
+        }
+
     }
 }
