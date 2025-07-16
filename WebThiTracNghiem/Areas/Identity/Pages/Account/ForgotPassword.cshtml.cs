@@ -78,13 +78,25 @@ namespace WebThiTracNghiem.Areas.Identity.Pages.Account
 
 
             var user = await _userManager.FindByEmailAsync(Input.Email);
-
-
-            if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+            if (user == null)
             {
-                // Không tiết lộ thông tin user có tồn tại hay không
+                ModelState.AddModelError(string.Empty, "Không tìm thấy email của bạn trong hệ thống.");
+                return Page();
+            }
+            bool emailExists = user != null;
+            bool emailConfirmed = emailExists && await _userManager.IsEmailConfirmedAsync(user);
+
+            // Ghi log để bạn dễ test nội bộ (nếu dùng Email giả)
+            _logger.LogInformation("🧪 Kiểm tra Email: {Email} → Tồn tại: {Exists}, Đã xác nhận: {Confirmed}",
+                Input.Email, emailExists, emailConfirmed);
+
+            // ✅ Nếu không tồn tại hoặc chưa xác nhận → vẫn chuyển đến trang xác nhận để tránh lộ info
+            if (!emailExists || !emailConfirmed)
+            {
+                TempData["ResetPasswordMessage"] = "Nếu email tồn tại và đã xác nhận, liên kết đặt lại mật khẩu sẽ được gửi.";
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }
+
 
             // Tạo mã đặt lại mật khẩu
             var code = await _userManager.GeneratePasswordResetTokenAsync(user);

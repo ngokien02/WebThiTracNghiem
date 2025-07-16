@@ -24,9 +24,9 @@
 <body>
 	<div class="container">
 		<header class="header">
-			<div class="logo">
-				<a asp-controller="home" asp-action="index">
-					<img src="/images/logo.png" alt="Logo Trường CĐ GTVT" class="logo-img">
+			<div class="main-logo">
+				<a asp-area="" asp-controller="Home" asp-action="Index">
+					<img src="/images/logo.png" alt="Trang chủ"class="logo-img" />
 				</a>
 			</div>
 			<div class="header-right">
@@ -133,6 +133,7 @@
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
+	<script src="~/js/profile.js" asp-append-version="true"></script>
 	<script src="~/js/Teacher/Exam.js" asp-append-version="true"></script>
 	<script src="~/js/Student/Exam.js" asp-append-version="true"></script>
 	@await RenderSectionAsync("Scripts", required: false)

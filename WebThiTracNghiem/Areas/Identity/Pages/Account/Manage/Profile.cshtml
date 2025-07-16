@@ -15,14 +15,15 @@
         <div class="profile-container">
             <div class="profile-header">
                 <div class="profile-avatar">
-                    <img src="@(Model.UserInfo.AvatarUrl ?? "/images/avatar-default.png")" alt="Avatar" />
-                    <div class="change-avatar-btn">
+                    <img src="..." alt="Avatar" id="avatarPreview" />
+                    <label for="avatarInput" class="change-avatar-btn">
                         <i class="fas fa-camera"></i> Thay đổi ảnh
-                    </div>
+                    </label>
+                    <input type="file" id="avatarInput" accept=".jpg,.jpeg,.png,.gif,.webp" style="display: none;" />
                 </div>
                 <div class="profile-summary">
                     <h2>@(Model.UserInfo.HoTen ?? "Chưa cập nhật")</h2>
-                    <p class="student-id">MSSV: @Model.UserInfo.Id</p>
+                    <p class="student-id">MSSV: @Model.UserInfo.MaSV</p>
                     <div class="student-status">
                         <i class="fas fa-circle"></i> Đang theo học
                     </div>
@@ -39,8 +40,13 @@
                             <input name="HoTen" value="@Model.UserInfo.HoTen" />
                         </div>
                         <div class="form-group">
-                            <label>Mã SV</label>
-                            <input name="MaSV" value="@Model.UserInfo.Id" />
+                            @{
+                                var roleLabel = User.IsInRole("Teacher") ? "Mã GV"
+                                : User.IsInRole("Admin") ? "Mã NV"
+                                : "Mã SV";
+                            }
+                            <label>@roleLabel</label>
+                            <input name="MaSV" value="@Model.UserInfo.MaSV" />
                         </div>
                         <div class="form-group">
                             <label>Ngày sinh</label>
@@ -71,7 +77,7 @@
                         </div>
                         <div class="form-group">
                             <label>Số điện thoại</label>
-                            <input name="PhoneNumber" value="@Model.UserInfo.PhoneNumber" />
+                            <input name="PhoneNumber" inputmode="numeric" value="@Model.UserInfo.PhoneNumber" />
                         </div>
                         <div class="form-group full-width">
                             <label>Địa chỉ thường trú</label>
@@ -130,84 +136,4 @@
     </div>
 </div>
 
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        $("#profile-form").on("submit", function (e) {
-            e.preventDefault();
-            const data = {};
-            $(this).serializeArray().forEach(f => data[f.name] = f.value);
 
-            fetch('/Profile/Update', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-                .then(res => {
-                    if (res.ok) {
-                        Swal.fire("✅ Cập nhật thành công!", "Thông tin cá nhân đã được lưu.", "success");
-                    } else {
-                        Swal.fire("❌ Lỗi", "Không thể cập nhật thông tin.", "error");
-                    }
-                });
-        });
- 
-        // Kiểm tra đổi mật khẩu
-        $("#btnChangePass").on("click", function () {
-            const current = $("input[name='CurrentPassword']").val().trim();
-            const newPass = $("input[name='NewPassword']").val().trim();
-            const confirm = $("input[name='ConfirmPassword']").val().trim();
-
-            // Reset lỗi
-            $(".input-error").removeClass("input-error");
-
-            let hasError = false; // ✅ KHỞI TẠO ĐÚNG Ở ĐÂY
-
-            if (!current) {
-                $("input[name='CurrentPassword']").addClass("input-error");
-                hasError = true;
-            }
-            if (!newPass || newPass.length < 6) {
-                $("input[name='NewPassword']").addClass("input-error");
-                hasError = true;
-            }
-            if (newPass !== confirm) {
-                $("input[name='ConfirmPassword']").addClass("input-error");
-                hasError = true;
-            }
-
-            if (hasError) {
-                Swal.fire("⚠️ Lỗi dữ liệu", "Vui lòng kiểm tra các ô nhập đang bị gạch đỏ.", "warning");
-                return;
-            }
-
-            Swal.fire({
-                title: "🔐 Đang đổi mật khẩu...",
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            });
-
-            fetch("/Profile/ChangePassword", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    CurrentPassword: current,
-                    NewPassword: newPass,
-                    ConfirmPassword: confirm
-                })
-            }).then(res => {
-                if (res.ok) {
-                    Swal.fire("✅ Đổi mật khẩu thành công", "Bạn có thể đăng nhập lại bằng mật khẩu mới.", "success");
-                    setTimeout(() => location.href = '/Identity/Account/Logout', 3000);
-                } else {
-                    res.json().then(r => {
-                        const err = r?.errors?.map(e => e.description).join("<br>") || "Lỗi không xác định.";
-                        Swal.fire("❌ Lỗi đổi mật khẩu", err, "error");
-                    });
-                }
-            });
-        });
-</script>
-}

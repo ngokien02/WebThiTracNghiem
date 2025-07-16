@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using WebThiTracNghiem.Models;
+using System.Globalization;
 
 namespace WebThiTracNghiem.Controllers
 {
@@ -17,12 +18,16 @@ namespace WebThiTracNghiem.Controllers
 		{
 			var user = await _userManager.GetUserAsync(User);
 			if (user == null) return NotFound();
-
-			return View(user);
+            var role = User.IsInRole("Teacher") ? "Teacher"
+         : User.IsInRole("Admin") ? "Admin"
+         : "Student";
+            ViewBag.RoleName = role;
+            Console.WriteLine("✅ Role hiện tại: " + role);
+            return View(user);
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Update([FromBody] ApplicationUser model)
+		public async Task<IActionResult> Update([FromBody] UpdateProfileViewModel model)
 		{
 			var user = await _userManager.GetUserAsync(User);
 			if (user == null) return NotFound();
@@ -30,7 +35,16 @@ namespace WebThiTracNghiem.Controllers
 			// Cập nhật tất cả các trường cần thiết
 			user.HoTen = model.HoTen;
 			user.PhoneNumber = model.PhoneNumber;
-			user.NgaySinh = model.NgaySinh;
+			if (model.NgaySinh.HasValue &&
+		DateTime.TryParseExact(model.NgaySinh.Value.ToString("dd/MM/yyyy"), "dd/MM/yyyy",
+		CultureInfo.InvariantCulture, DateTimeStyles.None, out var ngaySinh))
+			{
+				user.NgaySinh = ngaySinh;
+			}
+			else
+			{
+				return BadRequest("Ngày sinh sai định dạng.");
+			}
 			user.GioiTinh = model.GioiTinh;
 			user.CMND = model.CMND;
 			user.DiaChi = model.DiaChi;
@@ -39,6 +53,7 @@ namespace WebThiTracNghiem.Controllers
 			user.Khoa = model.Khoa;
 			user.LopHoc = model.LopHoc;
 			user.KhoaHoc = model.KhoaHoc;
+			user.MaSV = model.MaSV; // Nếu cho phép chỉnh mã sinh viên
 
 			// Bạn có thể thêm các trường bảo mật nếu được phép sửa như mật khẩu (cần xử lý riêng)
 
@@ -53,6 +68,9 @@ namespace WebThiTracNghiem.Controllers
         [Route("Profile/ChangePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel model)
 		{
+			// ✅ Bắt đầu bằng kiểm tra null
+			if (model == null)
+				return BadRequest(new { error = "Thiếu dữ liệu từ client." });
 			// Kiểm tra dữ liệu đầu vào
 			if (string.IsNullOrWhiteSpace(model.CurrentPassword) || string.IsNullOrWhiteSpace(model.NewPassword))
 			{
@@ -67,6 +85,10 @@ namespace WebThiTracNghiem.Controllers
 			{
 				return BadRequest(new { errors = new[] { new { description = "Mật khẩu mới không khớp hoặc trống." } } });
 			}
+			if (model == null)
+			{
+				return BadRequest(new { error = "Thiếu dữ liệu từ client." });
+			}
 
 			var user = await _userManager.GetUserAsync(User);
 			if (user == null) return NotFound();
@@ -80,8 +102,24 @@ namespace WebThiTracNghiem.Controllers
 				return Ok(new { success = true });
 			else
 				return BadRequest(new { errors = result.Errors });
-
 		}
+        [HttpPost]
+        public async Task<IActionResult> UploadAvatar(IFormFile avatar)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null || avatar == null) return BadRequest();
 
-	}
+            var fileName = $"{user.Id}_{Path.GetFileName(avatar.FileName)}";
+            var path = Path.Combine("wwwroot/uploads", fileName);
+
+            using var stream = new FileStream(path, FileMode.Create);
+            await avatar.CopyToAsync(stream);
+
+            user.AvatarUrl = "/uploads/" + fileName;
+            await _userManager.UpdateAsync(user);
+
+            return Ok();
+        }
+
+    }
 }

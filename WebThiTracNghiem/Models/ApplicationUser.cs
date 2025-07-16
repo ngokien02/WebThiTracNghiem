@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebThiTracNghiem.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public string? HoTen { get; set; }
+		[Required]
+		[MaxLength(10)]
+		public string MaSV { get; set; }
+		public string? HoTen { get; set; }
         public DateTime? NgaySinh { get; set; }
         public string? GioiTinh { get; set; }
         public string? CMND { get; set; }
@@ -13,6 +17,7 @@ namespace WebThiTracNghiem.Models
         public string? Khoa { get; set; }
         public string? KhoaHoc { get; set; }
         public string? AvatarUrl { get; set; }
+
         public static async Task SeedUserAsync(IServiceProvider serviceProvider)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
