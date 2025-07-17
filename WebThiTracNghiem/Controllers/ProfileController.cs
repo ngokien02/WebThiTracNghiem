@@ -2,19 +2,22 @@
 using Microsoft.AspNetCore.Identity;
 using WebThiTracNghiem.Models;
 using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebThiTracNghiem.Controllers
 {
 	public class ProfileController : Controller
 	{
 		private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ApplicationDbContext _db;
 
-		public ProfileController(UserManager<ApplicationUser> userManager)
-		{
+        public ProfileController(UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext)
+        {
 			_userManager = userManager;
-		}
+            _db = dbContext;
+        }
 
-		public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index()
 		{
 			var user = await _userManager.GetUserAsync(User);
 			if (user == null) return NotFound();
@@ -28,12 +31,23 @@ namespace WebThiTracNghiem.Controllers
 
 		[HttpPost]
 		public async Task<IActionResult> Update([FromBody] UpdateProfileViewModel model)
-		{
+		{	
 			var user = await _userManager.GetUserAsync(User);
 			if (user == null) return NotFound();
+            bool maSVExist = _db.Users.Any(u => u.MaSV == model.MaSV && u.Id != user.Id);
+            if (maSVExist)
+                return BadRequest("❌ Mã sinh viên đã tồn tại trong hệ thống.");
 
-			// Cập nhật tất cả các trường cần thiết
-			user.HoTen = model.HoTen;
+            // Kiểm tra trùng CMND nếu có
+            if (!string.IsNullOrWhiteSpace(model.CMND))
+            {
+                bool cmndExist = _db.Users.Any(u => u.CMND == model.CMND && u.Id != user.Id);
+                if (cmndExist)
+                    return BadRequest("❌ CCCD đã tồn tại trong hệ thống.");
+            }
+
+            // Cập nhật tất cả các trường cần thiết
+            user.HoTen = model.HoTen;
 			user.PhoneNumber = model.PhoneNumber;
 			if (model.NgaySinh.HasValue &&
 		DateTime.TryParseExact(model.NgaySinh.Value.ToString("dd/MM/yyyy"), "dd/MM/yyyy",

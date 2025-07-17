@@ -6,8 +6,9 @@ const label = role === "Teacher" ? "Mã GV"
 
 $("label[for='MaSV']").text(label);
 // ✅ Xử lý cập nhật thông tin cá nhân
-$("#profile-form").on("submit", function (e) {
+$("#profile-form").on("submit", async function (e) {
     e.preventDefault();
+
     const data = {
         HoTen: $("input[name='HoTen']").val()?.trim(),
         PhoneNumber: $("input[name='PhoneNumber']").val()?.trim(),
@@ -24,20 +25,21 @@ $("#profile-form").on("submit", function (e) {
     };
 
     // ✅ Gọi kiểm tra trước khi gửi
-    if (!validateProfileData(data)) return;
+    if (!(await validateProfileData(data))) return;
 
     fetch('/Profile/Update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
-    })
-        .then(res => {
-            if (res.ok) {
-                Swal.fire("✅ Cập nhật thành công!", "Thông tin cá nhân đã được lưu.", "success");
-            } else {
-                Swal.fire("❌ Lỗi", "Không thể cập nhật thông tin.", "error");
-            }
-        });
+    }).then(async res => {
+        if (res.ok) {
+            Swal.fire("✅ Cập nhật thành công!", "Thông tin cá nhân đã được lưu.", "success");
+        } else {
+            const msg = await res.text(); // 👈 đọc nội dung lỗi trả về
+            Swal.fire("❌ Lỗi cập nhật", msg || "Không thể cập nhật thông tin.", "error");
+        }
+
+    });
 });
 
 // ✅ Đổi mật khẩu
@@ -145,8 +147,13 @@ function isNumberKey(evt) {
     const charCode = evt.which ? evt.which : evt.keyCode;
     return charCode >= 48 && charCode <= 57; // chỉ cho 0–9
 }
+async function checkExist(field, value) {
+    const res = await fetch(`/api/profile/check-exist?type=${field}&value=${encodeURIComponent(value)}`);
+    if (!res.ok) return false;
+    return await res.json(); // true nếu tồn tại
+}
 
-function validateProfileData(data) {
+async function validateProfileData(data) {
     let errors = [];
     $(".input-error").removeClass("input-error");
     $("[name='MaSV'], [name='CMND'], [name='PhoneNumber']").on("input", function () {
@@ -162,8 +169,11 @@ function validateProfileData(data) {
         highlightInput("Email");
     }
 
-    if (!data.NgaySinh || calculateAge(data.NgaySinh) < 18) {
-        errors.push("Ngày sinh không hợp lệ hoặc tuổi < 18.");
+    const birthYear = new Date(data.NgaySinh).getFullYear();
+    const currentYear = new Date().getFullYear();
+
+    if (!data.NgaySinh || currentYear - birthYear < 18) {
+        errors.push("Năm sinh phải đủ 18 tuổi trong năm hiện tại.");
         highlightInput("NgaySinh");
     }
 
@@ -176,6 +186,17 @@ function validateProfileData(data) {
 
     if (data.CMND && !/^\d{12}$/.test(data.CMND)) {
         errors.push("CCCD phải gồm đúng 12 chữ số.");
+        highlightInput("CMND");
+    }
+    // Kiểm tra trùng mã sinh viên
+    if (data.MaSV && await checkExist("MaSV", data.MaSV)) {
+        errors.push("❌ Mã sinh viên đã tồn tại.");
+        highlightInput("MaSV");
+    }
+
+    // Kiểm tra trùng CCCD nếu có nhập
+    if (data.CMND && await checkExist("CMND", data.CMND)) {
+        errors.push("❌ CCCD đã tồn tại.");
         highlightInput("CMND");
     }
 

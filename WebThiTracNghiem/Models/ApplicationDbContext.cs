@@ -8,6 +8,7 @@ namespace WebThiTracNghiem.Models
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
+        public DbSet<ApplicationUser> Users { get; set; }
         public DbSet<DeThi> DeThi { get; set; }
         public DbSet<CauHoi> CauHoi { get; set; }
         public DbSet<DapAn> DapAn { get; set; }
