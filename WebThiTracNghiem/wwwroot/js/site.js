@@ -211,5 +211,47 @@
                 document.querySelector('.chat-actions').style.display = 'none';
             }
         });
+        function showAlert(title, message, icon = "info", href) {
+            Swal.fire({
+                title: title,
+                text: message,
+                icon: icon,
+                confirmButtonColor: "#0963a3"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (href != null || href != undefined) {
+                        window.location.href = href;
+                    }
+                }
+            });
+        };
+        $("#btnSendReset").on("click", function (e) {
+            e.preventDefault(); // Ngăn submit ngay
+
+            const email = $("#inputEmail").val().trim();
+            if (!email) {
+                Swal.fire("⚠️ Lỗi", "Vui lòng nhập email!", "warning");
+                return;
+            }
+
+            $.get("/Email/CheckExist", { email: email })
+                .done(res => {
+                    if (res.exists) {
+                        // ✅ Email hợp lệ → submit form
+                        $("#forgot-password-form")[0].submit();
+                    } else {
+                        // ❌ Không tồn tại trong hệ thống
+                        showAlert("⚠️ Lỗi", "Email không tồn tại trong hệ thống!", "warning");
+                    }
+                })
+                .fail(() => {
+                    showAlert("⚠️ Lỗi", "Đã xảy ra lỗi khi kiểm tra email!", "error");
+                });
+        });
+        if (TempData["EmailSent"] != null) {
+
+            showAlert("✅ Thành công", TempData["EmailSent"], "success", "/Account/Login");
+        };
+
     });
-})
+});
