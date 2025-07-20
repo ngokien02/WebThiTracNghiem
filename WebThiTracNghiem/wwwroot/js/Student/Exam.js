@@ -8,10 +8,8 @@
             icon: icon,
             confirmButtonColor: "#0963a3"
         }).then((result) => {
-            if (result.isConfirmed) {
-                if (href != null || href != undefined) {
-                    window.location.href = href;
-                }
+            if (href != null || href != undefined) {
+                window.location.href = href;
             }
         });
     };
@@ -167,20 +165,24 @@
     // xu ly nop bai, cham diem
     $(document).on("click", "button.exam-page-submit-btn", function () {
         SaveQuestion();
-        $.ajax({
-            url: '/student/exam/SubmitExam',
-            type: 'POST',
-            success: function (res) {
-                if (res.success) {
-                    showAlert('Thành công', res.message, 'success', '/student');
-                } else {
-                    alert(res.message || "Có lỗi xảy ra.");
+
+        setTimeout(() => {
+            $.ajax({
+                url: '/student/exam/SubmitExam',
+                type: 'POST',
+                success: function (res) {
+                    if (res.success) {
+                        showAlert('Thành công', res.message, 'success', '/student');
+                        console.log(JSON.stringify(res));
+                    } else {
+                        alert(res.message || "Có lỗi xảy ra.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Lỗi khi gửi yêu cầu:", error);
+                    alert("Không thể nộp bài. Vui lòng thử lại.");
                 }
-            },
-            error: function (xhr, status, error) {
-                console.error("Lỗi khi gửi yêu cầu:", error);
-                alert("Không thể nộp bài. Vui lòng thử lại.");
-            }
-        });
+            });
+        }), 100;
     });
 })

@@ -12,7 +12,7 @@
 	</div>
 
 	<div class="user-profile">
-		<img src="/Images/logo.png" alt="Avatar" class="avatar">
+		<img src='/Images/@((await UserManager.GetUserAsync(User))?.AvatarUrl ?? "logo.png")' alt="Avatar" class="avatar" style="object-fit: cover; object-position: center">
 		<div class="user-info">
 			@{
 				var hoTen = (await UserManager.GetUserAsync(User))?.HoTen ?? "User";
