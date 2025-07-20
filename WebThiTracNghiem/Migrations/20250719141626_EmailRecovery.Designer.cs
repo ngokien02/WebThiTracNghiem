@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebThiTracNghiem.Models;
 
@@ -11,9 +12,11 @@ using WebThiTracNghiem.Models;
 namespace WebThiTracNghiem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250719141626_EmailRecovery")]
+    partial class EmailRecovery
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,9 +167,7 @@ namespace WebThiTracNghiem.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("AvatarUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CCCD")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -174,6 +175,7 @@ namespace WebThiTracNghiem.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DiaChi")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -184,15 +186,18 @@ namespace WebThiTracNghiem.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("GioiTinh")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HoTen")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Khoa")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("KhoaHoc")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
@@ -202,6 +207,7 @@ namespace WebThiTracNghiem.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("LopHoc")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("NgaySinh")

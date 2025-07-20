@@ -1,4 +1,10 @@
-﻿@model DeThi
+﻿@using WebThiTracNghiem.Areas.Student.Models
+@model DeThiViewModel
+
+@{
+	var cauHoi1 = Model.CauHoiList.ToList()[0];
+}
+<input type="hidden" id="IdCauHoi" value="@cauHoi1.Id" />
 
 <!-- Header với thông tin tiến độ và thời gian -->
 <div class="exam-page-header">
@@ -11,25 +17,22 @@
 
 <div class="exam-page-container">
 	<!-- Nội dung bài thi bên trái -->
-	@{
-		var cauHoi1 = Model.CauHoiList.ToList()[0];
-	}
-	<input type="hidden" id="IdCauHoi" value="@cauHoi1.Id" />
 	<div class="exam-page-content">
 		<div class="exam-page-question">
 			<div class="exam-page-question-text">
-				<strong>Câu 1 (@ViewData["diem"] điểm) :</strong>
+				<strong id="SttCauHoi">Câu 1 </strong>(@ViewData["diem"] điểm) :
 				<p id="question-content">@cauHoi1.NoiDung @(cauHoi1.Loai == "NhieuDapAn" ? "(Có thể chọn nhiều đáp án)" : "")</p>
 			</div>
 			<div class="exam-page-answers" id="exam-page-answers">
+
 				@{
 					string[] ABCD = { "A", "B", "C", "D" };
 					int i = 0;
 					foreach (var dapAn in cauHoi1.DapAnList)
 					{
 						<label class="exam-page-answer-option">
-							<input type="@(cauHoi1.Loai == "NhieuDapAn" ? "checkbox" : "radio")" name="dapan" class="exam-page-answer-radio">
-							<span class="exam-page-answer-text" data-id-dapan="@dapAn.Id">@ABCD[i]. @dapAn.NoiDung</span>
+							<input type="@(cauHoi1.Loai == "NhieuDapAn" ? "checkbox" : "radio")" name="dapan" class="exam-page-answer-radio" value="@dapAn.Id">
+							<span class="exam-page-answer-text">@ABCD[i]. @dapAn.NoiDung</span>
 						</label>
 						i++;
 					}
@@ -56,7 +59,7 @@
 					int sttCauHoi = 1;
 					foreach (var cauHoi in Model.CauHoiList)
 					{
-						<div class="exam-page-question-number" data-id-cauhoi="@cauHoi.Id" data-quest-index="@sttCauHoi">@sttCauHoi</div>
+						<div class="exam-page-question-number @(sttCauHoi == 1 ? "current" : "")" data-quest-id="@cauHoi.Id" data-quest-index="@sttCauHoi">@sttCauHoi</div>
 						sttCauHoi++;
 					}
 				}

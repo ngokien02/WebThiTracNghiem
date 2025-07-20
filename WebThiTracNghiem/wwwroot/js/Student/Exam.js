@@ -1,4 +1,21 @@
 ﻿$(() => {
+
+    // Hiển thị thông báo swal
+    function showAlert(title, message, icon = "info", href) {
+        Swal.fire({
+            title: title,
+            text: message,
+            icon: icon,
+            confirmButtonColor: "#0963a3"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if (href != null || href != undefined) {
+                    window.location.href = href;
+                }
+            }
+        });
+    };
+
     // Hien thi ds de thi
     $(document).on("click", "a.ListExam", function (e) {
         e.preventDefault();
@@ -44,57 +61,126 @@
     $(document).on("click", "button.DoExam", function (e) {
         e.preventDefault();
         var url = $(this).attr("href");
+
         $.get(url, function (data) {
+            if (data.success === false) {
+                showAlert('Đợi xíu!', data.message);
+                return;
+            }
+
             $("body").html(data);
-            $(document).on("click", "div.exam-page-question-number", function (e) {
-                $('div.exam-page-question-number').removeClass('current');
-                $(this).addClass('current');
-                var questIndex = $(this).data('quest-index') - 1;
-                getQuestionObj(questIndex);
-            });
-            //initVisibilityTracking();
         });
     });
 
-    // Lay json cau hoi tu session
-    function getQuestionObj(index) {
+    //render cau hoi, ap an
+    $(document).on("click", "div.exam-page-question-number", function (e) {
+
+        SaveQuestion();
+        $('div.exam-page-question-number').removeClass('current');
+        $(this).addClass('current');
+
+        var questionId = $(this).data('quest-id');
+        var questionIndex = $(this).data('quest-index');
+
+        renderQuestion(questionId);
+        setTimeout(function () {
+            const input = document.getElementById("IdCauHoi");
+            const stt = document.querySelector('#SttCauHoi');
+            if (stt) stt.textContent = `Câu ${questionIndex} `;
+            if (input) input.value = questionId;
+            else console.warn("Không tìm thấy input #IdCauHoi sau render");
+        }, 100);
+    });
+
+    //luu cau hoi, ap an dang lam
+    function SaveQuestion() {
+        const questionId = parseInt($("#IdCauHoi").val());
+
+        const selectedAnswerIds = $(".exam-page-answers input:checked")
+            .map(function () {
+                return parseInt($(this).val());
+            }).get();
+
+        const dataToSend = {
+            cauHoiId: questionId,
+            dapAnIds: selectedAnswerIds
+        };
+
         $.ajax({
-            url: '/student/exam/LoadQuestion',
-            type: 'GET',
-            data: { index: index },
+            url: "/student/exam/SaveQuestion",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(dataToSend),
             success: function (res) {
-                if (res) {
-                    renderQuestion(res);
-                } else {
-                    console.warn("Không tìm thấy câu hỏi.");
-                }
+                console.log("Lưu câu hỏi thành công");
             },
-            error: function (xhr, status, error) {
-                console.error("Lỗi khi lấy câu hỏi:", error);
-                console.log("Chi tiết:", xhr.responseText);
-                alert("Lỗi khi lấy câu hỏi.");
+            error: function (xhr) {
+                console.error("Lỗi khi lưu câu hỏi:", xhr.responseText);
             }
         });
     }
 
-    function renderQuestion(res) {
-        document.getElementById('question-content').textContent = res.noiDung + ` ${res.loai === 'NhieuDapAn' ? '(Có thể chọn nhiều đáp án)' : ''}`;
+    // Lay json cau hoi tu session
+    function renderQuestion(questionId) {
+        $.ajax({
+            url: "/student/exam/RenderQuestion",
+            type: "GET",
+            data: { questionId: questionId },
+            success: function (res) {
 
-        const answerDiv = document.getElementById('exam-page-answers');
-        answerDiv.innerHTML = '';
+                // Cập nhật nội dung câu hỏi
+                document.getElementById('question-content').textContent = res.noiDung +
+                    (res.loai === 'NhieuDapAn' ? ' (Có thể chọn nhiều đáp án)' : '');
 
-        const inputType = res.loai === "TracNghiem" ? "radio" : "checkbox";
+                // Xác định loại input
+                const inputType = res.loai === "TracNghiem" ? "radio" : "checkbox";
 
-        res.dapAnList.forEach((da, index) => {
-            const answerKey = String.fromCharCode(65 + index);
-            const answerLabel = document.createElement('label');
-            answerLabel.className = 'exam-page-answer-option';
+                // Xóa đáp án cũ
+                const answerDiv = document.getElementById('exam-page-answers');
+                answerDiv.innerHTML = '';
 
-            answerLabel.innerHTML = `
-                <input type="${inputType}" name="dapan" class="exam-page-answer-radio">
-		        <span class="exam-page-answer-text" data-id-dapan="${da.id}">${answerKey}. ${da.noiDung}</span>
-            `;
-            answerDiv.appendChild(answerLabel);
+                // Render lại các đáp án
+                res.dapAnList.forEach((da, index) => {
+                    const answerKey = String.fromCharCode(65 + index);
+                    const isChecked = res.dapAnIdsDaChon?.includes(da.id);
+
+                    const answerLabel = document.createElement('label');
+                    answerLabel.className = 'exam-page-answer-option';
+
+                    answerLabel.innerHTML = `
+                    <input type="${inputType}" name="dapan" class="exam-page-answer-radio" value="${da.id}" ${da.isSelected ? 'checked' : ''}>
+                    <span class="exam-page-answer-text">${answerKey}. ${da.noiDung}</span>
+                `;
+
+                    answerDiv.appendChild(answerLabel);
+                });
+
+                // Gán lại IdCauHoi hiện tại
+                $("#IdCauHoi").val(res.id);
+            },
+            error: function (xhr) {
+                console.error("Lỗi khi tải câu hỏi:", xhr.responseText);
+            }
         });
     }
+
+    // xu ly nop bai, cham diem
+    $(document).on("click", "button.exam-page-submit-btn", function () {
+        SaveQuestion();
+        $.ajax({
+            url: '/student/exam/SubmitExam',
+            type: 'POST',
+            success: function (res) {
+                if (res.success) {
+                    showAlert('Thành công', res.message, 'success', '/student');
+                } else {
+                    alert(res.message || "Có lỗi xảy ra.");
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Lỗi khi gửi yêu cầu:", error);
+                alert("Không thể nộp bài. Vui lòng thử lại.");
+            }
+        });
+    });
 })

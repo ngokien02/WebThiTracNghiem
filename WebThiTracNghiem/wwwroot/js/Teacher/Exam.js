@@ -448,7 +448,7 @@
 
             if (thoiGianLamBai === '') {
                 if (showError) $('#errTime').text('');
-                return true; // Không kiểm tra nếu trống
+                return true; 
             }
 
             const intValue = parseInt(thoiGianLamBai, 10);

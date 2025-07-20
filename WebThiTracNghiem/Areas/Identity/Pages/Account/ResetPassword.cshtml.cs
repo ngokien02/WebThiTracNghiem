@@ -107,7 +107,8 @@ namespace WebThiTracNghiem.Areas.Identity.Pages.Account
             {
                 return RedirectToPage("./ResetPasswordConfirmation");
             }
-
+            // Nếu đến đây là lỗi (token sai, hoặc password không hợp lệ)
+            TempData["ResetPasswordError"] = string.Join("<br>", result.Errors.Select(e => e.Description));
             foreach (var error in result.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
