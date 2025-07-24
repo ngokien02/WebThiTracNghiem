@@ -28,32 +28,44 @@
     // Xử lý chuyển tab
     let count = 0;
     let hasTriggered = false;
+    let isHiddenHandled = false;
+
     function initVisibilityTracking() {
         const handleViolation = () => {
-            if (hasTriggered) return; // tránh lặp
+            if (hasTriggered || isHiddenHandled) return; // tránh gọi lặp
+
+            isHiddenHandled = true; // Đánh dấu đã xử lý lần ẩn này
             count++;
-            alert(`Bạn đã chuyển tab ${count} lần. Quá 3 lần sẽ tự hủy bài thi.`);
+            alert(`⚠️ Bạn đã chuyển tab ${count} lần. Quá 3 lần sẽ tự hủy bài thi.`);
 
             if (count > 3) {
                 hasTriggered = true;
-                // Gọi xử lý hủy bài thi ở đây (submit bài hoặc redirect)
-                alert("Bạn đã vi phạm quá 3 lần. Bài thi sẽ bị hủy.");
+                alert("🚫 Bạn đã vi phạm quá 3 lần. Bài thi sẽ bị hủy.");
+                // Thực hiện hành động như submit bài hoặc chuyển trang
+                // window.location.href = "/Exam/Cancel";
             }
         };
 
         document.addEventListener("visibilitychange", function () {
             if (document.hidden) {
                 handleViolation();
+            } else {
+                isHiddenHandled = false; // Cho phép lần xử lý tiếp theo
             }
         });
 
-        window.addEventListener('blur', function () {
+        window.addEventListener("blur", function () {
             setTimeout(() => {
-                if (document.hidden) return;
+                if (document.hidden) return; // Đã xử lý rồi
                 handleViolation();
             }, 100);
         });
-    };
+
+        window.addEventListener("focus", () => {
+            isHiddenHandled = false; // reset lại sau khi quay lại
+        });
+    }
+
 
     // Vao trang lam bai thi
     $(document).on("click", "button.DoExam", function (e) {
