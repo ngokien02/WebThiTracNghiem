@@ -58,6 +58,7 @@
     // Vao trang lam bai thi
     $(document).on("click", "button.DoExam", function (e) {
         e.preventDefault();
+        initVisibilityTracking();
         var url = $(this).attr("href");
 
         $.get(url, function (data) {
@@ -164,25 +165,75 @@
 
     // xu ly nop bai, cham diem
     $(document).on("click", "button.exam-page-submit-btn", function () {
-        SaveQuestion();
 
-        setTimeout(() => {
-            $.ajax({
-                url: '/student/exam/SubmitExam',
-                type: 'POST',
-                success: function (res) {
-                    if (res.success) {
-                        showAlert('Thành công', res.message, 'success', '/student');
-                        console.log(JSON.stringify(res));
-                    } else {
-                        alert(res.message || "Có lỗi xảy ra.");
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error("Lỗi khi gửi yêu cầu:", error);
-                    alert("Không thể nộp bài. Vui lòng thử lại.");
-                }
-            });
-        }), 100;
     });
+
+    // Modal kết quả thi 
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('button.exam-page-submit-btn')) {
+            SaveQuestion();
+
+            setTimeout(() => {
+                $.ajax({
+                    url: '/student/exam/SubmitExam',
+                    type: 'POST',
+                    success: function (res) {
+                        if (res.success) {
+                            showExamResultModal(res);
+                        } else {
+                            alert(res.message || "Có lỗi xảy ra.");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Lỗi khi gửi yêu cầu:", error);
+                        alert("Không thể nộp bài. Vui lòng thử lại.");
+                    }
+                });
+            }, 200);
+
+        }
+    });
+
+    // Hàm hiển thị modal kết quả thi
+    function showExamResultModal(examData) {
+        // Cập nhật nội dung modal với dữ liệu từ server
+        document.getElementById('examResultExamName').textContent = examData.title;
+        document.getElementById('examResultStudentName').textContent = examData.username;
+        document.getElementById('examResultCompletionTime').textContent = examData.timeDone;
+        document.getElementById('examResultCorrectAnswers').textContent = examData.correctAnswers || 'Chưa có';
+        document.getElementById('examResultScore').textContent = examData.score || 'Chưa có';
+
+        // Cập nhật thông điệp kết quả
+        const score = examData.score || 8.0;
+        const resultMessage = getResultMessage(score);
+        const scoreClass = getScoreClass(score);
+
+        const resultMessageElement = document.getElementById('examResultMessage');
+        resultMessageElement.className = `exam-result-message-text ${scoreClass}`;
+        resultMessageElement.textContent = resultMessage;
+
+        // Hiển thị modal
+        document.getElementById('examResultModalWrapper').classList.add('show');
+    }
+
+    // Hàm chuyển hướng về trang chủ
+    $(document).on('click', 'button.exam-result-btn-primary', function () {
+        window.location.href = '/student';
+    });
+
+    // Hàm lấy class CSS dựa trên điểm số
+    function getScoreClass(score) {
+        if (score >= 8.0) return 'exam-result-excellent';
+        if (score >= 6.5) return 'exam-result-good';
+        if (score >= 5.0) return 'exam-result-average';
+        return 'exam-result-poor';
+    }
+
+    // Hàm lấy thông điệp kết quả
+    function getResultMessage(score) {
+        if (score >= 8.0) return '🎉 Xuất sắc! Bạn đã hoàn thành bài thi rất tốt!';
+        if (score >= 6.5) return '👍 Tốt! Bạn đã làm bài thi khá tốt!';
+        if (score >= 5.0) return '✅ Đạt! Bạn đã hoàn thành bài thi!';
+        return '📚 Cần cố gắng thêm! Hãy ôn tập lại kiến thức!';
+    }
 })

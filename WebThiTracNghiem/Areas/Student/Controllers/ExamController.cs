@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -14,10 +15,13 @@ namespace WebThiTracNghiem.Areas.Student.Controllers
 	{
 		private readonly ApplicationDbContext _db;
 		private readonly ILogger<ExamController> _logger;
-		public ExamController(ApplicationDbContext db, ILogger<ExamController> logger)
+		private readonly UserManager<ApplicationUser> _userManager;
+
+		public ExamController(ApplicationDbContext db, ILogger<ExamController> logger, UserManager<ApplicationUser> userManager)
 		{
 			_db = db;
 			_logger = logger;
+			_userManager = userManager;
 		}
 
 		public async Task<IActionResult> Index()
@@ -206,17 +210,19 @@ namespace WebThiTracNghiem.Areas.Student.Controllers
 				}
 			}
 
-			double score = Math.Round((double)correctAnswers / totalQuestions * 10, 2);
+			double score = Math.Round((double)correctAnswers / totalQuestions * currentSession.DeThi.DiemToiDa, 2);
+			var user = await _userManager.GetUserAsync(User);
 
-			if (currentSession.DeThi.ShowKQ)
+
+            if (currentSession.DeThi.ShowKQ)
 			{
 				return Ok(new
 				{
 					success = true,
 					message = "Nộp bài thành công!",
 					title = currentSession.DeThi.TieuDe,
-					username = User.Identity.Name,
-					timeDone = DateTime.Now,
+					username = user?.HoTen,
+					timeDone = DateTime.Now.ToString("HH:mm dd/MM/yyyy"),
 					correctAnswers = correctAnswers + " / " + totalQuestions,
 					score = score.ToString()
 				});
@@ -228,8 +234,8 @@ namespace WebThiTracNghiem.Areas.Student.Controllers
 					success = true,
 					message = "Nộp bài thành công!",
 					title = currentSession.DeThi.TieuDe,
-					username = User.Identity.Name,
-					timeDone = DateTime.Now,
+					username = user?.HoTen,
+					timeDone = DateTime.Now.ToString("HH:mm dd/MM/yyyy"),
 				});
 			}
 
