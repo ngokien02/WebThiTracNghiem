@@ -1,14 +1,4 @@
 ﻿$(() => {
-    // Hien thi trang tao de thi
-    $(document).on("click", "a.CreateExam", function (e) {
-        e.preventDefault();
-        var url = $(this).attr("href");
-        $.get(url, function (data) {
-            $(".main-content").html(data);
-        });
-        $('a').removeClass('active');
-        $('a.CreateExam').addClass('active');
-    })
 
     // Hiển thị thông báo swal
     function showAlert(title, message, icon = "info") {
@@ -32,58 +22,54 @@
     });
 
     // Thêm/xóa câu hỏi thủ công
-    let questionCount = 0;
-
     function createQuestionItem(idx) {
         const div = $(`
-      <div class="manual-question question-item" style="border:1px solid #eee;padding:1rem;margin-bottom:1rem;border-radius:6px;">
-          <div class="form-group">
-              <label>Câu hỏi ${idx + 1}:</label>
-              <input type="text" name="question-${idx}" class="question-content" placeholder="Nhập nội dung câu hỏi...">
-          </div>
-          <div class="form-row" style="display:flex; gap:1rem;">
-              <div class="form-group" style="flex:1;">
-                  <label>Đáp án A:</label>
-                  <input type="text" name="answerA-${idx}" class="answer">
-              </div>
-              <div class="form-group" style="flex:1;">
-                  <label>Đáp án B:</label>
-                  <input type="text" name="answerB-${idx}" class="answer">
-              </div>
-              <div class="form-group" style="flex:1;">
-                  <label>Đáp án C:</label>
-                  <input type="text" name="answerC-${idx}" class="answer">
-              </div>
-              <div class="form-group" style="flex:1;">
-                  <label>Đáp án D:</label>
-                  <input type="text" name="answerD-${idx}" class="answer">
-              </div>
-          </div>
-        <div class="form-group">
-    <label>Đáp án đúng:</label>
-    <div class="correct-answers">
-        <label>
-            <input type="checkbox" name="correct-${idx}" value="A">
-            A
-        </label>
-        <label>
-            <input type="checkbox" name="correct-${idx}" value="B">
-            B
-        </label>
-        <label>
-            <input type="checkbox" name="correct-${idx}" value="C">
-            C
-        </label>
-        <label>
-            <input type="checkbox" name="correct-${idx}" value="D">
-            D
-        </label>
-    </div>
-    </div>
+   <div class="manual-question question-item" style="border:1px solid #eee; padding:1rem; margin-bottom:1rem; border-radius:6px;">
+       <div class="form-group">
+           <label>Câu hỏi ${idx + 1}:</label>
+           <input type="text" name="question-${idx}" class="question-content answer-input" placeholder="Nhập nội dung câu hỏi...">
+       </div>
 
-          <button type="button" class="btn secondary remove-question-btn">Xóa câu hỏi</button>
-      </div>
-  `);
+       <div class="form-row" style="display:flex; gap:1rem;">
+           <div class="answer-row form-group" style="flex:1;">
+               <label>Đáp án A:</label>
+               <input type="text" name="answerA-${idx}" class="answer-input">
+           </div>
+           <div class="answer-row form-group" style="flex:1;">
+               <label>Đáp án B:</label>
+               <input type="text" name="answerB-${idx}" class="answer-input">
+           </div>
+           <div class="answer-row form-group" style="flex:1;">
+               <label>Đáp án C:</label>
+               <input type="text" name="answerC-${idx}" class="answer-input">
+           </div>
+           <div class="answer-row form-group" style="flex:1;">
+               <label>Đáp án D:</label>
+               <input type="text" name="answerD-${idx}" class="answer-input">
+           </div>
+       </div>
+
+       <div class="form-group">
+           <label>Đáp án đúng:</label>
+           <div class="correct-answers">
+               <label>
+                   <input type="checkbox" name="correct-${idx}" value="A" class="answer-checkbox"> A
+               </label>
+               <label>
+                   <input type="checkbox" name="correct-${idx}" value="B" class="answer-checkbox"> B
+               </label>
+               <label>
+                   <input type="checkbox" name="correct-${idx}" value="C" class="answer-checkbox"> C
+               </label>
+               <label>
+                   <input type="checkbox" name="correct-${idx}" value="D" class="answer-checkbox"> D
+               </label>
+           </div>
+       </div>
+
+       <button type="button" class="btn secondary remove-question-btn">Xóa câu hỏi</button>
+   </div>
+   `);
         return div;
     }
 
@@ -323,6 +309,7 @@
         }
         else if (method === 'manual') {
             $('#errDeThiFile').text(''); // Xóa lỗi cũ
+
             if (soCauHoi === 0) {
                 $('#errDeThiFile').text('Vui lòng thêm ít nhất một câu hỏi.');
                 hasError = true;
@@ -331,8 +318,8 @@
 
                 $('.question-item').each(function (index) {
                     const questionText = $(this).find('.question-content').val()?.trim();
-                    const answers = $(this).find('.answer');
-                    const correctAnswer = $(this).find('select[name^="correct"]').val();
+                    const answers = $(this).find('.answer-input');
+                    const correctChecked = $(this).find('.answer-checkbox:checked');
 
                     // Kiểm tra nội dung câu hỏi
                     if (!questionText) {
@@ -358,10 +345,10 @@
                         return false;
                     }
 
-                    // Kiểm tra đáp án đúng đã chọn chưa
-                    if (!correctAnswer) {
+                    // Kiểm tra đáp án đúng (checkbox phải được chọn)
+                    if (correctChecked.length === 0) {
                         $('#errDeThiFile').text(`Câu hỏi số ${index + 1} chưa chọn đáp án đúng.`);
-                        $(this).find('select[name^="correct"]').focus();
+                        $(this).find('.answer-checkbox').first().focus();
                         hasEmptyField = true;
                         return false;
                     }
@@ -527,6 +514,56 @@
     });
 
     //xử lý tạo đề thi hoàn chỉnh
+    function createQuestionItem(idx) {
+        const div = $(`
+   <div class="manual-question question-item" style="border:1px solid #eee; padding:1rem; margin-bottom:1rem; border-radius:6px;">
+       <div class="form-group">
+           <label>Câu hỏi ${idx + 1}:</label>
+           <input type="text" name="question-${idx}" class="question-content answer-input" placeholder="Nhập nội dung câu hỏi...">
+       </div>
+
+       <div class="form-row" style="display:flex; gap:1rem;">
+           <div class="answer-row form-group" style="flex:1;">
+               <label>Đáp án A:</label>
+               <input type="text" name="answerA-${idx}" class="answer-input">
+           </div>
+           <div class="answer-row form-group" style="flex:1;">
+               <label>Đáp án B:</label>
+               <input type="text" name="answerB-${idx}" class="answer-input">
+           </div>
+           <div class="answer-row form-group" style="flex:1;">
+               <label>Đáp án C:</label>
+               <input type="text" name="answerC-${idx}" class="answer-input">
+           </div>
+           <div class="answer-row form-group" style="flex:1;">
+               <label>Đáp án D:</label>
+               <input type="text" name="answerD-${idx}" class="answer-input">
+           </div>
+       </div>
+
+       <div class="form-group">
+           <label>Đáp án đúng:</label>
+           <div class="correct-answers">
+               <label>
+                   <input type="checkbox" name="correct-${idx}" value="A" class="answer-checkbox"> A
+               </label>
+               <label>
+                   <input type="checkbox" name="correct-${idx}" value="B" class="answer-checkbox"> B
+               </label>
+               <label>
+                   <input type="checkbox" name="correct-${idx}" value="C" class="answer-checkbox"> C
+               </label>
+               <label>
+                   <input type="checkbox" name="correct-${idx}" value="D" class="answer-checkbox"> D
+               </label>
+           </div>
+       </div>
+
+       <button type="button" class="btn secondary remove-question-btn">Xóa câu hỏi</button>
+   </div>
+   `);
+        return div;
+    }
     $(document).on('click', '#modal-confirm-btn', function (e) {
 
         e.preventDefault();
@@ -541,7 +578,7 @@
             const type = $(this).attr('type');
 
             if (name === 'exam-create-method' && type === 'radio') {
-                return; 
+                return;
             }
             if (name === 'DiemToiDa') {
                 return;
@@ -552,7 +589,7 @@
                     fd.append(name, files[0]);
                 }
             } else if (type === 'checkbox') {
-                return; 
+                return;
             } else {
                 fd.append(name, $(this).val());
             }
@@ -575,36 +612,61 @@
         fd.append('RandomDapAn', $('#RandomDapAn').is(':checked') ? 'true' : 'false');
         fd.append('ShowKQ', $('#ShowKQ').is(':checked') ? 'true' : 'false');
 
-
         const cauHoiObj = [];
+        $('.question-item').each(function (i) {
+            const isFile = $(this).find('#contentQuestion').length > 0;
 
-        $('.question-item').each(function () {
-            const noiDungCH = $(this).find('#contentQuestion').val()?.split('. ').slice(1).join('. ').trim() || '';
-            const isMultipleChoice = $(this).find('#questionType').prop('checked');
+            if (isFile) {
+                // 📁 Câu hỏi từ file Excel
+                const noiDungCH = $(this).find('#contentQuestion').val()?.split('. ').slice(1).join('. ').trim() || '';
+                const isMultipleChoice = $(this).find('#questionType').prop('checked');
 
-            const cauHoi = {
-                NoiDung: noiDungCH,
-                Loai: isMultipleChoice ? "NhieuDapAn" : "TracNghiem",
-                DapAnList: []
-            };
+                const cauHoi = {
+                    NoiDung: noiDungCH,
+                    Loai: isMultipleChoice ? "NhieuDapAn" : "TracNghiem",
+                    DapAnList: []
+                };
 
-            $(this).find('.answer-row').each(function () {
-                const answerText = $(this).find('.answer-input').val()?.split('. ').slice(1).join('. ').trim() || '';
-                const isCorrect = $(this).find('.answer-checkbox').prop('checked');
+                $(this).find('.answer-row').each(function () {
+                    const answerText = $(this).find('.answer-input').val()?.split('. ').slice(1).join('. ').trim() || '';
+                    const isCorrect = $(this).find('.answer-checkbox').prop('checked');
 
-                cauHoi.DapAnList.push({
-                    NoiDung: answerText,
-                    DungSai: isCorrect
+                    cauHoi.DapAnList.push({
+                        NoiDung: answerText,
+                        DungSai: isCorrect
+                    });
                 });
-            });
 
-            cauHoiObj.push(cauHoi);
+                cauHoiObj.push(cauHoi);
+            } else {
+                // ✍️ Câu hỏi tạo thủ công bằng createQuestionItem(idx)
+                const cauHoi = {
+                    NoiDung: $(this).find('.question-content').val()?.trim() || '',
+                    Loai: $(this).find('.correct-answers input:checked').length > 1 ? "NhieuDapAn" : "TracNghiem",
+                    DapAnList: []
+                };
+
+                ["A", "B", "C", "D"].forEach(opt => {
+                    const answer = $(this).find(`input[name='answer${opt}-${i}']`).val()?.trim();
+                    const isCorrect = $(this).find(`input[name='correct-${i}'][value='${opt}']`).prop('checked');
+                    if (answer) {
+                        cauHoi.DapAnList.push({
+                            NoiDung: answer,
+                            DungSai: isCorrect
+                        });
+                    }
+                });
+
+                cauHoiObj.push(cauHoi);
+            }
         });
 
         const soCauHoi = $('.question-item').length;
         fd.append("SoCauHoi", soCauHoi);
 
         fd.append("cauHoiObj", JSON.stringify(cauHoiObj));
+
+        fd.append("PhuongThucTao", "KetHop");
 
         // Hiển thị thông báo swal
         function showAlert(title, message, icon = "info") {

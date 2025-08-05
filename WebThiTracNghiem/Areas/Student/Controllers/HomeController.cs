@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebThiTracNghiem.Models;
 
 namespace WebThiTracNghiem.Areas.Student.Controllers

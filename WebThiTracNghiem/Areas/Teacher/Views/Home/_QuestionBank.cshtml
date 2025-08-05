@@ -1,0 +1,98 @@
+﻿@model List<WebThiTracNghiem.Models.CauHoi>
+
+<div class="main-content">
+    <div class="question-page">
+        <h1>Ngân hàng câu hỏi</h1>
+        <div class="header-actions">
+            <a asp-controller="QuestionBank" asp-action="Import" class="btn secondary">
+                <i class="fas fa-file-import"></i> Nhập từ file
+            </a>
+            <a asp-controller="QuestionBank" asp-action="Create" class="btn primary AddQuestion">
+                <i class="fas fa-plus"></i> Thêm câu hỏi mới
+            </a>
+        </div>
+    </div>
+
+    <div class="questionbank-section" style="background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(25,118,210,0.08);padding:2.5rem 2rem;max-width:1200px;margin:2rem auto;">
+
+        <!-- Bộ lọc -->
+        <div class="filters-section">
+            <div class="filter-group">
+                <label for="subject">Môn học:</label>
+                <select id="subject">
+                    <option value="">Tất cả môn học</option>
+                    <option value="auto-repair">Kỹ thuật Sửa chữa Ô tô</option>
+                    <option value="traffic-safety">An toàn Giao thông</option>
+                    <option value="mechanics">Động cơ đốt trong</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="chapter">Chương:</label>
+                <select id="chapter">
+                    <option value="">Tất cả chương</option>
+                    <option value="1">Chương 1</option>
+                    <option value="2">Chương 2</option>
+                    <option value="3">Chương 3</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="difficulty">Độ khó:</label>
+                <select id="difficulty">
+                    <option value="">Tất cả</option>
+                    <option value="easy">Dễ</option>
+                    <option value="medium">Trung bình</option>
+                    <option value="hard">Khó</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="type">Loại câu hỏi:</label>
+                <select id="type">
+                    <option value="">Tất cả</option>
+                    <option value="single">Một đáp án</option>
+                    <option value="multiple">Nhiều đáp án</option>
+                    <option value="true-false">Đúng/Sai</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Danh sách câu hỏi -->
+        <div class="questions-list">
+            @foreach (var cauHoi in Model)
+            {
+                <div class="question-card">
+                    <div class="question-header">
+                        <span class="question-type">@cauHoi.Loai</span>
+                        <div class="question-actions">
+                            <a asp-action="Edit" asp-route-id="@cauHoi.Id" class="btn-icon"><i class="fas fa-edit"></i></a>
+                            <a asp-action="Copy" asp-route-id="@cauHoi.Id" class="btn-icon"><i class="fas fa-copy"></i></a>
+                            <a asp-action="Delete" asp-route-id="@cauHoi.Id" class="btn-icon danger"><i class="fas fa-trash"></i></a>
+                        </div>
+                    </div>
+                    <div class="question-content">
+                        <p class="question-text">@cauHoi.NoiDung</p>
+                        <div class="answer-options">
+                            @foreach (var dapAn in cauHoi.DapAnList)
+                            {
+                                <div class="answer-option @(dapAn.DungSai ? "correct" : "")">
+                                    <span class="option-label">@dapAn.Id</span>
+                                    <span class="option-text">@dapAn.NoiDung</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Phân trang -->
+        <div class="pagination">
+            <button class="btn-page"><i class="fas fa-chevron-left"></i></button>
+            <button class="btn-page active">1</button>
+            <button class="btn-page">2</button>
+            <button class="btn-page">3</button>
+            <span class="pagination-dots">...</span>
+            <button class="btn-page">10</button>
+            <button class="btn-page"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+</div>

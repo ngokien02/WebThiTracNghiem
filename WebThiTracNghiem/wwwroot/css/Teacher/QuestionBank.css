@@ -1,0 +1,251 @@
+﻿/* Filters Section */
+.filters-section {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+    .filter-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .filter-group select {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
+
+/* Questions List */
+.questions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.question-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    transition: transform 0.2s;
+}
+
+    .question-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.question-type {
+    background: #E3F2FD;
+    color: #1976D2;
+    padding: 0.25rem 0.75rem;
+    border-radius: 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.difficulty {
+    padding: 0.25rem 0.75rem;
+    border-radius: 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+
+    .difficulty.easy {
+        background: #E8F5E9;
+        color: #388E3C;
+    }
+
+    .difficulty.medium {
+        background: #FFF3E0;
+        color: #F57C00;
+    }
+
+    .difficulty.hard {
+        background: #FFEBEE;
+        color: #D32F2F;
+    }
+
+.question-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: #666;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+    .btn-icon:hover {
+        background: #f5f5f5;
+        color: #333;
+    }
+
+    .btn-icon.danger {
+        color: #d32f2f;
+    }
+
+        .btn-icon.danger:hover {
+            background: #ffebee;
+        }
+
+.question-content {
+    margin-bottom: 1rem;
+}
+
+.question-text {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.answer-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-left: 1rem;
+}
+
+.answer-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+    .answer-option:hover {
+        background: #f5f5f5;
+    }
+
+    .answer-option.correct {
+        background: #E8F5E9;
+    }
+
+.option-label {
+    font-weight: 500;
+    color: #1976D2;
+    min-width: 24px;
+}
+
+.option-text {
+    color: #333;
+    line-height: 1.4;
+}
+
+.question-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.question-info {
+    color: #666;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+.btn-page {
+    min-width: 36px;
+    height: 36px;
+    border: none;
+    background: #fff;
+    color: #666;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .btn-page:hover {
+        background: #f5f5f5;
+        color: #333;
+    }
+
+    .btn-page.active {
+        background: #1976D2;
+        color: white;
+    }
+
+.pagination-dots {
+    color: #666;
+    padding: 0 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .filters-section {
+        flex-direction: column;
+    }
+
+    .filter-group {
+        width: 100%;
+    }
+
+    .question-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .question-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .question-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .header-actions {
+        display: flex;
+        justify-content: flex-end; /* Đẩy nội dung sang phải */
+        gap: 1rem; /* Khoảng cách giữa các nút */
+        margin-top: 1rem;
+    }
+}

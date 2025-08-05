@@ -1,0 +1,117 @@
+﻿@model List<DeThi>
+@{
+	ViewData["Title"] = "Báo cáo thống kê";
+}
+
+<!-- Main Content -->
+<main class="main-content">
+	<div class="page-header">
+		<h1>Báo cáo thống kê</h1>
+	</div>
+
+	<div class="filter-section">
+		<select class="filter-select">
+			<option value="">Tất cả kỳ thi</option>
+			@foreach (var item in Model.Select(m => m.TieuDe).Distinct())
+			{
+				<option value="@item">@item</option>
+			}
+		</select>
+		<select class="filter-select">
+			<option value="">Tất cả môn học</option>
+			<option value="cntt">Công nghệ thông tin</option>
+			<option value="oto">Công nghệ ô tô</option>
+		</select>
+		<select class="filter-select">
+			<option value="">Tất cả lớp</option>
+			<option value="CD23OT01">CD23OT01</option>
+			<option value="CD23OT02">CD23OT02</option>
+		</select>
+		<button class="filter-button"><i class="fas fa-filter"></i> Lọc</button>
+	</div>
+	@{
+		var thongKe = ViewBag.ThongKe;
+	}
+
+	<div class="stats-grid">
+		<div class="stat-card">
+			<h3>Người tham gia:</h3>
+			<p>@thongKe.TongNguoi</p>
+		</div>
+		<div class="stat-card">
+			<h3>Điểm trung bình:</h3>
+			<p>@thongKe.DiemTB.ToString("0.00")</p>   <!-- Ví dụ: 4.05 -->
+		</div>
+
+		<div class="stat-card">
+			<h3>Tỷ lệ trên TB:</h3>
+			<p>@thongKe.TyLeTrenTB.ToString("0.00")%</p>  <!-- Ví dụ: 76.19% -->
+		</div>
+		<div class="stat-button">
+			<button class="btn-detail" onclick="window.location.href='/ThongKe/ChiTiet'">
+				Xem Chi tiết kết quả
+			</button>
+		</div>
+	</div>
+	<div class="chart-section">
+		<div id="examChart" style="width:100%; height:350px;"></div>
+	</div>
+
+	<div class="reports-table-wrapper">
+		<table class="reports-table">
+			<thead>
+				<tr>
+					<th>STT</th>
+					<th>Tiêu đề</th>
+					<th>Mã đề</th>
+					<th>Giờ bắt đầu</th>
+					<th>Giờ kết thúc</th>
+					<th>Thời gian</th>
+					<th>Số câu hỏi</th>
+					<th>Giảng viên</th>
+					<th>Hiển thị kết quả?</th>
+				</tr>
+			</thead>
+			<tbody>
+				@for (int i = 0; i < Model.Count; i++)
+				{
+					var d = Model[i];
+					<tr>
+						<td>@(i + 1)</td>
+						<td>@d.TieuDe</td>
+						<td>@d.MaDe</td>
+						<td>@d.GioBD.ToString("HH:mm dd/MM/yyyy")</td>
+						<td>@d.GioKT.ToString("HH:mm dd/MM/yyyy")</td>
+						<td>@d.ThoiGian phút</td>
+						<td>@d.SoCauHoi</td>
+						<td>@d.GiangVien?.UserName</td>
+						<td>@(d.ShowKQ ? "Có" : "Không")</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+
+	<div class="pagination">
+		<button class="page-btn active">1</button>
+		<button class="page-btn">2</button>
+		<button class="page-btn">3</button>
+		<button class="page-btn">...</button>
+		<button class="page-btn">10</button>
+	</div>
+</main>
+@{
+	var diemTB = ((double)ViewBag.ThongKe.DiemTB).ToString("0.##");
+	var tyLeTrenTB = ((double)ViewBag.ThongKe.TyLeTrenTB).ToString("0.##");
+	var nguoiThamGia = ViewBag.ThongKe.TongNguoi;
+}
+<script>
+	$(() => {
+		const stats = {
+			diemTB: "@diemTB",
+			tyLeTrenTB: "@tyLeTrenTB", 
+				nguoiThamGia: @nguoiThamGia 
+			};
+		});
+</script>
+

@@ -176,11 +176,6 @@
     }
 
     // xu ly nop bai, cham diem
-    $(document).on("click", "button.exam-page-submit-btn", function () {
-
-    });
-
-    // Modal kết quả thi 
     document.addEventListener('click', function (e) {
         if (e.target.closest('button.exam-page-submit-btn')) {
             SaveQuestion();
