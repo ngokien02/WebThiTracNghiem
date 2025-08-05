@@ -70,5 +70,15 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 
 			return PartialView("_ActiveExam", danhSachDeThi);
 		}
+		public IActionResult Results()
+		{
+			var ketQuas = _db.KetQua
+				.Include(k => k.SinhVien)
+				.Include(k => k.DeThi)
+				.AsNoTracking()
+				.ToList();
+
+			return PartialView("_Results", ketQuas);
+		}
 	}
 }

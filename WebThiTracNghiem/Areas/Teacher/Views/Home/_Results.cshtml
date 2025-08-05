@@ -1,0 +1,148 @@
+﻿@model List<KetQua>
+
+<main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Kết quả thi</h1>
+        <div class="header-actions">
+            <button class="btn-export">
+                <i class="fas fa-file-lines"></i>
+                Xuất báo cáo
+            </button>
+        </div>
+    </div>
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-info">
+                <h3>Tổng số sinh viên</h3>
+                <p class="stat-number">@Model.Select(k => k.IdSinhVien).Distinct().Count()</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-info">
+                <h3>Đã hoàn thành</h3>
+                <p class="stat-number">@Model.Count()</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
+            <div class="stat-info">
+                <h3>Tỷ lệ đạt</h3>
+                <p class="stat-number">
+                    @{
+                        var total = Model.Count;
+                        var pass = Model.Count(k => k.Diem >= 5);
+                        var percent = total > 0 ? pass * 100 / total : 0;
+                    }
+                    @percent%
+                </p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="stat-info">
+                <h3>Điểm trung bình</h3>
+                <p class="stat-number">@Model.Where(k => k.Diem.HasValue).Average(k => k.Diem.Value).ToString("0.00")</p>
+            </div>
+        </div>
+    </div>
+    <!-- Filters -->
+  
+    <!-- Results Table -->
+    <div class="results-section">
+        <div class="results-header">
+            <h2>Danh sách kết quả</h2>
+            <div class="results-actions">
+                <div class="dropdown-filter">
+                    <button class="btn-filter" onclick="toggleFilterDropdown()">
+                        <i class="fas fa-sliders-h"></i> Lọc
+                    </button>
+                    <div class="filter-dropdown-content" id="filterDropdown">
+                        <label for="fromDate">Từ ngày:</label>
+                        <input type="date" id="fromDate" />
+
+                        <label for="toDate">Đến ngày:</label>
+                        <input type="date" id="toDate" />
+
+                        <label for="examSelect">Kỳ thi:</label>
+                        <select id="examSelect">
+                            <option value="">Tất cả</option>
+                            <option value="thi1">Kỳ thi giữa kỳ</option>
+                            <option value="thi2">Kỳ thi cuối kỳ</option>
+                        </select>
+
+                        <button class="btn-apply">Áp dụng</button>
+                    </div>
+                </div>
+
+                <div class="search-box">
+                    <input type="text" placeholder="Tìm kiếm sinh viên..." />
+                    <button><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="results-table-container">
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>MSSV</th>
+                        <th>Họ và tên</th>
+                        <th>Đề Thi</th>
+                        <th>Ngày thi</th>
+                        <th>Thời gian làm bài</th>
+                        <th>Điểm số</th>
+                        <th>Kết quả</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var duration = item.GioNop.HasValue
+                        ? (item.GioNop.Value - item.GioLam).ToString(@"hh\:mm\:ss")
+                        : "N/A";
+
+                        <tr>
+                            <td>@item.SinhVien?.UserName</td>
+                            <td>@item.SinhVien?.HoTen</td>
+                            <td>@item.DeThi?.TieuDe</td>
+                            <td>@item.DeThi?.ThoiGian.ToString("dd/MM/yyyy")</td>
+                            <td>@duration</td>
+                            <td>@item.Diem?.ToString("0.00")</td>
+                            <td>
+                                <span class="status-badge @(item.Diem >= 5 ? "passed" : "failed")">
+                                    @(item.Diem >= 5 ? "Đạt" : "Không đạt")
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn-view" title="Xem chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Placeholder -->
+        <div class="pagination">
+            <button class="page-btn" disabled><i class="fas fa-chevron-left"></i></button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <span class="page-dots">...</span>
+            <button class="page-btn">10</button>
+            <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+</main>
+<script>
+    function toggleFilterDropdown() {
+        const dropdown = document.getElementById("filterDropdown");
+        dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+    }
+</script>
