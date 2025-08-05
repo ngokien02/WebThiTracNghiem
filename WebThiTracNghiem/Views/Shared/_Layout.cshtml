@@ -12,10 +12,9 @@
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/Teacher/QuestionBank.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/Teacher/Report.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/Teacher/Active.css" asp-append-version="true" />
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body>
 	<div class="container">
@@ -125,6 +124,8 @@
 	<a href="#" class="contact-fab" title="Liên hệ với nhà trường">
 		<i class="fas fa-comments"></i>
 	</a>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
@@ -132,7 +133,6 @@
 	<script src="~/js/Student/Exam.js" asp-append-version="true"></script>
 	<script src="~/js/Profile.js" asp-append-version="true"></script>
 	<script src="~/js/Teacher/Render.js" asp-append-version="true"></script>
-	<script src="~/js/Teacher/ChartExam.js" asp-append-version="true"></script>
 	@await RenderSectionAsync("Scripts", required: false)
 	@await RenderSectionAsync("ProfileStyle", required: false);
 </body>

@@ -61,5 +61,14 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 
 			return PartialView("_Reports", deThis);
 		}
+		public IActionResult ActiveExam()
+		{
+			var danhSachDeThi = _db.DeThi
+				.Where(dt => DateTime.Now >= dt.GioBD && DateTime.Now <= dt.GioKT)
+				.Include(dt => dt.GiangVien)
+				.ToList();
+
+			return PartialView("_ActiveExam", danhSachDeThi);
+		}
 	}
 }
