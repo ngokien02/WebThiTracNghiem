@@ -16,7 +16,6 @@
 
     handleAjaxNav("a.QuestionBank");
     handleAjaxNav("a.CreateExam");
-    handleAjaxNav("a.Reports");
     handleAjaxNav("a.ActiveExam");
     handleAjaxNav("a.ExamResult");
 

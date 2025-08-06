@@ -410,7 +410,7 @@ body {
 /* Main Content Styles */
 .main-content {
     flex: 1;
-    padding: 2rem;
+    padding: 1rem;
     min-width: 0; /* Để tránh content bị overflow */
 }
 
