@@ -5,14 +5,12 @@
 	var cauHoi1 = Model.CauHoiList.ToList()[0];
 }
 <input type="hidden" id="IdCauHoi" value="@cauHoi1.Id" />
+<input type="hidden" id="QuestionIndex" value="" />
 
 <!-- Header với thông tin tiến độ và thời gian -->
 <div class="exam-page-header">
-	@{
-		var min = Model.ThoiGian;
-	}
 	<div class="exam-page-progress">0 / 15 câu</div>
-	<div class="exam-page-timer">45 phút 30 giây</div>
+	<div class="exam-page-timer">@Model.ThoiGian phút</div>
 </div>
 
 <div class="exam-page-container">
@@ -41,10 +39,10 @@
 		</div>
 
 		<div class="exam-page-navigation">
-			<button class="exam-page-nav-btn prev" disabled>
+			<button class="exam-page-nav-btn" direct="prev">
 				<i class="fas fa-chevron-left"></i>
 			</button>
-			<button class="exam-page-nav-btn next">
+			<button class="exam-page-nav-btn" direct="next">
 				<i class="fas fa-chevron-right"></i>
 			</button>
 		</div>

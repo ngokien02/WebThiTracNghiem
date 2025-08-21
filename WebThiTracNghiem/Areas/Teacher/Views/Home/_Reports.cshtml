@@ -17,16 +17,6 @@
 				<option value="@item">@item</option>
 			}
 		</select>
-		<select class="filter-select">
-			<option value="">Tất cả môn học</option>
-			<option value="cntt">Công nghệ thông tin</option>
-			<option value="oto">Công nghệ ô tô</option>
-		</select>
-		<select class="filter-select">
-			<option value="">Tất cả lớp</option>
-			<option value="CD23OT01">CD23OT01</option>
-			<option value="CD23OT02">CD23OT02</option>
-		</select>
 		<button class="filter-button"><i class="fas fa-filter"></i> Lọc</button>
 	</div>
 	@{
@@ -40,15 +30,15 @@
 		</div>
 		<div class="stat-card">
 			<h3>Điểm trung bình:</h3>
-			<p>@thongKe.DiemTB.ToString("0.00")</p>   <!-- Ví dụ: 4.05 -->
+			<p>@thongKe.DiemTB.ToString("0.00")</p>   
 		</div>
 
 		<div class="stat-card">
 			<h3>Tỷ lệ trên TB:</h3>
-			<p>@thongKe.TyLeTrenTB.ToString("0.00")%</p>  <!-- Ví dụ: 76.19% -->
+			<p>@thongKe.TyLeTrenTB.ToString("0.00")%</p>  
 		</div>
 		<div class="stat-button">
-			<button class="btn-detail" onclick="window.location.href='/ThongKe/ChiTiet'">
+			<button class="btn-detail">
 				Xem Chi tiết kết quả
 			</button>
 		</div>
@@ -100,6 +90,7 @@
 		<button class="page-btn">10</button>
 	</div>
 </main>
+
 @{
 	var diemTB = ((double)ViewBag.ThongKe.DiemTB).ToString("0.##");
 	var tyLeTrenTB = ((double)ViewBag.ThongKe.TyLeTrenTB).ToString("0.##");

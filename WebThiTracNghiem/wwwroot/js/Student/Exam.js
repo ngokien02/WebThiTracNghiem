@@ -103,6 +103,45 @@
         }, 100);
     });
 
+    //button dieu huong trai phai
+    $(document).on("click", "button.exam-page-nav-btn", function (e) {
+
+        var direct = $(this).attr("direct");
+
+        if (direct === "next") {
+            handleDirectButtons("next");
+        } else {
+            handleDirectButtons("prev");
+        }
+    });
+    //ham xu ly dieu huong
+    function handleDirectButtons(direct) {
+
+        document.querySelectorAll(".exam-page-question-number").forEach(div => {
+            if (div.classList.contains("current")) {
+
+                var directDiv = direct === "next" ? $(div).next(".exam-page-question-number") : $(div).prev(".exam-page-question-number");
+                var directId = directDiv.data("quest-id");
+                var directIndex = directDiv.data("quest-index");
+
+                $(div).removeClass("current");
+                if (directDiv.length === 0) {
+                    return;
+                }
+                renderQuestion(directId);
+                $("#QuestionIndex").val(directIndex);
+            }
+        });
+        var sttCauHoi = parseInt($("#QuestionIndex").val());
+        $("div.exam-page-question-number").each(function () {
+            let value = parseInt($(this).text().trim());
+            if (value == sttCauHoi) {
+                $(this).addClass("current");
+            }
+        });
+        SaveQuestion();
+    }
+
     //luu cau hoi, ap an dang lam
     function SaveQuestion() {
         const questionId = parseInt($("#IdCauHoi").val());
