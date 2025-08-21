@@ -80,6 +80,48 @@
             }
 
             $("body").html(data);
+
+            const examId = $("input#IdDeThi").val();
+            const timeInput = document.getElementById("ExamTime");
+            const totalMinute = parseInt(timeInput.value);
+            const totalTime = totalMinute * 60;
+            const timerKey = `remainingTime_${examId}`;
+            const finishKey = `finishTime_ ${examId}`;
+
+            let remainingTime = localStorage.getItem(timerKey) ? parseInt(localStorage.getItem(timerKey)) : totalTime;
+
+            const timerDisplay = document.getElementById('exam-timer');
+            let countdownInterval;
+
+            function formatTime(seconds) {
+                const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+                const s = String(seconds % 60).padStart(2, '0');
+                return `${m} : ${s}`;
+            }
+
+            function startCountdown() {
+                timerDisplay.textContent = formatTime(remainingTime);
+
+                countdownInterval = setInterval(() => {
+                    remainingTime--;
+                    timerDisplay.textContent = formatTime(remainingTime);
+
+                    localStorage.setItem(timerKey, remainingTime);
+
+                    if (remainingTime <= 0) {
+                        clearInterval(countdownInterval);
+                        localStorage.removeItem(timerKey);
+                        handleTimeUp();
+                    }
+                }, 1000);
+            }
+
+            function handleTimeUp() {
+                showAlert('Hết giờ', 'Đã hết giờ làm bài, hệ thống sẽ tự động nộp bài!');
+                handleSubmitExam();
+            }
+
+            startCountdown();
         });
     });
 
@@ -114,6 +156,7 @@
             handleDirectButtons("prev");
         }
     });
+
     //ham xu ly dieu huong
     function handleDirectButtons(direct) {
 
@@ -217,28 +260,31 @@
     // xu ly nop bai, cham diem
     document.addEventListener('click', function (e) {
         if (e.target.closest('button.exam-page-submit-btn')) {
-            SaveQuestion();
-
-            setTimeout(() => {
-                $.ajax({
-                    url: '/student/exam/SubmitExam',
-                    type: 'POST',
-                    success: function (res) {
-                        if (res.success) {
-                            showExamResultModal(res);
-                        } else {
-                            alert(res.message || "Có lỗi xảy ra.");
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Lỗi khi gửi yêu cầu:", error);
-                        alert("Không thể nộp bài. Vui lòng thử lại.");
-                    }
-                });
-            }, 200);
-
+            handleSubmitExam();
         }
     });
+
+    function handleSubmitExam() {
+        SaveQuestion();
+
+        setTimeout(() => {
+            $.ajax({
+                url: '/student/exam/SubmitExam',
+                type: 'POST',
+                success: function (res) {
+                    if (res.success) {
+                        showExamResultModal(res);
+                    } else {
+                        alert(res.message || "Có lỗi xảy ra.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Lỗi khi gửi yêu cầu:", error);
+                    alert("Không thể nộp bài. Vui lòng thử lại.");
+                }
+            });
+        }, 200);
+    }
 
     // Hàm hiển thị modal kết quả thi
     function showExamResultModal(examData) {
