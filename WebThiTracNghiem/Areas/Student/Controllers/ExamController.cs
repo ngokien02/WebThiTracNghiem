@@ -38,6 +38,18 @@ namespace WebThiTracNghiem.Areas.Student.Controllers
         [HttpGet]
         public async Task<IActionResult> StartExam(int id)
         {
+            var kq = await _db.KetQua
+                            .FirstOrDefaultAsync(k => k.DeThiId == id);
+
+            if (kq?.TrangThai == "HoanThanh")
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Bạn đã làm bài thi này rồi!"
+                });
+            }
+
             var deThi = await _db.DeThi
                             .Include(d => d.CauHoiList)
                             .ThenInclude(ch => ch.DapAnList)

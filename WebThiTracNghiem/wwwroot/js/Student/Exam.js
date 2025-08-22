@@ -75,55 +75,61 @@
 
         $.get(url, function (data) {
             if (data.success === false) {
-                showAlert('Đợi xíu!', data.message);
+                showAlert('Thao tác thất bại!', data.message);
                 return;
             }
 
             $("body").html(data);
-
-            const examId = $("input#IdDeThi").val();
-            const timeInput = document.getElementById("ExamTime");
-            const totalMinute = parseInt(timeInput.value);
-            const totalTime = totalMinute * 60;
-            const timerKey = `remainingTime_${examId}`;
-            const finishKey = `finishTime_ ${examId}`;
-
-            let remainingTime = localStorage.getItem(timerKey) ? parseInt(localStorage.getItem(timerKey)) : totalTime;
-
-            const timerDisplay = document.getElementById('exam-timer');
-            let countdownInterval;
-
-            function formatTime(seconds) {
-                const m = String(Math.floor(seconds / 60)).padStart(2, '0');
-                const s = String(seconds % 60).padStart(2, '0');
-                return `${m} : ${s}`;
-            }
-
-            function startCountdown() {
-                timerDisplay.textContent = formatTime(remainingTime);
-
-                countdownInterval = setInterval(() => {
-                    remainingTime--;
-                    timerDisplay.textContent = formatTime(remainingTime);
-
-                    localStorage.setItem(timerKey, remainingTime);
-
-                    if (remainingTime <= 0) {
-                        clearInterval(countdownInterval);
-                        localStorage.removeItem(timerKey);
-                        handleTimeUp();
-                    }
-                }, 1000);
-            }
-
-            function handleTimeUp() {
-                showAlert('Hết giờ', 'Đã hết giờ làm bài, hệ thống sẽ tự động nộp bài!');
-                handleSubmitExam();
-            }
-
-            startCountdown();
+            handleCountdown();
         });
     });
+
+    //ham xu ly dem nguoc thoi gian 
+    function handleCountdown() {
+        const examId = $("input#IdDeThi").val();
+        const timeInput = document.getElementById("ExamTime");
+        const totalMinute = parseInt(timeInput.value);
+        const totalTime = totalMinute * 60;
+        const timerKey = `remainingTime_${examId}`;
+        const finishKey = `finishTime_ ${examId}`;
+
+        let remainingTime = localStorage.getItem(timerKey) ? parseInt(localStorage.getItem(timerKey)) : totalTime;
+
+        const timerDisplay = document.getElementById('exam-timer');
+        let countdownInterval;
+
+        function formatTime(seconds) {
+            const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const s = String(seconds % 60).padStart(2, '0');
+            return `${m} : ${s}`;
+        }
+
+        function startCountdown() {
+            timerDisplay.textContent = formatTime(remainingTime);
+
+            countdownInterval = setInterval(() => {
+                remainingTime--;
+                timerDisplay.textContent = formatTime(remainingTime);
+
+                localStorage.setItem(timerKey, remainingTime);
+
+                if (remainingTime <= 0) {
+                    clearInterval(countdownInterval);
+                    localStorage.removeItem(timerKey);
+                    handleTimeUp();
+                }
+            }, 1000);
+        }
+
+        function handleTimeUp() {
+            showAlert('Hết giờ', 'Đã hết giờ làm bài, hệ thống sẽ tự động nộp bài!');
+            setTimeout(() => {
+                handleSubmitExam();
+            }, 2000);
+        }
+
+        startCountdown();
+    }
 
     //render cau hoi, ap an
     $(document).on("click", "div.exam-page-question-number", function (e) {
