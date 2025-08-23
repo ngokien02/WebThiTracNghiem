@@ -1,0 +1,78 @@
+﻿@model IEnumerable<dynamic>
+
+<div class="page-header">
+    <h1>Lịch sử Làm bài</h1>
+</div>
+
+<!-- History Filters -->
+<div class="exam-filters">
+    <select class="filter-select">
+        <option value="">Tất cả môn học</option>
+        <option value="auto">Kỹ thuật Sửa chữa Ô tô</option>
+        <option value="safety">An toàn Giao thông</option>
+        <option value="logistics">Quản lý Kho vận</option>
+    </select>
+    <select class="filter-select">
+        <option value="">Tất cả học kỳ</option>
+        <option value="20242">HK2 (2024-2025)</option>
+        <option value="20241">HK1 (2024-2025)</option>
+    </select>
+    <div class="search-box">
+        <input type="text" placeholder="Tìm kiếm bài thi...">
+        <button><i class="fas fa-search"></i></button>
+    </div>
+</div>
+
+<!-- Results Table -->
+<div class="results-table">
+    <table>
+        <thead>
+            <tr>
+                <th>Mã đề</th>
+                <th>Tiêu đề</th>
+                <th>Ngày làm bài</th>
+                <th>Thời gian làm bài</th>
+                <th>Điểm số</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="7" class="text-center text-muted">Chưa có lịch sử làm bài</td>
+                </tr>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    var trangThaiText = item.Diem >= 5 ? "Đạt" : "Không đạt";
+                    var trangThaiClass = item.Diem >= 5 ? "passed" : "failed";
+
+                    <tr>
+                        <td>@item.MaDe</td>
+                        <td>@item.TieuDe</td>
+                        <td>@item.GioLam.ToString("dd/MM/yyyy")</td>
+                        <td>@($"{item.ThoiGian} phút")</td>
+                        <td>@(item.Diem?.ToString("0.##") ?? "-")</td>
+                        <td><span class="status @trangThaiClass">@trangThaiText</span></td>
+                        <td>
+                            <button class="action-btn view">Xem chi tiết</button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+<div class="pagination">
+    <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+    <button class="page-btn active">1</button>
+    <button class="page-btn">2</button>
+    <button class="page-btn">3</button>
+    <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+</div>

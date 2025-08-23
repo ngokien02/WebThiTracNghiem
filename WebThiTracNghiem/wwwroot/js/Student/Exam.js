@@ -26,23 +26,24 @@
     });
 
     // Xử lý chuyển tab
-    let count = 0;
+    let count = parseInt(localStorage.getItem("tabSwitchCount")) || 0;
     let hasTriggered = false;
     let isHiddenHandled = false;
 
     function initVisibilityTracking() {
         const handleViolation = () => {
-            if (hasTriggered || isHiddenHandled) return; // tránh gọi lặp
+            if (hasTriggered || isHiddenHandled) return; // Ngăn lặp thông báo
 
-            isHiddenHandled = true; // Đánh dấu đã xử lý lần ẩn này
+            isHiddenHandled = true;
             count++;
+            localStorage.setItem("tabSwitchCount", count); // Lưu lại số lần chuyển tab
+
             alert(`⚠️ Bạn đã chuyển tab ${count} lần. Quá 3 lần sẽ tự hủy bài thi.`);
 
             if (count > 3) {
                 hasTriggered = true;
                 alert("🚫 Bạn đã vi phạm quá 3 lần. Bài thi sẽ bị hủy.");
-                // Thực hiện hành động như submit bài hoặc chuyển trang
-                // window.location.href = "/Exam/Cancel";
+                //handleSubmitExam();
             }
         };
 
@@ -50,27 +51,15 @@
             if (document.hidden) {
                 handleViolation();
             } else {
-                isHiddenHandled = false; // Cho phép lần xử lý tiếp theo
+                // Reset cho lần xử lý tiếp theo
+                setTimeout(() => { isHiddenHandled = false; }, 300);
             }
-        });
-
-        window.addEventListener("blur", function () {
-            setTimeout(() => {
-                if (document.hidden) return; // Đã xử lý rồi
-                handleViolation();
-            }, 100);
-        });
-
-        window.addEventListener("focus", () => {
-            isHiddenHandled = false; // reset lại sau khi quay lại
         });
     }
 
-
-    // Vao trang lam bai thi
+    // Vào trang làm bài thi
     $(document).on("click", "button.DoExam", function (e) {
         e.preventDefault();
-        initVisibilityTracking();
         var url = $(this).attr("href");
 
         $.get(url, function (data) {
@@ -80,9 +69,11 @@
             }
 
             $("body").html(data);
+            initVisibilityTracking();
             handleCountdown();
         });
     });
+
 
     //ham xu ly dem nguoc thoi gian 
     function handleCountdown() {
