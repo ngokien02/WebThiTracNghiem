@@ -1,48 +1,60 @@
 ﻿@model List<DeThi>
 
 <main class="main-content">
-    <div class="page-header">
-        <h1>@ViewData["Title"]</h1>
-        <div class="header-actions" style="background-color: var(--primary-color);">
-            <a href="/teacher/exam/index" class="side-link CreateExam">
-                <i class="fas fa-plus-circle"style="color:white"></i>
-                <span style="color:white">Tạo đề thi mới</span>
-            </a>
-        </div>
-    </div>
-    <div class="exams-list">
-        @if (Model.Any())
-        {
-            foreach (var de in Model)
-            {
-                <div class="exam-card active">
-                    <div class="exam-status">
-                        <span class="status-badge in-progress">Đang diễn ra</span>
-                    </div>
-                    <div class="exam-info">
-                        <h3>@de.TieuDe (@de.MaDe)</h3>
-                        <div class="exam-details">
-                            <p>
-                                <i class="fas fa-calendar"></i>
-                                @de.GioBD.ToString("dd/MM/yyyy HH:mm") - @de.GioKT.ToString("dd/MM/yyyy HH:mm")
-                            </p>
-                            <p><i class="fas fa-clock"></i> Thời gian: @de.ThoiGian phút</p>
-                            <p><i class="fas fa-list-ol"></i> Số câu hỏi: @de.SoCauHoi</p>
-                            <p><i class="fas fa-star"></i> Điểm tối đa: @de.DiemToiDa</p>
-                            <p><i class="fas fa-user-tie"></i> Giảng viên: @de.GiangVien.HoTen</p>
-                        </div>
-                    </div>
-                    <div class="exam-actions">
-                        <a class="btn primary" asp-action="GiamSat" asp-route-id="@de.Id">Giám sát</a>
-                        <a class="btn secondary" asp-action="Edit" asp-route-id="@de.Id">Chỉnh sửa</a>
-                        <a class="btn danger" asp-action="KetThuc" asp-route-id="@de.Id">Kết thúc</a>
-                    </div>
-                </div>
-            }
-        }
-        else
-        {
-            <p class="text-muted">Hiện không có đề thi nào đang diễn ra.</p>
-        }
-    </div>
+	<div class="page-header">
+		<h1>@ViewData["Title"]</h1>
+		<div class="header-actions" style="background-color: var(--primary-color);">
+			<a href="/teacher/exam/index" class="side-link CreateExam">
+				<i class="fas fa-plus-circle" style="color:white"></i>
+				<span style="color:white">Tạo đề thi mới</span>
+			</a>
+		</div>
+	</div>
+	<div class="exams-list">
+		@if (Model.Any())
+		{
+			foreach (var de in Model)
+			{
+				<div class="exam-card active">
+					<div class="exam-status">
+						@{
+							if (de.GioBD <= DateTime.Now && de.GioKT > DateTime.Now)
+							{
+								<span class="status-badge in-progress">
+									"Đang diễn ra"
+								</span>
+							}
+							else
+							{
+								<span class="status-badge upcoming">
+									"Sắp diễn ra"
+								</span>
+							} 
+						}
+					</div>
+					<div class="exam-info">
+						<h3>@de.TieuDe (@de.MaDe)</h3>
+						<div class="exam-details">
+							<p>
+								<i class="fas fa-calendar"></i>
+								@de.GioBD.ToString("dd/MM/yyyy HH:mm") - @de.GioKT.ToString("dd/MM/yyyy HH:mm")
+							</p>
+							<p><i class="fas fa-clock"></i> Thời gian: @de.ThoiGian phút</p>
+							<p><i class="fas fa-list-ol"></i> Số câu hỏi: @de.SoCauHoi</p>
+							<p><i class="fas fa-star"></i> Điểm tối đa: @de.DiemToiDa</p>
+							<p><i class="fas fa-user-tie"></i> Giảng viên: @de.GiangVien.HoTen</p>
+						</div>
+					</div>
+					<div class="exam-actions">
+						<a class="btn secondary" asp-action="Edit" asp-route-id="@de.Id">Chỉnh sửa</a>
+						<a class="btn danger" asp-action="KetThuc" asp-route-id="@de.Id">Kết thúc</a>
+					</div>
+				</div>
+			}
+		}
+		else
+		{
+			<p class="text-muted">Hiện không có đề thi nào đang diễn ra.</p>
+		}
+	</div>
 </main>

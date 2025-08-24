@@ -1,208 +1,158 @@
-﻿<!-- Side Menu -->
-<nav class="side-menu">
-    <ul>
-        <li>
-            <a asp-controller="home" asp-action="index" class="side-link active">
-                <i class="fas fa-tachometer-alt"></i>
-                <span>Tổng quan</span>
-            </a>
-        </li>
-        <li>
-            <a href="users/index.html" class="side-link">
-                <i class="fas fa-users"></i>
-                <span>Quản lý người dùng</span>
-            </a>
-        </li>
-        <li>
-            <a href="courses/index.html" class="side-link">
-                <i class="fas fa-book"></i>
-                <span>Quản lý khóa học</span>
-            </a>
-        </li>
-        <li>
-            <a href="exams/index.html" class="side-link">
-                <i class="fas fa-file-alt"></i>
-                <span>Quản lý kỳ thi</span>
-            </a>
-        </li>
-        <li>
-            <a href="questions/index.html" class="side-link">
-                <i class="fas fa-question-circle"></i>
-                <span>Ngân hàng câu hỏi</span>
-            </a>
-        </li>
-        <li>
-            <a href="reports/index.html" class="side-link">
-                <i class="fas fa-chart-bar"></i>
-                <span>Báo cáo & Thống kê</span>
-            </a>
-        </li>
-    </ul>
-</nav>
+﻿@model List<WebThiTracNghiem.Areas.Admin.Models.AdminNotification>
+
+<partial name="_SideMenu" />
 
 <!-- Main Content -->
 <main class="main-content">
-    <div class="page-header">
-        <h1>Tổng quan hệ thống</h1>
-        <div class="date-filter">
-            <select id="timeRange">
-                <option value="today">Hôm nay</option>
-                <option value="week">Tuần này</option>
-                <option value="month" selected>Tháng này</option>
-                <option value="year">Năm nay</option>
-            </select>
-        </div>
-    </div>
+	<div class="page-header">
+		<h1>Tổng quan hệ thống</h1>
+		<div class="date-filter">
+			<select id="timeRange">
+				<option value="today">Hôm nay</option>
+				<option value="week">Tuần này</option>
+				<option value="month" selected>Tháng này</option>
+				<option value="year">Năm nay</option>
+			</select>
+		</div>
+	</div>
 
-    <!-- Quick Stats -->
-    <div class="stats-container">
-        <div class="stat-card">
-            <div class="stat-icon users">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-info">
-                <h3>Người dùng</h3>
-                <div class="stat-numbers">
-                    <span class="main-number">2,547</span>
-                    <span class="change positive">+12%</span>
-                </div>
-                <div class="stat-breakdown">
-                    <span>Giảng viên: 127</span>
-                    <span>Sinh viên: 2,420</span>
-                </div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon exams">
-                <i class="fas fa-file-alt"></i>
-            </div>
-            <div class="stat-info">
-                <h3>Kỳ thi</h3>
-                <div class="stat-numbers">
-                    <span class="main-number">156</span>
-                    <span class="change positive">+5%</span>
-                </div>
-                <div class="stat-breakdown">
-                    <span>Đang diễn ra: 23</span>
-                    <span>Sắp tới: 45</span>
-                </div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon courses">
-                <i class="fas fa-book"></i>
-            </div>
-            <div class="stat-info">
-                <h3>Khóa học</h3>
-                <div class="stat-numbers">
-                    <span class="main-number">89</span>
-                    <span class="change neutral">0%</span>
-                </div>
-                <div class="stat-breakdown">
-                    <span>Đang hoạt động: 76</span>
-                    <span>Đã kết thúc: 13</span>
-                </div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon system">
-                <i class="fas fa-server"></i>
-            </div>
-            <div class="stat-info">
-                <h3>Hệ thống</h3>
-                <div class="stat-numbers">
-                    <span class="main-number">98.5%</span>
-                    <span class="change positive">Ổn định</span>
-                </div>
-                <div class="stat-breakdown">
-                    <span>CPU: 45%</span>
-                    <span>RAM: 62%</span>
-                </div>
-            </div>
-        </div>
-    </div>
+	<!-- Quick Stats -->
+	<div class="stats-container">
+		<div class="stat-card">
+			<div class="stat-icon users">
+				<i class="fas fa-users"></i>
+			</div>
+			<div class="stat-info">
 
-    <!-- Charts Section -->
-    <div class="charts-container">
-        <div class="chart-card">
-            <h3>Thống kê truy cập</h3>
-            <canvas id="accessChart"></canvas>
-        </div>
-        <div class="chart-card">
-            <h3>Phân bố kỳ thi</h3>
-            <canvas id="examChart"></canvas>
-        </div>
-    </div>
+				@{
+					var userCount = ViewData["UserCount"];
+					var teacherCount = ViewData["TeacherCount"];
+					var studentCount = ViewData["StudentCount"];
+				}
 
-    <!-- Recent Activities -->
-    <div class="activities-container">
-        <div class="section-header">
-            <h2>Hoạt động gần đây</h2>
-            <a href="logs/activities.html" class="view-all">Xem tất cả</a>
-        </div>
-        <div class="activity-list">
-            <div class="activity-item">
-                <div class="activity-icon"><i class="fas fa-user-plus"></i></div>
-                <div class="activity-details">
-                    <p>Thêm mới 50 tài khoản sinh viên</p>
-                    <span class="activity-time">5 phút trước</span>
-                </div>
-                <div class="activity-status success">
-                    <i class="fas fa-check"></i>
-                </div>
-            </div>
-            <div class="activity-item">
-                <div class="activity-icon"><i class="fas fa-file-alt"></i></div>
-                <div class="activity-details">
-                    <p>Kỳ thi "Lập trình web" đã bắt đầu</p>
-                    <span class="activity-time">15 phút trước</span>
-                </div>
-                <div class="activity-status warning">
-                    <i class="fas fa-clock"></i>
-                </div>
-            </div>
-            <div class="activity-item">
-                <div class="activity-icon"><i class="fas fa-database"></i></div>
-                <div class="activity-details">
-                    <p>Sao lưu dữ liệu tự động</p>
-                    <span class="activity-time">1 giờ trước</span>
-                </div>
-                <div class="activity-status success">
-                    <i class="fas fa-check"></i>
-                </div>
-            </div>
-        </div>
-    </div>
+				<h3>Người dùng</h3>
+				<div class="stat-numbers">
+					<span class="main-number">@userCount</span>
+				</div>
+				<div class="stat-breakdown">
+					<span>Giảng viên: @teacherCount</span>
+					<span>Sinh viên: @studentCount</span>
+				</div>
+			</div>
+		</div>
+		<div class="stat-card">
+			<div class="stat-icon exams">
+				<i class="fas fa-file-alt"></i>
+			</div>
+			<div class="stat-info">
 
-    <!-- System Alerts -->
-    <div class="alerts-container">
-        <div class="section-header">
-            <h2>Cảnh báo hệ thống</h2>
-            <a href="logs/alerts.html" class="view-all">Xem tất cả</a>
-        </div>
-        <div class="alert-list">
-            <div class="alert-item warning">
-                <div class="alert-icon"><i class="fas fa-exclamation-triangle"></i></div>
-                <div class="alert-details">
-                    <h4>Tải hệ thống cao</h4>
-                    <p>CPU đang hoạt động ở mức 85%</p>
-                    <span class="alert-time">2 phút trước</span>
-                </div>
-                <div class="alert-actions">
-                    <button class="btn-investigate">Kiểm tra</button>
-                </div>
-            </div>
-            <div class="alert-item error">
-                <div class="alert-icon"><i class="fas fa-times-circle"></i></div>
-                <div class="alert-details">
-                    <h4>Lỗi đăng nhập</h4>
-                    <p>Phát hiện nhiều lần đăng nhập thất bại từ IP: 192.168.1.100</p>
-                    <span class="alert-time">5 phút trước</span>
-                </div>
-                <div class="alert-actions">
-                    <button class="btn-block">Chặn IP</button>
-                </div>
-            </div>
-        </div>
-    </div>
+				@{
+					var examCount = ViewData["ExamCount"];
+					var activeExam = ViewData["ActiveExam"];
+					var upcomingExam = ViewData["UpcomingExam"];
+				}
+
+				<h3>Kỳ thi</h3>
+				<div class="stat-numbers">
+					<span class="main-number">@examCount</span>
+				</div>
+				<div class="stat-breakdown">
+					<span>Đang diễn ra: @activeExam</span>
+					<span>Sắp tới: @upcomingExam</span>
+				</div>
+			</div>
+		</div>
+		<div class="stat-card">
+			<div class="stat-icon courses">
+				<i class="fas fa-book"></i>
+			</div>
+			<div class="stat-info">
+				<h3>Khóa học</h3>
+				<div class="stat-numbers">
+					<span class="main-number">89</span>
+					<span class="change neutral">0%</span>
+				</div>
+				<div class="stat-breakdown">
+					<span>Đang hoạt động: 76</span>
+					<span>Đã kết thúc: 13</span>
+				</div>
+			</div>
+		</div>
+		<div class="stat-card">
+			<div class="stat-icon system">
+				<i class="fas fa-server"></i>
+			</div>
+			<div class="stat-info">
+				<h3>Hệ thống</h3>
+				<div class="stat-numbers">
+					<span class="main-number">98.5%</span>
+					<span class="change positive">Ổn định</span>
+				</div>
+				<div class="stat-breakdown">
+					<span>CPU: 45%</span>
+					<span>RAM: 62%</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Charts Section -->
+	<div class="charts-container">
+		<div class="chart-card">
+			<h3>Thống kê truy cập</h3>
+			<canvas id="accessChart"></canvas>
+		</div>
+		<div class="chart-card">
+			<h3>Phân bố kỳ thi</h3>
+			<canvas id="examChart"></canvas>
+		</div>
+	</div>
+
+	<!-- Recent Activities -->
+	<div class="activities-container">
+		<div class="section-header">
+			<h2>Hoạt động gần đây</h2>
+			<a href="logs/activities.html" class="view-all">Xem tất cả</a>
+		</div>
+		<div class="activity-list">
+			@* <div class="activity-item">
+			<div class="activity-icon"><i class="fas fa-user-plus"></i></div>
+			<div class="activity-details">
+			<p>Thêm mới 50 tài khoản sinh viên</p>
+			<span class="activity-time">5 phút trước</span>
+			</div>
+			<div class="activity-status success">
+			<i class="fas fa-check"></i>
+			</div>
+			</div> *@
+
+			@foreach (var tb in Model)
+			{
+				<div class="activity-item">
+					<div class="activity-icon"><i class="fas fa-file-alt"></i></div>
+					<div class="activity-details">
+						<p>Kỳ thi "@tb.TieuDe" đã bắt đầu</p>
+						@{
+							var now = DateTime.Now;
+							var timeSpan = (Int32)(now - tb.GioTB).TotalMinutes;
+						}
+						<span class="activity-time">@timeSpan phút trước</span>
+					</div>
+					<div class="activity-status warning">
+						<i class="fas fa-clock"></i>
+					</div>
+				</div>
+			}
+			@* <div class="activity-item">
+			<div class="activity-icon"><i class="fas fa-database"></i></div>
+			<div class="activity-details">
+			<p>Sao lưu dữ liệu tự động</p>
+			<span class="activity-time">1 giờ trước</span>
+			</div>
+			<div class="activity-status success">
+			<i class="fas fa-check"></i>
+			</div>
+			</div> *@
+		</div>
+	</div>
 </main>

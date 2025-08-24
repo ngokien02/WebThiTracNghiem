@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -77,42 +78,44 @@ namespace WebThiTracNghiem.Areas.Identity.Pages.Account
             _cache.Set(cacheKey, true, TimeSpan.FromSeconds(60));
 
 
-            var user = await _userManager.FindByEmailAsync(Input.Email);
-            if (user == null)
+            var users = await _userManager.Users
+      .Where(x => x.Email == Input.Email)
+      .ToListAsync();
+
+            if (users.Count == 0)
             {
                 ModelState.AddModelError(string.Empty, "Không tìm thấy email của bạn trong hệ thống.");
                 return Page();
             }
-            bool emailExists = user != null;
-            bool emailConfirmed = emailExists && await _userManager.IsEmailConfirmedAsync(user);
 
-            // Ghi log để bạn dễ test nội bộ (nếu dùng Email giả)
-            _logger.LogInformation("🧪 Kiểm tra Email: {Email} → Tồn tại: {Exists}, Đã xác nhận: {Confirmed}",
-                Input.Email, emailExists, emailConfirmed);
+            // Lấy user đầu tiên (hoặc bạn có thể lọc thêm theo UserName)
+            var user = users.First();
 
-            // ✅ Nếu không tồn tại hoặc chưa xác nhận → vẫn chuyển đến trang xác nhận để tránh lộ info
-            if (!emailExists || !emailConfirmed)
+            // Kiểm tra xác nhận email
+            bool emailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+
+            // Ghi log để kiểm tra
+            _logger.LogInformation("🧪 Kiểm tra Email: {Email} → Số user: {Count}, Đã xác nhận: {Confirmed}",
+                Input.Email, users.Count, emailConfirmed);
+
+            // Nếu chưa xác nhận → vẫn chuyển tới trang thông báo
+            if (!emailConfirmed)
             {
                 TempData["ResetPasswordMessage"] = "Nếu email tồn tại và đã xác nhận, liên kết đặt lại mật khẩu sẽ được gửi.";
                 return RedirectToPage("./ForgotPasswordConfirmation");
             }
 
-
             // Tạo mã đặt lại mật khẩu
             var code = await _userManager.GeneratePasswordResetTokenAsync(user);
             var encodedCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-            // Tạo đường dẫn reset password
             var callbackUrl = Url.Page(
                 "/Account/ResetPassword",
                 pageHandler: null,
-                values: new { area = "Identity", code = encodedCode },
+                values: new { area = "Identity", code = encodedCode, email = user.Email },
                 protocol: Request.Scheme);
 
-            // ✅ Log ra Output (Visual Studio → Output → Debug)
             System.Diagnostics.Debug.WriteLine("🔗 LINK TEST: " + callbackUrl);
-
-            // ✅ Hiển thị trong Razor view (nếu bạn gắn ở ForgotPassword.cshtml)
             ViewData["DebugResetLink"] = callbackUrl;
 
             // Gửi email (nếu dùng thật)

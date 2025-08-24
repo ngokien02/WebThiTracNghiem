@@ -1,0 +1,172 @@
+﻿@model List<ApplicationUser>
+<div class="page-header">
+    <h1>@ViewData["Title"]</h1>
+    <div class="header-actions">
+        <button class="btn btn-primary" onclick="showAddUserModal()">
+            <i class="fas fa-plus"></i> Thêm người dùng
+        </button>
+        <button class="btn btn-secondary" onclick="exportUsers()">
+            <i class="fas fa-file-export"></i> Export Excel
+        </button>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="filter-section">
+    <div class="filter-group">
+        <label>Vai trò:</label>
+        <select id="roleFilter">
+            <option value="">Tất cả</option>
+            <option value="student">Sinh viên</option>
+            <option value="teacher">Giảng viên</option>
+            <option value="admin">Quản trị viên</option>
+        </select>
+    </div>
+    <div class="filter-group">
+        <label>Trạng thái:</label>
+        <select id="statusFilter">
+            <option value="">Tất cả</option>
+            <option value="active">Đang hoạt động</option>
+            <option value="inactive">Đã khóa</option>
+        </select>
+    </div>
+    <div class="filter-group">
+        <label>Tìm kiếm:</label>
+        <input type="text" id="searchInput" placeholder="Tên, email, mã số...">
+    </div>
+</div>
+
+<!-- Users Table -->
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll" /></th>
+                <th>Mã số</th>
+                <th>Họ và tên</th>
+                <th>Email</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                var locked = u.LockoutEnd.HasValue && u.LockoutEnd > DateTimeOffset.UtcNow;
+
+                // Map role -> tiếng Việt (nếu muốn)
+                Func<string, string> toVnRole = r =>
+                r?.ToLower() switch
+                {
+                    "admin" => "Quản trị viên",
+                    "teacher" => "Giảng viên",
+                    "student" => "Sinh viên",
+                    _ => r ?? "—"
+                };
+
+                <tr>
+                    <!-- 1) Checkbox -->
+                    <td><input type="checkbox" class="user-select" /></td>
+
+                    <!-- 2) Mã số -->
+                    <td>@u.UserName</td>
+
+                    <!-- 3) Họ và tên -->
+                    <td>@(u.HoTen)</td>
+
+                    <!-- 4) Email -->
+                    <td>@u.Email</td>
+
+                    <!-- 5) Vai trò -->
+                    <td>
+                        @if (u.Roles != null && u.Roles.Any())
+                        {
+                            foreach (var r in u.Roles)
+                            {
+                                <span class="badge">@toVnRole(r)</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="badge"></span>
+                        }
+                    </td>
+
+
+                    <!-- 6) Trạng thái -->
+                    <td>
+                        <span class="badge @(locked ? "inactive" : "active")">
+                            @(locked ? "Đã khóa" : "Đang hoạt động")
+                        </span>
+                    </td>
+
+                    <!-- 7) Thao tác -->
+                    <td>
+                        <div class="action-buttons">
+                            <a href="javascript:void(0)" class="btn-icon" title="Sửa" onclick="editUser('@u.Id')">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="javascript:void(0)" class="btn-icon" title="Khóa/Mở" onclick="toggleUserStatus('@u.Id')">
+                                <i class="fas fa-lock"></i>
+                            </a>
+                            <a href="javascript:void(0)" class="btn-icon" title="Xóa" onclick="deleteUser('@u.Id')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+<div class="pagination">
+    <button class="btn-page" disabled><i class="fas fa-chevron-left"></i></button>
+    <button class="btn-page active">1</button>
+    <button class="btn-page">2</button>
+    <button class="btn-page">3</button>
+    <span class="pagination-ellipsis">...</span>
+    <button class="btn-page">10</button>
+    <button class="btn-page"><i class="fas fa-chevron-right"></i></button>
+</div>
+
+<!-- Add/Edit User Modal -->
+<div class="modal" id="userModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Thêm người dùng mới</h2>
+            <button class="close-btn" onclick="closeModal('userModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="userForm">
+                <div class="form-group">
+                    <label>Vai trò</label>
+                    <select name="role" required>
+                        <option value="student">Sinh viên</option>
+                        <option value="teacher">Giảng viên</option>
+                        <option value="admin">Quản trị viên</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Mã số</label>
+                    <input type="text" name="id" required />
+                </div>
+                <div class="form-group">
+                    <label>Họ và tên</label>
+                    <input type="text" name="name" required />
+                </div>
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" name="password" required />
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('userModal')">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

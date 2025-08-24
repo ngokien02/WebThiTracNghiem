@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using Xceed.Document.NET;
 using Newtonsoft.Json;
 using System.Security.Claims;
+using WebThiTracNghiem.Areas.Admin.Models;
 
 namespace WebThiTracNghiem.Areas.Teacher.Controllers
 {
@@ -168,6 +169,17 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 					}
 				}
 
+				_db.SaveChanges();
+
+				//tao thong bao admin
+				var tbAdmin = new AdminNotification
+				{
+					LoaiTB = "TaoDe",
+					TieuDe = deThi.TieuDe,
+					GioTB = DateTime.Now
+				};
+
+				_db.ThongBaoAdmin.Add(tbAdmin);
 				_db.SaveChanges();
 
 				return true;

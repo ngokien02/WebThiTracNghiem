@@ -15,6 +15,7 @@
 	<link rel="stylesheet" href="~/css/Teacher/Report.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/Teacher/Active.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/Teacher/Results.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/Admin/UserManager.css" asp-append-version="true" />
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -128,6 +129,7 @@
 	</a>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
@@ -137,6 +139,10 @@
 	<script src="~/js/Profile.js" asp-append-version="true"></script>
 	<script src="~/js/Teacher/Render.js" asp-append-version="true"></script>
 	<script src="~/js/Teacher/ChartExam.js" asp-append-version="true"></script>
+	<script src="~/js/Admin/Dashboard.js" asp-append-version="true"></script>
+	<script src="~/js/Admin/Render.js" asp-append-version="true"></script>
+	<script src="~/js/Admin/UserManager.js" asp-append-version="true"></script>
+	<script src="~/js/Admin/ExamManager.js" asp-append-version="true"></script>
 	@await RenderSectionAsync("Scripts", required: false)
 	@await RenderSectionAsync("ProfileStyle", required: false);
 </body>

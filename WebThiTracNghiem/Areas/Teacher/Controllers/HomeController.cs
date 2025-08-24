@@ -64,8 +64,9 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 		public IActionResult ActiveExam()
 		{
 			var danhSachDeThi = _db.DeThi
-				.Where(dt => DateTime.Now >= dt.GioBD && DateTime.Now <= dt.GioKT)
+				.Where(dt => dt.GioKT > DateTime.Now)
 				.Include(dt => dt.GiangVien)
+				.OrderByDescending(dt => dt.GioBD)
 				.ToList();
 
 			return PartialView("_ActiveExam", danhSachDeThi);

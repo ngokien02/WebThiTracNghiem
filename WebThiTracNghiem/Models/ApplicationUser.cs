@@ -17,7 +17,9 @@ namespace WebThiTracNghiem.Models
         public string? CCCD { get; set; }
         [NotMapped]
         public IFormFile? avtImg { get; set; }
-        public virtual ICollection<KetQua> KetQuaList { get; set; }
+		[NotMapped]
+		public List<string> Roles { get; set; } = new();
+		public virtual ICollection<KetQua> KetQuaList { get; set; }
         public static async Task SeedUserAsync(IServiceProvider serviceProvider)
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();

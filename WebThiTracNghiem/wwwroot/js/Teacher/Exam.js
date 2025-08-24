@@ -308,7 +308,16 @@
             }
         }
         else if (method === 'manual') {
-            $('#errDeThiFile').text(''); // Xóa lỗi cũ
+            $('#errDeThiFile').text('');
+
+            $(".question-item").each(function () {
+                const qText = $(this).find(".question-content").val()?.trim();
+                if (!qText) {
+                    $(this).remove();
+                }
+            });
+
+            const soCauHoi = $('.question-item').length;
 
             if (soCauHoi === 0) {
                 $('#errDeThiFile').text('Vui lòng thêm ít nhất một câu hỏi.');
@@ -435,7 +444,7 @@
 
             if (thoiGianLamBai === '') {
                 if (showError) $('#errTime').text('');
-                return true; 
+                return true;
             }
 
             const intValue = parseInt(thoiGianLamBai, 10);

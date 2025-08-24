@@ -32,11 +32,11 @@
 
     function initVisibilityTracking() {
         const handleViolation = () => {
-            if (hasTriggered || isHiddenHandled) return; // Ngăn lặp thông báo
+            if (hasTriggered || isHiddenHandled) return; 
 
             isHiddenHandled = true;
             count++;
-            localStorage.setItem("tabSwitchCount", count); // Lưu lại số lần chuyển tab
+            localStorage.setItem("tabSwitchCount", count); 
 
             alert(`⚠️ Bạn đã chuyển tab ${count} lần. Quá 3 lần sẽ tự hủy bài thi.`);
 
@@ -51,7 +51,6 @@
             if (document.hidden) {
                 handleViolation();
             } else {
-                // Reset cho lần xử lý tiếp theo
                 setTimeout(() => { isHiddenHandled = false; }, 300);
             }
         });

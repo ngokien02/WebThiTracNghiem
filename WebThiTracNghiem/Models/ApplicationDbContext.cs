@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using WebThiTracNghiem.Areas.Admin.Models;
 
 namespace WebThiTracNghiem.Models
 {
@@ -12,5 +13,6 @@ namespace WebThiTracNghiem.Models
         public DbSet<CauHoi> CauHoi { get; set; }
         public DbSet<DapAn> DapAn { get; set; }
         public DbSet<KetQua> KetQua { get; set; }
+        public DbSet<AdminNotification> ThongBaoAdmin { get; set; }
 	}
 }
