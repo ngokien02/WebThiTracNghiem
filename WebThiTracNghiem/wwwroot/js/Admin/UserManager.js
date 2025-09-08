@@ -1,4 +1,28 @@
-﻿// ====== Filter & Form Elements ======
+﻿
+$(document).on("submit", "#userForm", function (e) {
+    e.preventDefault();
+
+    $.ajax({
+        url: "/admin/user/createuser",
+        type: "POST",
+        data: $(this).serialize(),
+        success: function (res) {
+            if (res.success) {
+                alert(res.message);
+            } else {
+                alert(res.message);
+            }
+        },
+        error: function () {
+            alert("Lỗi không xác định");
+        }
+    })
+})
+
+
+
+
+// ====== Filter & Form Elements ======
 let roleFilter, statusFilter, searchInput, selectAllCheckbox;
 
 // ====== DOM Ready ======

@@ -1,0 +1,416 @@
+﻿/* Kiểu dáng trang Quản lý bài viết - Admin */
+
+/* Container chính */
+.admin-posts-form-container {
+    background: var(--white);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+/* Form chính */
+.admin-posts-form {
+    padding: 2rem;
+}
+
+/* Tiêu đề các section */
+.admin-posts-section-title {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary-light);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+    .admin-posts-section-title i {
+        color: var(--primary-color);
+        font-size: 1.2rem;
+    }
+
+/* Các section của form */
+.admin-posts-form-section {
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+}
+
+/* Nhóm form */
+.admin-posts-form-group {
+    margin-bottom: 1.5rem;
+}
+
+    .admin-posts-form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--secondary-color);
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+.admin-posts-form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .admin-posts-form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+    }
+
+    .admin-posts-form-control::placeholder {
+        color: #999;
+    }
+
+/* Khu vực upload ảnh trong section */
+.admin-posts-image-upload-slot {
+    position: relative;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #fafafa;
+    margin-top: 0.5rem;
+}
+
+    .admin-posts-image-upload-slot:hover {
+        border-color: var(--primary-color);
+        background: #f0f8ff;
+    }
+
+    .admin-posts-image-upload-slot.has-image {
+        border-style: solid;
+        border-color: var(--primary-color);
+    }
+
+/* Placeholder upload */
+.admin-posts-upload-placeholder {
+    text-align: center;
+    color: #666;
+}
+
+    .admin-posts-upload-placeholder i {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--primary-color);
+    }
+
+    .admin-posts-upload-placeholder span {
+        display: block;
+        font-size: 0.85rem;
+    }
+
+/* Input file ẩn */
+.admin-posts-image-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Preview ảnh */
+.admin-posts-image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.admin-posts-image-preview-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.admin-posts-image-remove-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: background 0.2s ease;
+}
+
+    .admin-posts-image-remove-btn:hover {
+        background: #cc0000;
+    }
+
+/* Textarea */
+textarea.admin-posts-form-control {
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+}
+
+/* Nút hành động */
+.admin-posts-form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
+    margin-top: 2rem;
+}
+
+/* Buttons với prefix admin-posts- */
+.admin-posts-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.admin-posts-btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+    .admin-posts-btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+    }
+
+.admin-posts-btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+    .admin-posts-btn-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-1px);
+    }
+
+/* Modal thành công với prefix admin-posts- */
+.admin-posts-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.admin-posts-modal-content {
+    background-color: var(--white);
+    margin: 15% auto;
+    padding: 0;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    animation: adminPostsModalSlideIn 0.3s ease;
+}
+
+@keyframes adminPostsModalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.admin-posts-modal-header {
+    background: var(--primary-color);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 10px 10px 0 0;
+}
+
+    .admin-posts-modal-header h3 {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+.admin-posts-modal-body {
+    padding: 2rem;
+    text-align: center;
+}
+
+    .admin-posts-modal-body p {
+        margin: 0;
+        font-size: 1.1rem;
+        color: var(--secondary-color);
+    }
+
+.admin-posts-modal-footer {
+    padding: 1rem 2rem 2rem 2rem;
+    text-align: center;
+}
+
+/* Toast Notifications */
+.admin-posts-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    max-width: 350px;
+}
+
+    .admin-posts-toast.show {
+        transform: translateX(0);
+    }
+
+.admin-posts-toast-success {
+    background: #4caf50;
+}
+
+.admin-posts-toast-error {
+    background: #f44336;
+}
+
+.admin-posts-toast i {
+    font-size: 1.2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .admin-posts-form {
+        padding: 1rem;
+    }
+
+    .admin-posts-form-section {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .admin-posts-form-actions {
+        flex-direction: column;
+    }
+
+    .admin-posts-modal-content {
+        margin: 10% auto;
+        width: 95%;
+    }
+
+    .admin-posts-toast {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        transform: translateY(-100px);
+    }
+
+        .admin-posts-toast.show {
+            transform: translateY(0);
+        }
+}
+
+@media (max-width: 480px) {
+    .admin-posts-section-title {
+        font-size: 1.1rem;
+    }
+
+    .admin-posts-form-control {
+        padding: 0.6rem;
+    }
+
+    .admin-posts-image-upload-slot {
+        height: 100px;
+    }
+
+    .admin-posts-upload-placeholder i {
+        font-size: 1.2rem;
+    }
+
+    .admin-posts-upload-placeholder span {
+        font-size: 0.8rem;
+    }
+}
+
+/* Trạng thái loading */
+.admin-posts-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+    .admin-posts-loading::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        margin: -10px 0 0 -10px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid var(--primary-color);
+        border-radius: 50%;
+        animation: adminPostsSpin 1s linear infinite;
+    }
+
+@keyframes adminPostsSpin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Validation styles */
+.admin-posts-form-control.error {
+    border-color: #ff4444;
+    box-shadow: 0 0 0 3px rgba(255, 68, 68, 0.1);
+}
+
+.admin-posts-error-message {
+    color: #ff4444;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Success styles */
+.admin-posts-form-control.success {
+    border-color: #4caf50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}

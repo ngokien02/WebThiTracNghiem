@@ -73,6 +73,11 @@ namespace WebThiTracNghiem.Areas.Admin.Controllers
 			return PartialView("_ExamManager", danhSachKyThi);
 		}
 
+		public IActionResult Post()
+		{
+			return PartialView("_Post");
+		}
+
 	}
 }
 
