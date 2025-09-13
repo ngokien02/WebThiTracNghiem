@@ -21,7 +21,7 @@ namespace WebThiTracNghiem.Models
         public string IdGiangVien {  get; set; }
         [ForeignKey("IdGiangVien")]
         public virtual ApplicationUser GiangVien { get; set; }
-        public virtual ICollection<CauHoi> CauHoiList { get; set; }
         public virtual ICollection<KetQua> KetQuaList { get; set; }
+        public virtual ICollection<ChiTietDeThi> ChiTietDe { get; set; }
     }
 }

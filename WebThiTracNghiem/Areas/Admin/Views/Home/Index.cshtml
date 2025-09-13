@@ -130,10 +130,30 @@
 			{
 				<div class="activity-item">
 					<div class="activity-icon">
-						<i class="fas fa-file-alt"></i>
+						@{
+							switch (tb.LoaiTB)
+							{
+								case "TaoDe":
+									<i class="fas fa-file-alt"></i>
+									break;
+								case "TaoUser":
+									<i class="fas fa-user-plus"></i>
+									break;
+							}
+						}
 					</div>
 					<div class="activity-details">
-						<p>Kỳ thi "@tb.TieuDe" đã bắt đầu</p>
+						@{
+							switch (tb.LoaiTB)
+							{
+								case "TaoDe":
+									<p>Kỳ thi "@tb.TieuDe" đã bắt đầu</p>
+									break;
+								case "TaoUser":
+									<p>Người dùng "@tb.TieuDe" đã được tạo</p>
+									break;
+							}
+						}
 						@{
 							var now = DateTime.Now;
 							var timeSpan = (Int32)(now - tb.GioTB).TotalMinutes;

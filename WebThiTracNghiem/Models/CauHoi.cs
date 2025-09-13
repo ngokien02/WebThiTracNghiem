@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebThiTracNghiem.Models
 {
@@ -7,10 +8,9 @@ namespace WebThiTracNghiem.Models
 		public int Id { get; set; }
 		public string NoiDung { get; set; }
 		public string Loai {  get; set; }
-		public int DeThiId { get; set; }
-		[JsonIgnore]
-		public virtual DeThi DeThi { get; set; }
-		public List<DapAn> DapAnList { get; set; } = new();
-
-	}
+        public int ChuDeId { get; set; }
+		[ForeignKey("ChuDeId")]
+        public ChuDe ChuDe { get; set; }
+        public List<DapAn> DapAnList { get; set; } = new();
+    }
 }

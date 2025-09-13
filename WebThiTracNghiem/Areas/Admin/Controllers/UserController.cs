@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using WebThiTracNghiem.Areas.Admin.Models;
 using WebThiTracNghiem.Models;
 
 namespace WebThiTracNghiem.Areas.Admin.Controllers
@@ -41,6 +42,17 @@ namespace WebThiTracNghiem.Areas.Admin.Controllers
 			}
 
 			await _userManager.AddToRoleAsync(user, role);
+
+			//tao thong bao admin
+			var tbAdmin = new AdminNotification
+			{
+				LoaiTB = "TaoUser",
+				TieuDe = user.UserName,
+				GioTB = DateTime.Now
+			};
+
+			_db.ThongBaoAdmin.Add(tbAdmin);
+			_db.SaveChanges();
 
 			return Json(new
 			{

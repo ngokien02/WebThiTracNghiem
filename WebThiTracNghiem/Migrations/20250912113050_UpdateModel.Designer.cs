@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebThiTracNghiem.Models;
 
@@ -11,9 +12,11 @@ using WebThiTracNghiem.Models;
 namespace WebThiTracNghiem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250912113050_UpdateModel")]
+    partial class UpdateModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -282,6 +285,9 @@ namespace WebThiTracNghiem.Migrations
                     b.Property<int>("ChuDeId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("DeThiId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Loai")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -293,6 +299,8 @@ namespace WebThiTracNghiem.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ChuDeId");
+
+                    b.HasIndex("DeThiId");
 
                     b.ToTable("CauHoi");
                 });
@@ -543,6 +551,10 @@ namespace WebThiTracNghiem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("WebThiTracNghiem.Models.DeThi", null)
+                        .WithMany("CauHoiList")
+                        .HasForeignKey("DeThiId");
+
                     b.Navigation("ChuDe");
                 });
 
@@ -648,6 +660,8 @@ namespace WebThiTracNghiem.Migrations
 
             modelBuilder.Entity("WebThiTracNghiem.Models.DeThi", b =>
                 {
+                    b.Navigation("CauHoiList");
+
                     b.Navigation("ChiTietDe");
 
                     b.Navigation("KetQuaList");

@@ -36,90 +36,93 @@ namespace WebThiTracNghiem.Areas.Student.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> StartExam(int id)
-        {
-            var kq = await _db.KetQua
-                            .FirstOrDefaultAsync(k => k.DeThiId == id);
+        //public async Task<IActionResult> StartExam(int id)
+        //{
+        //    var kq = await _db.KetQua
+        //                    .FirstOrDefaultAsync(k => k.DeThiId == id);
 
-            if (kq?.TrangThai == "HoanThanh")
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Bạn đã làm bài thi này rồi!"
-                });
-            }
+        //    if (kq?.TrangThai == "HoanThanh")
+        //    {
+        //        return Json(new
+        //        {
+        //            success = false,
+        //            message = "Bạn đã làm bài thi này rồi!"
+        //        });
+        //    }
 
-            var deThi = await _db.DeThi
-                            .Include(d => d.CauHoiList)
-                            .ThenInclude(ch => ch.DapAnList)
-                            .FirstOrDefaultAsync(d => d.Id == id && d.GioKT >= DateTime.Now);
+        //    //kq.GioLam = DateTime.Now;
+        //    //_db.SaveChanges();
 
-            if (deThi == null)
-                return NotFound("Không tìm thấy đề thi.");
+        //    var deThi = await _db.DeThi
+        //                    .Include(d => d.CauHoiList)
+        //                    .ThenInclude(ch => ch.DapAnList)
+        //                    .FirstOrDefaultAsync(d => d.Id == id && d.GioKT >= DateTime.Now);
 
-            var listCauHoi = deThi.RandomCauHoi
-                ? deThi.CauHoiList.OrderBy(c => Guid.NewGuid()).ToList()
-                : deThi.CauHoiList.ToList();
+        //    if (deThi == null)
+        //        return NotFound("Không tìm thấy đề thi.");
 
-            foreach (var ch in listCauHoi)
-            {
-                if (ch.DapAnList != null)
-                {
-                    ch.DapAnList = deThi.RandomDapAn
-                        ? ch.DapAnList.OrderBy(d => Guid.NewGuid()).ToList()
-                        : ch.DapAnList.ToList();
-                }
-            }
+        //    var listCauHoi = deThi.RandomCauHoi
+        //        ? deThi.CauHoiList.OrderBy(c => Guid.NewGuid()).ToList()
+        //        : deThi.CauHoiList.ToList();
 
-            var deThiVm = new DeThiViewModel
-            {
-                Id = deThi.Id,
-                TieuDe = deThi.TieuDe,
-                MaDe = deThi.MaDe,
-                GioBD = deThi.GioBD,
-                GioKT = deThi.GioKT,
-                ThoiGian = deThi.ThoiGian,
-                SoCauHoi = deThi.SoCauHoi,
-                DiemToiDa = deThi.DiemToiDa,
-                RandomCauHoi = deThi.RandomCauHoi,
-                RandomDapAn = deThi.RandomDapAn,
-                ShowKQ = deThi.ShowKQ,
-                CauHoiList = listCauHoi.Select(ch => new CauHoiViewModel
-                {
-                    Id = ch.Id,
-                    NoiDung = ch.NoiDung,
-                    Loai = ch.Loai,
-                    DapAnList = ch.DapAnList.Select(d => new DapAnViewModel
-                    {
-                        Id = d.Id,
-                        NoiDung = d.NoiDung,
-                        IsDung = d.DungSai,
-                        IsSelected = false
-                    }).ToList()
-                }).ToList()
-            };
+        //    foreach (var ch in listCauHoi)
+        //    {
+        //        if (ch.DapAnList != null)
+        //        {
+        //            ch.DapAnList = deThi.RandomDapAn
+        //                ? ch.DapAnList.OrderBy(d => Guid.NewGuid()).ToList()
+        //                : ch.DapAnList.ToList();
+        //        }
+        //    }
 
-            if (deThi.GioBD > DateTime.Now)
-            {
-                return Json(new { success = false, message = "Chưa đến giờ làm bài." });
-            }
+        //    var deThiVm = new DeThiViewModel
+        //    {
+        //        Id = deThi.Id,
+        //        TieuDe = deThi.TieuDe,
+        //        MaDe = deThi.MaDe,
+        //        GioBD = deThi.GioBD,
+        //        GioKT = deThi.GioKT,
+        //        ThoiGian = deThi.ThoiGian,
+        //        SoCauHoi = deThi.SoCauHoi,
+        //        DiemToiDa = deThi.DiemToiDa,
+        //        RandomCauHoi = deThi.RandomCauHoi,
+        //        RandomDapAn = deThi.RandomDapAn,
+        //        ShowKQ = deThi.ShowKQ,
+        //        CauHoiList = listCauHoi.Select(ch => new CauHoiViewModel
+        //        {
+        //            Id = ch.Id,
+        //            NoiDung = ch.NoiDung,
+        //            Loai = ch.Loai,
+        //            DapAnList = ch.DapAnList.Select(d => new DapAnViewModel
+        //            {
+        //                Id = d.Id,
+        //                NoiDung = d.NoiDung,
+        //                IsDung = d.DungSai,
+        //                IsSelected = false
+        //            }).ToList()
+        //        }).ToList()
+        //    };
 
-            var currentSession = new CurrentExamSession
-            {
-                DeThi = deThiVm,
-                TimeStart = DateTime.Now,
-                IsDone = false
-            };
+        //    if (deThi.GioBD > DateTime.Now)
+        //    {
+        //        return Json(new { success = false, message = "Chưa đến giờ làm bài." });
+        //    }
 
-            HttpContext.Session.SetJson("currentExamSession", currentSession);
+        //    var currentSession = new CurrentExamSession
+        //    {
+        //        DeThi = deThiVm,
+        //        TimeStart = DateTime.Now,
+        //        IsDone = false
+        //    };
 
-            ViewData["diem"] = deThi.SoCauHoi > 0
-                ? Math.Round(deThi.DiemToiDa / deThi.CauHoiList.Count, 1)
-                : 0;
+        //    HttpContext.Session.SetJson("currentExamSession", currentSession);
 
-            return PartialView("_DoExam", deThiVm);
-        }
+        //    ViewData["diem"] = deThi.SoCauHoi > 0
+        //        ? Math.Round(deThi.DiemToiDa / deThi.CauHoiList.Count, 1)
+        //        : 0;
+
+        //    return PartialView("_DoExam", deThiVm);
+        //}
 
         [HttpPost]
         public async Task<IActionResult> SaveQuestion([FromBody] SaveAnswerDto model)

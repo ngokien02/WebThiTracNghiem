@@ -1,4 +1,6 @@
 ﻿@using System.Security.Claims
+@model IEnumerable<dynamic>
+
 <div class="page-header">
 	<h1>Tạo đề thi mới</h1>
 </div>
@@ -12,6 +14,19 @@
 			<input type="text" id="TieuDe" name="TieuDe" placeholder="Nhập tên đề thi...">
 			<span id="errTenDeThi" class="errMessage"></span>
 		</div>
+		<div class="form-group">
+			<label for="ChuDe">Chủ đề:</label>
+			<input list="chuDeOptions" id="ChuDe" name="ChuDe" class="form-control" placeholder="Nhập hoặc chọn chủ đề...">
+			<datalist id="chuDeOptions">
+				<option disabled>Nhập hoặc chọn chủ đề...</option>
+				@foreach (var cd in Model)
+				{
+					<option value="@cd.TenCD"></option>
+				}
+			</datalist>
+			<span id="errChuDe" class="errMessage"></span>
+		</div>
+
 		<div class="form-group">
 			<label for="MaDe">Mã đề thi:</label>
 			<input type="text" id="MaDe" name="MaDe" placeholder="Nhập mã đề thi...">
@@ -37,6 +52,7 @@
 			</div>
 		</div>
 		<div id="manual-section" style="display:none;">
+			<button id="question-bank-btn" type="button" class="btn primary btnQB" style="margin-bottom:10px;">Thêm từ ngân hàng câu hỏi</button>
 			<div id="questions-list"></div>
 			<button type="button" class="btn secondary" id="add-question-btn">+ Thêm câu hỏi</button>
 		</div>
@@ -125,5 +141,111 @@
 	<div class="loading-box">
 		<div class="spinner"></div>
 		<div style="font-size:1.1rem;color:#1976D2;font-weight:500;">Đang phân tích file...</div>
+	</div>
+</div>
+
+<!-- Modal (ẩn mặc định) -->
+<div class="qb-modal" id="qb-modal">
+	<div class="qb-overlay" data-action="close"></div>
+	<div class="qb-content" role="dialog" aria-modal="true" aria-label="Ngân hàng câu hỏi">
+		<div class="qb-header">
+			<div class="qb-title">Ngân hàng câu hỏi</div>
+			<button class="qb-close" data-action="close">×</button>
+		</div>
+
+		<div class="qb-toolbar">
+			<select class="qb-select" id="qb-topic">
+				<option value="all">Tất cả chủ đề</option>
+				<option value="Cơ sở dữ liệu">Cơ sở dữ liệu</option>
+				<option value="Mạng máy tính">Mạng máy tính</option>
+				<option value="Kỹ thuật ô tô">Kỹ thuật ô tô</option>
+			</select>
+			<input type="text" class="qb-search" id="qb-search" placeholder="Tìm kiếm câu hỏi...">
+		</div>
+
+		<div class="qb-body">
+			<div class="qb-grid" id="qb-grid">
+				<!-- Các câu hỏi ở đây -->
+				<div class="qb-modal is-open">
+					<div class="qb-overlay" data-action="close"></div>
+					<div class="qb-content" role="dialog" aria-modal="true" aria-label="Ngân hàng câu hỏi">
+
+						<!-- Header -->
+						<div class="qb-header">
+							<div class="qb-title">Ngân hàng câu hỏi</div>
+							<button class="qb-close" data-action="close">×</button>
+						</div>
+
+						<!-- Toolbar -->
+						<div class="qb-toolbar">
+							<select class="qb-select" id="qb-topic">
+								<option value="all">Tất cả chủ đề</option>
+								<option value="Cơ sở dữ liệu">Cơ sở dữ liệu</option>
+								<option value="Mạng máy tính">Mạng máy tính</option>
+								<option value="Kỹ thuật ô tô">Kỹ thuật ô tô</option>
+							</select>
+							<input type="text" class="qb-search" id="qb-search" placeholder="Tìm kiếm câu hỏi...">
+						</div>
+
+						<!-- Body -->
+						<div class="qb-body">
+							<div class="qb-grid" id="qb-grid">
+
+								<!-- Item 1 -->
+								@foreach (var cd in Model)
+								{
+									var list = cd.CauHoiList as IEnumerable<dynamic>;
+
+									if (list != null && list.Any())
+									{
+								 		<div class="qb-item">
+								 			<input type="checkbox">
+								 			<div>
+								 				<div class="qb-question">
+								 					Trong cơ sở dữ liệu, khoá chính (Primary Key) có đặc điểm nào?
+								 				</div>
+								 				<div class="qb-answers">
+								 					<div>A. Có thể trùng lặp</div>
+								 					<div>B. Không cho phép null và duy nhất (đúng)</div>
+								 					<div>C. Chỉ dùng cho số nguyên</div>
+								 					<div>D. Chỉ dùng cho chuỗi</div>
+								 				</div>
+								 				<div class="qb-tags">Chủ đề: Cơ sở dữ liệu</div>
+								 			</div>
+								 			<div style="min-width: 120px; text-align: right;">
+								 				<div style="font-size: 12px; color: rgb(107, 114, 128);">Độ khó: Trung bình</div>
+								 			</div>
+								 		</div>
+								 	}
+								 	else
+								 	{
+								 		<h1>cccccccccccccccccc</h1>
+								 	}
+								 }
+							</div>
+						</div>
+
+						<!-- Footer -->
+						<div class="qb-footer">
+							<div class="qb-count" id="qb-count">Đã chọn: 0</div>
+							<div class="qb-actions">
+								<button class="btnQBModal" data-action="close">Hủy</button>
+								<button class="btnQBModal btn-primary" id="qb-confirm">Thêm vào đề</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<div class="qb-footer">
+			<div class="qb-count" id="qb-count">Đã chọn: 0</div>
+			<div class="qb-actions">
+				<button class="btn" data-action="close">Hủy</button>
+				<button class="btn btn-primary" id="qb-confirm">Thêm vào đề</button>
+			</div>
+		</div>
 	</div>
 </div>

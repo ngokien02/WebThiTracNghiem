@@ -10,6 +10,7 @@ using Xceed.Document.NET;
 using Newtonsoft.Json;
 using System.Security.Claims;
 using WebThiTracNghiem.Areas.Admin.Models;
+using System.Dynamic;
 
 namespace WebThiTracNghiem.Areas.Teacher.Controllers
 {
@@ -24,7 +25,19 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 		}
 		public IActionResult Index()
 		{
-			return PartialView("Index");
+			var cd = _db.ChuDe
+				.GroupJoin(_db.CauHoi,
+				cd => cd.Id,
+				ch => ch.ChuDeId,
+				(cds, chs) => new
+				{
+					cds.Id,
+					cds.TenCD,
+					CauHoiList = chs.ToList()
+				})
+				.ToList();
+
+			return PartialView("Index", cd);
 		}
 		public async Task<IActionResult> XuLyUpload(IFormFile examFile)
 		{
@@ -153,20 +166,48 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 				var cauHoiListRaw = form["cauHoiObj"];
 				var cauHoiList = JsonConvert.DeserializeObject<List<CauHoi>>(cauHoiListRaw);
 
+				var tenCD = form["ChuDe"].ToString();
+				var chuDe = _db.ChuDe.FirstOrDefault(cd => cd.TenCD == tenCD);
+
+				var newCD = new ChuDe();
+				if (chuDe == null)
+				{
+					newCD.TenCD = tenCD;
+					_db.ChuDe.Add(newCD);
+					_db.SaveChanges();
+				}
+
 				foreach (var cauHoi in cauHoiList)
 				{
-					cauHoi.DeThiId = deThi.Id;
 					var dapAnList = cauHoi.DapAnList;
 					cauHoi.DapAnList = null;
 
-					_db.CauHoi.Add(cauHoi);
-					_db.SaveChanges();
+					cauHoi.ChuDeId = chuDe != null ? chuDe.Id : newCD.Id;
 
-					foreach (var dapAn in dapAnList)
+					var existingQuestion = _db.CauHoi
+						.Any(ch => ch.NoiDung == cauHoi.NoiDung && ch.ChuDeId == cauHoi.ChuDeId);
+
+					if (!existingQuestion)
 					{
-						dapAn.CauHoiId = cauHoi.Id;
-						_db.DapAn.Add(dapAn);
+						_db.CauHoi.Add(cauHoi);
+						_db.SaveChanges();
+
+						foreach (var dapAn in dapAnList)
+						{
+							dapAn.CauHoiId = cauHoi.Id;
+							_db.DapAn.Add(dapAn);
+							_db.SaveChanges();
+						}
 					}
+					//luu cauhoi vao chitietdethi
+					var chiTietDT = new ChiTietDeThi
+					{
+						DeThiId = deThi.Id,
+						CauHoiId = cauHoi.Id
+					};
+
+					_db.ChiTietDeThi.Add(chiTietDT);
+					_db.SaveChanges();
 				}
 
 				_db.SaveChanges();

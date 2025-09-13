@@ -201,36 +201,36 @@ function clearFieldError(event) {
 }
 
 // Lưu bài viết
-function savePost() {
-    // Validate tất cả fields
-    const form = document.getElementById('adminPostsForm');
-    const inputs = form.querySelectorAll('input, textarea');
-    let isValid = true;
+//function savePost() {
+//    // Validate tất cả fields
+//    const form = document.getElementById('adminPostsForm');
+//    const inputs = form.querySelectorAll('input, textarea');
+//    let isValid = true;
 
-    inputs.forEach(input => {
-        if (!validateField({ target: input })) {
-            isValid = false;
-        }
-    });
+//    inputs.forEach(input => {
+//        if (!validateField({ target: input })) {
+//            isValid = false;
+//        }
+//    });
 
-    if (!isValid) {
-        showError('Vui lòng kiểm tra lại các trường bắt buộc');
-        return;
-    }
+//    if (!isValid) {
+//        showError('Vui lòng kiểm tra lại các trường bắt buộc');
+//        return;
+//    }
 
-    // Thu thập dữ liệu form
-    const formData = collectFormData();
+//    // Thu thập dữ liệu form
+//    const formData = collectFormData();
 
-    // Hiển thị loading
-    showLoading(true);
+//    // Hiển thị loading
+//    showLoading(true);
 
-    // Giả lập gửi dữ liệu (thay thế bằng API call thực tế)
-    setTimeout(() => {
-        showLoading(false);
-        showSuccessModal();
-        console.log('Dữ liệu bài viết:', formData);
-    }, 2000);
-}
+//    // Giả lập gửi dữ liệu (thay thế bằng API call thực tế)
+//    setTimeout(() => {
+//        showLoading(false);
+//        showSuccessModal();
+//        console.log('Dữ liệu bài viết:', formData);
+//    }, 2000);
+//}
 
 // Thu thập dữ liệu form
 function collectFormData() {
@@ -386,7 +386,7 @@ document.addEventListener('keydown', function (event) {
     // Ctrl + S để lưu
     if (event.ctrlKey && event.key === 's') {
         event.preventDefault();
-        savePost();
+        //savePost();
     }
 
     // Esc để đóng modal

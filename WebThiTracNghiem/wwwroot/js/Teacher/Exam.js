@@ -675,7 +675,9 @@
 
         fd.append("cauHoiObj", JSON.stringify(cauHoiObj));
 
-        fd.append("PhuongThucTao", "KetHop");
+        //for (const [key, value] of fd.entries()) {
+        //    console.log(`${key}: ${value}`);
+        //}
 
         // Hiển thị thông báo swal
         function showAlert(title, message, icon = "info") {

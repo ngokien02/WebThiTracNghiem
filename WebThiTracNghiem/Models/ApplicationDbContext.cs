@@ -14,5 +14,8 @@ namespace WebThiTracNghiem.Models
         public DbSet<DapAn> DapAn { get; set; }
         public DbSet<KetQua> KetQua { get; set; }
         public DbSet<AdminNotification> ThongBaoAdmin { get; set; }
-	}
+        public DbSet<ChiTietDeThi> ChiTietDeThi { get; set; }
+        public DbSet<ChiTietKQ> ChiTietKQ { get; set; }
+        public DbSet<ChuDe> ChuDe { get; set; }
+    }
 }

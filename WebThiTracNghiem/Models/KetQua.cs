@@ -16,6 +16,7 @@ namespace WebThiTracNghiem.Models
 		public double? Diem { get; set; }
 		public DateTime GioLam { get; set; }
 		public DateTime? GioNop { get; set; }
-		public string TrangThai { get; set; } 
-	}
+		public string TrangThai { get; set; }
+        public virtual ICollection<ChiTietKQ> ChiTietKQs { get; set; }
+    }
 }
