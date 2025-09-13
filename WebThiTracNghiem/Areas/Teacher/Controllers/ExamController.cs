@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using System.Security.Claims;
 using WebThiTracNghiem.Areas.Admin.Models;
 using System.Dynamic;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebThiTracNghiem.Areas.Teacher.Controllers
 {
@@ -26,16 +27,9 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 		public IActionResult Index()
 		{
 			var cd = _db.ChuDe
-				.GroupJoin(_db.CauHoi,
-				cd => cd.Id,
-				ch => ch.ChuDeId,
-				(cds, chs) => new
-				{
-					cds.Id,
-					cds.TenCD,
-					CauHoiList = chs.ToList()
-				})
-				.ToList();
+					.Include(c => c.CauHoiList)
+					.ThenInclude(ch => ch.DapAnList)
+					.ToList();
 
 			return PartialView("Index", cd);
 		}

@@ -380,20 +380,3 @@ window.addEventListener('click', function (event) {
         modal.style.display = 'none';
     }
 });
-
-// Xử lý phím tắt
-document.addEventListener('keydown', function (event) {
-    // Ctrl + S để lưu
-    if (event.ctrlKey && event.key === 's') {
-        event.preventDefault();
-        //savePost();
-    }
-
-    // Esc để đóng modal
-    if (event.key === 'Escape') {
-        const modal = document.getElementById('adminPostsSuccessModal');
-        if (modal.style.display === 'block') {
-            modal.style.display = 'none';
-        }
-    }
-});
