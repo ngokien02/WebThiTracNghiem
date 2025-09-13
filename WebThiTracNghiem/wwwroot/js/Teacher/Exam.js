@@ -573,6 +573,29 @@
    `);
         return div;
     }
+
+
+    //xu ly load ngan hang cau hoi theo chu de
+    $(document).on("change", "#qb-topic", function () {
+        let selectedId = $(this).val();
+
+        $.ajax({
+            url: '/teacher/exam/LoadQuestionFromBank',
+            type: 'GET',
+            data: {
+                chuDeId: selectedId === "all" ? null : selectedId
+            },
+            success: function (res) {
+                $(".listQuestionFromBank").html(res);
+            },
+            error: function () {
+                alert("Lỗi khi load câu hỏi!");
+            }
+        });
+    });
+
+
+    //xu ly submit de thi
     $(document).on('click', '#modal-confirm-btn', function (e) {
 
         e.preventDefault();
@@ -654,6 +677,8 @@
                     Loai: $(this).find('.correct-answers input:checked').length > 1 ? "NhieuDapAn" : "TracNghiem",
                     DapAnList: []
                 };
+
+                //them cau hoi tu ngan hang 
 
                 ["A", "B", "C", "D"].forEach(opt => {
                     const answer = $(this).find(`input[name='answer${opt}-${i}']`).val()?.trim();

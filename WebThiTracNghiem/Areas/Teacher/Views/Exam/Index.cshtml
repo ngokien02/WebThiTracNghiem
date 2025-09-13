@@ -164,7 +164,7 @@
 						<!-- Toolbar -->
 						<div class="qb-toolbar">
 							<select class="qb-select" id="qb-topic">
-								<option value="all">Tất cả chủ đề</option>
+								<option value="0">Tất cả chủ đề</option>
 								@foreach (var cd in Model)
 								{
 									<option value="@cd.Id">@cd.TenCD</option>
@@ -175,7 +175,7 @@
 
 						<!-- Body -->
 						<div class="qb-body">
-							<div class="qb-grid" id="qb-grid">
+							<div class="qb-grid listQuestionFromBank" id="qb-grid">
 
 								<!-- Item 1 -->
 								@foreach (var cd in Model)
@@ -195,16 +195,19 @@
 													<div class="qb-answers">
 														@foreach (var da in ch.DapAnList)
 														{
-															<div>@ABCD[i]. @da.NoiDung <b>@(da.DungSai ? "(Đúng)" : "")</b></div>
+															<div class="@(da.DungSai ? "dapAnDung" : "")">@ABCD[i]. @da.NoiDung</div>
+															<b>@(da.DungSai ? "(Đúng)" : "")</b>
+															i++;
 														}
 													</div>
 												</div>
-												<div style="min-width: 120px; text-align: right;">
-													<div style="font-size: 12px; color: rgb(107, 114, 128);">Độ khó: Trung bình</div>
-												</div>
 											</div>
-											i++;
+											i = 0;
 										}
+									}
+									else
+									{
+										<h1>Chưa có câu hỏi thuộc chủ đề này</h1>
 									}
 								}
 							</div>

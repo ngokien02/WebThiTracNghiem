@@ -1,0 +1,40 @@
+﻿@model IEnumerable<ChuDe>
+
+@{
+    string[] ABCD = new[] { "A", "B", "C", "D" };
+    bool hasQuestion = false;
+}
+
+@foreach (var cd in Model)
+{
+    if (cd.CauHoiList != null && cd.CauHoiList.Any())
+    {
+        hasQuestion = true;
+        foreach (var ch in cd.CauHoiList)
+        {
+            <div class="qb-item">
+                <input type="checkbox" />
+                <div>
+                    <div class="qb-question">
+                        @ch.NoiDung
+                    </div>
+                    <div class="qb-answers">
+                        @{
+                            var i = 0;
+                        }
+                        @foreach (var da in ch.DapAnList)
+                        {
+                            <div>@ABCD[i]. @da.NoiDung <b>@(da.DungSai ? "(Đúng)" : "")</b></div>
+                            i++;
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+
+@if (!hasQuestion)
+{
+    <h1>Chưa có câu hỏi thuộc chủ đề này</h1>
+}

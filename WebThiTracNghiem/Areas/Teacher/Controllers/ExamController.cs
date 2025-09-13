@@ -224,5 +224,22 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 				return false;
 			}
 		}
+
+		public IActionResult LoadQuestionFromBank(int? chuDeId)
+		{
+			var query = _db.ChuDe
+				.Include(cd => cd.CauHoiList)
+					.ThenInclude(ch => ch.DapAnList)
+				.AsQueryable();
+
+			if (chuDeId != null && chuDeId > 0)
+			{
+				query = query.Where(cd => cd.Id == chuDeId);
+			}
+
+			var data = query.ToList();
+
+			return PartialView("_ListQuestionFromBank", data);
+		}
 	}
 }
