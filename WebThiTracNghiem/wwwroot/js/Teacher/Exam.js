@@ -318,8 +318,9 @@
             });
 
             const soCauHoi = $('.question-item').length;
+            const soCauHoiNganHang = $(".qb-item input[type='checkbox']:checked").length;
 
-            if (soCauHoi === 0) {
+            if (soCauHoi === 0 && soCauHoiNganHang === 0) {
                 $('#errDeThiFile').text('Vui lòng thêm ít nhất một câu hỏi.');
                 hasError = true;
             } else {
@@ -583,7 +584,7 @@
             url: '/teacher/exam/LoadQuestionFromBank',
             type: 'GET',
             data: {
-                chuDeId: selectedId === "all" ? null : selectedId
+                chuDeId: selectedId === 0 ? null : selectedId
             },
             success: function (res) {
                 $(".listQuestionFromBank").html(res);
@@ -645,8 +646,9 @@
         fd.append('ShowKQ', $('#ShowKQ').is(':checked') ? 'true' : 'false');
 
         const cauHoiObj = [];
-        $('.question-item').each(function (i) {
+        $('.question-item, .qb-item').each(function (i) {
             const isFile = $(this).find('#contentQuestion').length > 0;
+            const isBank = $(this).hasClass("qb-item");
 
             if (isFile) {
                 // 📁 Câu hỏi từ file Excel
@@ -670,39 +672,66 @@
                 });
 
                 cauHoiObj.push(cauHoi);
-            } else {
-                // ✍️ Câu hỏi tạo thủ công bằng createQuestionItem(idx)
-                const cauHoi = {
-                    NoiDung: $(this).find('.question-content').val()?.trim() || '',
-                    Loai: $(this).find('.correct-answers input:checked').length > 1 ? "NhieuDapAn" : "TracNghiem",
-                    DapAnList: []
-                };
+            }
+            else {
+                if ($(this).hasClass("qb-item")) {
+                    const isChecked = $(this).find("input[type='checkbox']").prop("checked");
+                    if (!isChecked) return; // bỏ qua nếu chưa tick
 
-                //them cau hoi tu ngan hang 
+                    const noiDungCH = $(this).find('.qb-question').text().trim();
 
-                ["A", "B", "C", "D"].forEach(opt => {
-                    const answer = $(this).find(`input[name='answer${opt}-${i}']`).val()?.trim();
-                    const isCorrect = $(this).find(`input[name='correct-${i}'][value='${opt}']`).prop('checked');
-                    if (answer) {
+                    const cauHoi = {
+                        NoiDung: noiDungCH,
+                        Loai: $(this).find('.dapAnDung').length > 1 ? "NhieuDapAn" : "TracNghiem",
+                        DapAnList: []
+                    };
+
+                    $(this).find('.qb-answers div').each(function () {
+                        let fullText = $(this).text().trim();
+                        let answerText = fullText.replace(/^([A-D]\. ?)/, '').replace(/\(Đúng\)/, '').trim();
+                        const isCorrect = $(this).hasClass("dapAnDung");
+
                         cauHoi.DapAnList.push({
-                            NoiDung: answer,
+                            NoiDung: answerText,
                             DungSai: isCorrect
                         });
-                    }
-                });
+                    });
 
-                cauHoiObj.push(cauHoi);
+                    cauHoiObj.push(cauHoi);
+                }
+
+                // Nếu là câu hỏi tạo thủ công
+                else if ($(this).hasClass("question-item")) {
+                    const cauHoi = {
+                        NoiDung: $(this).find('.question-content').val()?.trim() || '',
+                        Loai: $(this).find('.correct-answers input:checked').length > 1 ? "NhieuDapAn" : "TracNghiem",
+                        DapAnList: []
+                    };
+
+                    ["A", "B", "C", "D"].forEach(opt => {
+                        const answer = $(this).find(`input[name='answer${opt}-${i}']`).val()?.trim();
+                        const isCorrect = $(this).find(`input[name='correct-${i}'][value='${opt}']`).prop('checked');
+                        if (answer) {
+                            cauHoi.DapAnList.push({
+                                NoiDung: answer,
+                                DungSai: isCorrect
+                            });
+                        }
+                    });
+
+                    cauHoiObj.push(cauHoi);
+                }
             }
         });
 
-        const soCauHoi = $('.question-item').length;
+        const soCauHoi = $('.question-item').length + $(".qb-item input[type='checkbox']:checked").length;
         fd.append("SoCauHoi", soCauHoi);
 
         fd.append("cauHoiObj", JSON.stringify(cauHoiObj));
 
-        //for (const [key, value] of fd.entries()) {
-        //    console.log(`${key}: ${value}`);
-        //}
+        for (const [key, value] of fd.entries()) {
+            console.log(`${key}: ${value}`);
+        }
 
         // Hiển thị thông báo swal
         function showAlert(title, message, icon = "info") {

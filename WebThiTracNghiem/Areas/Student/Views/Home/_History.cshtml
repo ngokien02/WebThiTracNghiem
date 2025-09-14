@@ -1,5 +1,4 @@
-﻿@model IEnumerable<dynamic>
-
+﻿@model IEnumerable<KetQua>
 <div class="page-header">
     <h1>Lịch sử Làm bài</h1>
 </div>
@@ -50,19 +49,89 @@
                 {
                     var trangThaiText = item.Diem >= 5 ? "Đạt" : "Không đạt";
                     var trangThaiClass = item.Diem >= 5 ? "passed" : "failed";
+                    var duration = item.GioNop.HasValue
+                    ? (item.GioNop.Value - item.GioLam).ToString(@"hh\:mm\:ss")
+                    : "Chưa nộp";
 
                     <tr>
-                        <td>@item.MaDe</td>
-                        <td>@item.TieuDe</td>
+                        <td>@item.DeThi?.MaDe</td>
+                        <td>@item.DeThi?.TieuDe</td>
                         <td>@item.GioLam.ToString("dd/MM/yyyy")</td>
-                        <td>@($"{item.ThoiGian} phút")</td>
+                        <td>@duration</td>
                         <td>@(item.Diem?.ToString("0.##") ?? "-")</td>
                         <td><span class="status @trangThaiClass">@trangThaiText</span></td>
                         <td>
-                            <button class="action-btn view">Xem chi tiết</button>
+                            <button class="btn-view" title="Xem chi tiết" onclick="document.getElementById('resultModal_@item.Id').classList.add('is-open')">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </td>
                     </tr>
-                }
+                      <!-- Modal riêng cho từng kết quả -->
+                            <div class="result-modal" id="resultModal_@item.Id">
+                                <div class="result-modal__overlay" data-action="close" onclick="this.closest('.result-modal').classList.remove('is-open')"></div>
+                                <div class="result-modal__content" role="dialog" aria-modal="true" aria-label="Chi tiết kết quả bài thi">
+                                    <div class="result-modal__header">
+                                        <div class="result-modal__title">Chi tiết kết quả bài thi</div>
+                                        <button class="result-modal__close" title="Đóng" data-action="close" onclick="this.closest('.result-modal').classList.remove('is-open')">×</button>
+                                    </div>
+
+                                    <div class="result-modal__body">
+
+                                        <div class="result-summary" id="result-summary-@item.Id">
+                                            <p><strong>Đề thi:</strong> @item.DeThi?.TieuDe</p>
+                                            <p><strong>Sinh viên:</strong> @item.SinhVien?.HoTen (@item.SinhVien?.UserName)</p>
+                                            <p><strong>Lớp:</strong> @item.SinhVien?.LopHoc</p>
+                                            <p><strong>Ngày thi:</strong> @item.GioLam.ToString("dd/MM/yyyy HH:mm")</p>
+                                    <p><strong>Thời gian làm bài:</strong> @duration</p>
+                                            <p><strong>Điểm:</strong> @item.Diem</p>
+                                            <p><strong>Kết quả:</strong> @(item.Diem >= 5 ? "Đạt" : "Không đạt")</p>
+                                            <p><strong>Số câu đúng:</strong> @item.SoCauDung</p>
+                                        </div>
+                                        <div class="result-section">
+                                            <h4>Chi tiết câu hỏi</h4>
+                                            <div class="question-list" id="question-list-@item.Id">
+                                                @foreach (var ct in item.ChiTietKQs)
+                                                {
+                                                    var ABCD = new[] { "A", "B", "C", "D", "E", "F" };
+                                                    var i = 0;
+
+                                                    <div class="question-card">
+                                                        <p><strong>Câu hỏi:</strong> @ct.CauHoi?.NoiDung</p>
+                                                        <ul>
+                                                            @foreach (var da in ct.CauHoi.DapAnList)
+                                                            {
+                                                                var isSelected = ct.DapAnChon != null && ct.DapAnChon.Id == da.Id;
+                                                                var isCorrect = da.DungSai; // 1 = đúng
+
+                                                                var classes = "";
+                                                                if (isCorrect) classes += "badge-correct";
+                                                                if (isSelected) classes += " badge-selected";
+
+                                                                <li>
+                                                                    @ABCD[i]. @da.NoiDung
+                                                                    <span class="@classes">
+                                                                        @(isCorrect ? "(Đúng)" : "(Sai)")
+                                                                        @(isSelected ? " (Đã Chọn)" : "")
+                                                                    </span>
+                                                                </li>
+
+                                                                i++;
+                                                            }
+                                                        </ul>
+                                                        <hr />
+                                                    </div>
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="result-modal__footer">
+                                        <button class="btn" data-action="close" onclick="this.closest('.result-modal').classList.remove('is-open')">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                 
             }
         </tbody>
     </table>

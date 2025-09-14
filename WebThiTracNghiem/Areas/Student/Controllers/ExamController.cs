@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -36,93 +37,99 @@ namespace WebThiTracNghiem.Areas.Student.Controllers
         }
 
         [HttpGet]
-        //public async Task<IActionResult> StartExam(int id)
-        //{
-        //    var kq = await _db.KetQua
-        //                    .FirstOrDefaultAsync(k => k.DeThiId == id);
+        public async Task<IActionResult> StartExam(int id)
+        {
+            var kq = await _db.KetQua
+                            .FirstOrDefaultAsync(k => k.DeThiId == id);
 
-        //    if (kq?.TrangThai == "HoanThanh")
-        //    {
-        //        return Json(new
-        //        {
-        //            success = false,
-        //            message = "Bạn đã làm bài thi này rồi!"
-        //        });
-        //    }
+            if (kq?.TrangThai == "HoanThanh")
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Bạn đã làm bài thi này rồi!"
+                });
+            }
 
-        //    //kq.GioLam = DateTime.Now;
-        //    //_db.SaveChanges();
+            var deThi = await _db.DeThi
+                .Include(dt => dt.ChiTietDe)
+                .FirstOrDefaultAsync(d => d.Id == id && d.GioKT >= DateTime.Now);
 
-        //    var deThi = await _db.DeThi
-        //                    .Include(d => d.CauHoiList)
-        //                    .ThenInclude(ch => ch.DapAnList)
-        //                    .FirstOrDefaultAsync(d => d.Id == id && d.GioKT >= DateTime.Now);
+            if (deThi == null)
+                return NotFound("Không tìm thấy đề thi.");
 
-        //    if (deThi == null)
-        //        return NotFound("Không tìm thấy đề thi.");
+            var cauHoiQuery = _db.CauHoi.Include(ch => ch.DapAnList);
 
-        //    var listCauHoi = deThi.RandomCauHoi
-        //        ? deThi.CauHoiList.OrderBy(c => Guid.NewGuid()).ToList()
-        //        : deThi.CauHoiList.ToList();
+            var listCauHoi = new List<CauHoi>();
 
-        //    foreach (var ch in listCauHoi)
-        //    {
-        //        if (ch.DapAnList != null)
-        //        {
-        //            ch.DapAnList = deThi.RandomDapAn
-        //                ? ch.DapAnList.OrderBy(d => Guid.NewGuid()).ToList()
-        //                : ch.DapAnList.ToList();
-        //        }
-        //    }
+            foreach(var ct in deThi.ChiTietDe)
+            {
+                var cauHoi = cauHoiQuery.FirstOrDefault(ch => ch.Id == ct.CauHoiId);
+                listCauHoi.Add(cauHoi);
+            }
 
-        //    var deThiVm = new DeThiViewModel
-        //    {
-        //        Id = deThi.Id,
-        //        TieuDe = deThi.TieuDe,
-        //        MaDe = deThi.MaDe,
-        //        GioBD = deThi.GioBD,
-        //        GioKT = deThi.GioKT,
-        //        ThoiGian = deThi.ThoiGian,
-        //        SoCauHoi = deThi.SoCauHoi,
-        //        DiemToiDa = deThi.DiemToiDa,
-        //        RandomCauHoi = deThi.RandomCauHoi,
-        //        RandomDapAn = deThi.RandomDapAn,
-        //        ShowKQ = deThi.ShowKQ,
-        //        CauHoiList = listCauHoi.Select(ch => new CauHoiViewModel
-        //        {
-        //            Id = ch.Id,
-        //            NoiDung = ch.NoiDung,
-        //            Loai = ch.Loai,
-        //            DapAnList = ch.DapAnList.Select(d => new DapAnViewModel
-        //            {
-        //                Id = d.Id,
-        //                NoiDung = d.NoiDung,
-        //                IsDung = d.DungSai,
-        //                IsSelected = false
-        //            }).ToList()
-        //        }).ToList()
-        //    };
+            listCauHoi = deThi.RandomCauHoi?
+                listCauHoi.OrderBy(ch => Guid.NewGuid()).ToList()
+                : listCauHoi.ToList();
 
-        //    if (deThi.GioBD > DateTime.Now)
-        //    {
-        //        return Json(new { success = false, message = "Chưa đến giờ làm bài." });
-        //    }
+            foreach (var ch in listCauHoi)
+            {
+                if (ch.DapAnList != null)
+                {
+                    ch.DapAnList = deThi.RandomDapAn
+                        ? ch.DapAnList.OrderBy(d => Guid.NewGuid()).ToList()
+                        : ch.DapAnList.ToList();
+                }
+            }
 
-        //    var currentSession = new CurrentExamSession
-        //    {
-        //        DeThi = deThiVm,
-        //        TimeStart = DateTime.Now,
-        //        IsDone = false
-        //    };
+            var deThiVm = new DeThiViewModel
+            {
+                Id = deThi.Id,
+                TieuDe = deThi.TieuDe,
+                MaDe = deThi.MaDe,
+                GioBD = deThi.GioBD,
+                GioKT = deThi.GioKT,
+                ThoiGian = deThi.ThoiGian,
+                SoCauHoi = deThi.SoCauHoi,
+                DiemToiDa = deThi.DiemToiDa,
+                RandomCauHoi = deThi.RandomCauHoi,
+                RandomDapAn = deThi.RandomDapAn,
+                ShowKQ = deThi.ShowKQ,
+                CauHoiList = listCauHoi.Select(ch => new CauHoiViewModel
+                {
+                    Id = ch.Id,
+                    NoiDung = ch.NoiDung,
+                    Loai = ch.Loai,
+                    DapAnList = ch.DapAnList.Select(d => new DapAnViewModel
+                    {
+                        Id = d.Id,
+                        NoiDung = d.NoiDung,
+                        IsDung = d.DungSai,
+                        IsSelected = false
+                    }).ToList()
+                }).ToList()
+            };
 
-        //    HttpContext.Session.SetJson("currentExamSession", currentSession);
+            if (deThi.GioBD > DateTime.Now)
+            {
+                return Json(new { success = false, message = "Chưa đến giờ làm bài." });
+            }
 
-        //    ViewData["diem"] = deThi.SoCauHoi > 0
-        //        ? Math.Round(deThi.DiemToiDa / deThi.CauHoiList.Count, 1)
-        //        : 0;
+            var currentSession = new CurrentExamSession
+            {
+                DeThi = deThiVm,
+                TimeStart = DateTime.Now,
+                IsDone = false
+            };
 
-        //    return PartialView("_DoExam", deThiVm);
-        //}
+            HttpContext.Session.SetJson("currentExamSession", currentSession);
+
+            ViewData["diem"] = deThi.SoCauHoi > 0
+                ? Math.Round(deThi.DiemToiDa / listCauHoi.Count, 1)
+                : 0;
+
+            return PartialView("_DoExam", deThiVm);
+        }
 
         [HttpPost]
         public async Task<IActionResult> SaveQuestion([FromBody] SaveAnswerDto model)
@@ -191,80 +198,96 @@ namespace WebThiTracNghiem.Areas.Student.Controllers
             return Json(result);
         }
 
-        public async Task<IActionResult> SubmitExam()
-        {
-            var currentSession = HttpContext.Session.GetJson<CurrentExamSession>("currentExamSession");
+		public async Task<IActionResult> SubmitExam()
+		{
+			var currentSession = HttpContext.Session.GetJson<CurrentExamSession>("currentExamSession");
 
-            if (currentSession == null)
-            {
-                _logger.LogWarning("currentExamSession is null");
-                return Json(new { success = false, message = "Không tìm thấy bài thi." });
-            }
+			if (currentSession == null)
+			{
+				_logger.LogWarning("currentExamSession is null");
+				return Json(new { success = false, message = "Không tìm thấy bài thi." });
+			}
 
-            int totalQuestions = currentSession.DeThi.CauHoiList.Count;
-            int correctAnswers = 0;
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            foreach (var cauHoi in currentSession.DeThi.CauHoiList)
-            {
-                bool isCorrect = false;
+			// Lấy KetQua đã tạo lúc StartExam
+			var kq = await _db.KetQua
+						.Include(k => k.ChiTietKQs)
+						.FirstOrDefaultAsync(k => k.DeThiId == currentSession.DeThi.Id && k.IdSinhVien == userId);
 
-                if (cauHoi.Loai == "TracNghiem")
-                {
-                    isCorrect = cauHoi.DapAnList.Any(d => d.IsDung && d.IsSelected) &&
-                                cauHoi.DapAnList.Where(d => d.IsDung == false).All(d => d.IsSelected == false);
-                }
-                else if (cauHoi.Loai == "NhieuDapAn")
-                {
-                    isCorrect = cauHoi.DapAnList.All(d =>
-                        (d.IsDung && d.IsSelected) || (!d.IsDung && !d.IsSelected));
-                }
+			if (kq == null)
+			{
+				// Nếu chưa có, tạo mới KetQua
+				kq = new KetQua
+				{
+					IdSinhVien = userId,
+					DeThiId = currentSession.DeThi.Id,
+					GioLam = currentSession.TimeStart,
+					TrangThai = "HoanThanh",
+					SoCauDung = 0,
+					Diem = 0
+				};
+				_db.KetQua.Add(kq);
+				await _db.SaveChangesAsync();
+			}
 
-                if (isCorrect)
-                {
-                    correctAnswers++;
-                }
-            }
+			int totalQuestions = currentSession.DeThi.CauHoiList.Count;
+			int correctAnswers = 0;
 
-            double score = Math.Round((double)correctAnswers / totalQuestions * currentSession.DeThi.DiemToiDa, 2);
-            var user = await _userManager.GetUserAsync(User);
+			foreach (var cauHoiVm in currentSession.DeThi.CauHoiList)
+			{
+				bool isCorrect = false;
 
-            var kq = new KetQua
-            {
-                IdSinhVien = user?.Id,
-                DeThiId = currentSession.DeThi.Id,
-                SoCauDung = correctAnswers,
-                Diem = score,
-                GioLam = currentSession.TimeStart,
-                GioNop = DateTime.Now,
-                TrangThai = "HoanThanh"
-            };
-            _db.Add(kq);
-            _db.SaveChanges();
+				if (cauHoiVm.Loai == "TracNghiem")
+				{
+					isCorrect = cauHoiVm.DapAnList.Any(d => d.IsDung && d.IsSelected) &&
+								cauHoiVm.DapAnList.Where(d => !d.IsDung).All(d => !d.IsSelected);
+				}
+				else if (cauHoiVm.Loai == "NhieuDapAn")
+				{
+					isCorrect = cauHoiVm.DapAnList.All(d =>
+						(d.IsDung && d.IsSelected) || (!d.IsDung && !d.IsSelected));
+				}
 
-            if (currentSession.DeThi.ShowKQ)
-            {
-                return Ok(new
-                {
-                    success = true,
-                    message = "Nộp bài thành công!",
-                    title = currentSession.DeThi.TieuDe,
-                    username = user?.HoTen,
-                    timeDone = DateTime.Now.ToString("HH:mm dd/MM/yyyy"),
-                    correctAnswers = correctAnswers + " / " + totalQuestions,
-                    score = score.ToString()
-                });
-            }
-            else
-            {
-                return Ok(new
-                {
-                    success = true,
-                    message = "Nộp bài thành công!",
-                    title = currentSession.DeThi.TieuDe,
-                    username = user?.HoTen,
-                    timeDone = DateTime.Now.ToString("HH:mm dd/MM/yyyy"),
-                });
-            }
-        }
-    }
+				if (isCorrect) correctAnswers++;
+
+				// Cập nhật ChiTietKQ
+				var chiTiet = kq.ChiTietKQs.FirstOrDefault(ct => ct.CauHoiId == cauHoiVm.Id);
+				if (chiTiet == null)
+				{
+					// Nếu chưa có chi tiết, tạo mới
+					chiTiet = new ChiTietKQ
+					{
+						KetQuaId = kq.Id,
+						CauHoiId = cauHoiVm.Id,
+						//Diem = isCorrect ? (double)currentSession.DeThi.DiemToiDa / totalQuestions : 0,
+						DapAnId = cauHoiVm.DapAnList.Where(d => d.IsSelected).Select(d => d.Id).FirstOrDefault()
+					};
+					_db.ChiTietKQ.Add(chiTiet);
+				}
+				else
+				{
+					// Cập nhật chi tiết hiện có
+					//chiTiet.Diem = isCorrect ? (double)currentSession.DeThi.DiemToiDa / totalQuestions : 0;
+					chiTiet.DapAnId = cauHoiVm.DapAnList.Where(d => d.IsSelected).Select(d => d.Id).FirstOrDefault();
+				}
+			}
+
+			kq.SoCauDung = correctAnswers;
+			kq.Diem = Math.Round((double)correctAnswers / totalQuestions * currentSession.DeThi.DiemToiDa, 2);
+			kq.GioNop = DateTime.Now;
+			kq.TrangThai = "HoanThanh";
+
+			await _db.SaveChangesAsync();
+			HttpContext.Session.Remove("currentExamSession");
+
+			return Ok(new
+			{
+				success = true,
+				message = "Nộp bài thành công!",
+				correctAnswers = $"{correctAnswers} / {totalQuestions}",
+				score = kq.Diem
+			});
+		}
+	}
 }

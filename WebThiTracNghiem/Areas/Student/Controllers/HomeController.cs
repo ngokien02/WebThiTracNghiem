@@ -21,29 +21,24 @@ namespace WebThiTracNghiem.Areas.Student.Controllers
 			ViewData["Title"] = "Trang chủ Sinh viên";
 			return View();
 		}
-        public async Task<IActionResult> History()
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+		public async Task<IActionResult> History()
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var listKetQua = await _db.KetQua
-				.Join(_db.DeThi,
-				kq => kq.DeThiId,
-				dt => dt.Id,
-				(kqdt, dt) => new
-				{
-					dt.MaDe,
-					dt.TieuDe,
-					kqdt.GioLam,
-					dt.ThoiGian,
-					dt.ShowKQ,
-					kqdt.Diem,
-					kqdt.TrangThai,
-					kqdt.IdSinhVien
-				})
-                .Where(kqdt => kqdt.IdSinhVien == userId && kqdt.ShowKQ == true)      
-                .OrderByDescending(kq => kq.GioLam)
-                .ToListAsync();
-            return PartialView("_History", listKetQua);
-        }
-    }
+			var listKetQua = await _db.KetQua
+							.Where(kq => kq.IdSinhVien == userId && kq.DeThi.ShowKQ) 
+							.Include(kq => kq.SinhVien)
+							.Include(kq => kq.DeThi)
+							.Include(kq => kq.ChiTietKQs)
+								.ThenInclude(ct => ct.CauHoi)
+									.ThenInclude(ch => ch.DapAnList)
+							.Include(kq => kq.ChiTietKQs)
+								.ThenInclude(ct => ct.DapAnChon)
+							.OrderByDescending(kq => kq.GioLam)
+							.AsNoTracking()
+							.ToListAsync();
+
+			return PartialView("_History", listKetQua);
+		}
+	}
 }

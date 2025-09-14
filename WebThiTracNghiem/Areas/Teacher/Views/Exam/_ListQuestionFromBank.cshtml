@@ -24,7 +24,7 @@
                         }
                         @foreach (var da in ch.DapAnList)
                         {
-                            <div>@ABCD[i]. @da.NoiDung <b>@(da.DungSai ? "(Đúng)" : "")</b></div>
+                            <div class="@(da.DungSai ? "dapAnDung" : "")">@ABCD[i]. @da.NoiDung <b>@(da.DungSai ? "(Đúng)" : "")</b></div>
                             i++;
                         }
                     </div>

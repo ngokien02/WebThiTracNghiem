@@ -179,9 +179,9 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 					cauHoi.ChuDeId = chuDe != null ? chuDe.Id : newCD.Id;
 
 					var existingQuestion = _db.CauHoi
-						.Any(ch => ch.NoiDung == cauHoi.NoiDung && ch.ChuDeId == cauHoi.ChuDeId);
+						.FirstOrDefault(ch => ch.NoiDung == cauHoi.NoiDung && ch.ChuDeId == cauHoi.ChuDeId);
 
-					if (!existingQuestion)
+					if (existingQuestion == null)
 					{
 						_db.CauHoi.Add(cauHoi);
 						_db.SaveChanges();
@@ -197,7 +197,7 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 					var chiTietDT = new ChiTietDeThi
 					{
 						DeThiId = deThi.Id,
-						CauHoiId = cauHoi.Id
+						CauHoiId = existingQuestion == null ? cauHoi.Id : existingQuestion.Id
 					};
 
 					_db.ChiTietDeThi.Add(chiTietDT);

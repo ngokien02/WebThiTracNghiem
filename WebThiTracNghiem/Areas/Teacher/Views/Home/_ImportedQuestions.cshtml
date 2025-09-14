@@ -1,0 +1,29 @@
+﻿@model List<CauHoi>
+
+<div class="form-group">
+    <label for="ChuDe">Chủ đề:</label>
+    <input list="chuDeOptions" id="ChuDe" name="ChuDe" class="form-control" placeholder="Nhập hoặc chọn chủ đề...">
+    <datalist id="chuDeOptions">
+        <option disabled>Nhập hoặc chọn chủ đề...</option>
+        @foreach (var cd in Model.Select(q => q.ChuDe).Where(c => c != null))
+        {
+            <option value="@cd.TenCD"></option>
+        }
+    </datalist>
+    <span id="errChuDe" class="errMessage"></span>
+</div>  
+@foreach (var q in Model)
+{
+    <div class="question-item" data-noidung="@q.NoiDung">
+        <div class="question-text">@q.NoiDung</div>
+        <ul class="answer-list">
+            @foreach (var a in q.DapAnList)
+            {
+                <li class="answer-item @(a.DungSai ? "correct" : "")" data-correct="@(a.DungSai.ToString().ToLower())">
+                    <span class="answer-text">@a.NoiDung</span>
+                </li>
+            }
+
+        </ul>
+    </div>
+}

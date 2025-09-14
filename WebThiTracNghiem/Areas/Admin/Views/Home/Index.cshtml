@@ -156,9 +156,23 @@
 						}
 						@{
 							var now = DateTime.Now;
-							var timeSpan = (Int32)(now - tb.GioTB).TotalMinutes;
+							var span = now - tb.GioTB;
+							string displayTime;
+
+							if (span.TotalMinutes < 60)
+							{
+								displayTime = $"{(int)span.TotalMinutes} phút trước";
+							}
+							else if (span.TotalHours < 24)
+							{
+								displayTime = $"{(int)span.TotalHours} giờ trước";
+							}
+							else
+							{
+								displayTime = $"{(int)span.TotalDays} ngày trước";
+							}
 						}
-						<span class="activity-time">@timeSpan phút trước</span>
+						<span class="activity-time">@displayTime</span>
 					</div>
 					<div class="activity-status warning">
 						<i class="fas fa-clock"></i>

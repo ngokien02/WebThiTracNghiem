@@ -1,0 +1,36 @@
+﻿@model IEnumerable<ChuDe>
+
+@foreach (var cd in Model)
+{
+	@if (cd.CauHoiList != null && cd.CauHoiList.Any())
+	{
+		@foreach (var ch in cd.CauHoiList)
+		{
+			<div class="question-card">
+				<div class="question-header">
+					<span class="question-type">@(ch.Loai == "TracNghiem" ? "Trắc nghiệm" : "Nhiều đáp án")</span>
+					<div class="question-actions">
+						<a asp-action="Edit" asp-route-id="@ch.Id" class="btn-icon"><i class="fas fa-edit"></i></a>
+						<a asp-action="Delete" asp-route-id="@ch.Id" class="btn-icon danger"><i class="fas fa-trash"></i></a>
+					</div>
+				</div>
+				<div class="question-content">
+					<p class="question-text">@ch.NoiDung</p>
+					<div class="answer-options">
+						@foreach (var da in ch.DapAnList)
+						{
+							<div class="answer-option @(da.DungSai ? "correct" : "")">
+								<span class="option-label">@da.Id</span>
+								<span class="option-text">@da.NoiDung</span>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		}
+	}
+	else
+	{
+		<h2>Không có câu hỏi thuộc chủ đề này</h2>
+	}
+}
