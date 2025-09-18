@@ -32,11 +32,11 @@
 
     function initVisibilityTracking() {
         const handleViolation = () => {
-            if (hasTriggered || isHiddenHandled) return; 
+            if (hasTriggered || isHiddenHandled) return;
 
             isHiddenHandled = true;
             count++;
-            localStorage.setItem("tabSwitchCount", count); 
+            localStorage.setItem("tabSwitchCount", count);
 
             alert(`⚠️ Bạn đã chuyển tab ${count} lần. Quá 3 lần sẽ tự hủy bài thi.`);
 
@@ -130,12 +130,18 @@
 
         var questionId = $(this).data('quest-id');
         var questionIndex = $(this).data('quest-index');
+        var totalQuestion = $("#TotalQuestion").val();
 
         renderQuestion(questionId);
         setTimeout(function () {
             const input = document.getElementById("IdCauHoi");
             const stt = document.querySelector('#SttCauHoi');
-            if (stt) stt.textContent = `Câu ${questionIndex} `;
+            const examProgress = document.querySelector("#exam-page-progress");
+            if (stt) {
+                stt.textContent = `Câu ${questionIndex} `;
+                examProgress.textContent = questionIndex + " / " + totalQuestion + " câu";
+                $("#CurrentIndex").val(questionIndex);
+            }
             if (input) input.value = questionId;
             else console.warn("Không tìm thấy input #IdCauHoi sau render");
         }, 100);
@@ -171,13 +177,22 @@
                 $("#QuestionIndex").val(directIndex);
             }
         });
+
         var sttCauHoi = parseInt($("#QuestionIndex").val());
+        const examProgress = document.querySelector("#exam-page-progress");
+        var totalQuestion = $("#TotalQuestion").val();
+        const stt = document.querySelector('#SttCauHoi');
+
+        examProgress.textContent = sttCauHoi + " / " + totalQuestion + " câu";
+        stt.textContent = `Câu ${sttCauHoi} `;
+
         $("div.exam-page-question-number").each(function () {
             let value = parseInt($(this).text().trim());
             if (value == sttCauHoi) {
                 $(this).addClass("current");
             }
         });
+
         SaveQuestion();
     }
 

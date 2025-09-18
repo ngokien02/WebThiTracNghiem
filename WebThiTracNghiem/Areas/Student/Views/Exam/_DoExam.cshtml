@@ -2,12 +2,13 @@
 @model DeThiViewModel
 
 @{
-	var cauHoi1 = Model.CauHoiList.ToList()[0];
+    var cauHoi1 = Model.CauHoiList.ToList()[0];
+    var totalQuestion = Model.CauHoiList.Count();
 }
 
 <!-- Header với thông tin tiến độ và thời gian -->
 <div class="exam-page-header">
-	<div class="exam-page-progress">0 / 15 câu</div>
+    <div class="exam-page-progress" id="exam-page-progress">1 / @Model.CauHoiList.Count() câu</div>
 	<div id="exam-timer" class="exam-page-timer"></div>
 </div>
 
@@ -137,3 +138,4 @@
 <input type="hidden" id="IdCauHoi" value="@cauHoi1.Id" />
 <input type="hidden" id="QuestionIndex" value="" />
 <input type="hidden" id="ExamTime" value="@Model.ThoiGian" />
+<input type="hidden" id="TotalQuestion" value="@totalQuestion" />

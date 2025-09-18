@@ -651,7 +651,6 @@
             const isBank = $(this).hasClass("qb-item");
 
             if (isFile) {
-                // 📁 Câu hỏi từ file Excel
                 const noiDungCH = $(this).find('#contentQuestion').val()?.split('. ').slice(1).join('. ').trim() || '';
                 const isMultipleChoice = $(this).find('#questionType').prop('checked');
 
@@ -676,7 +675,7 @@
             else {
                 if ($(this).hasClass("qb-item")) {
                     const isChecked = $(this).find("input[type='checkbox']").prop("checked");
-                    if (!isChecked) return; // bỏ qua nếu chưa tick
+                    if (!isChecked) return;
 
                     const noiDungCH = $(this).find('.qb-question').text().trim();
 
@@ -729,9 +728,9 @@
 
         fd.append("cauHoiObj", JSON.stringify(cauHoiObj));
 
-        for (const [key, value] of fd.entries()) {
-            console.log(`${key}: ${value}`);
-        }
+        //for (const [key, value] of fd.entries()) {
+        //    console.log(`${key}: ${value}`);
+        //}
 
         // Hiển thị thông báo swal
         function showAlert(title, message, icon = "info") {

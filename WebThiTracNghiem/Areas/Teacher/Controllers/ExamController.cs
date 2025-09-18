@@ -15,231 +15,307 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WebThiTracNghiem.Areas.Teacher.Controllers
 {
-	[Area("Teacher")]
-	[Authorize(Roles = VaiTro.Role_Teach)]
-	public class ExamController : Controller
-	{
-		private readonly ApplicationDbContext _db;
-		public ExamController(ApplicationDbContext db)
-		{
-			_db = db;
-		}
-		public IActionResult Index()
-		{
-			var cd = _db.ChuDe
-					.Include(c => c.CauHoiList)
-					.ThenInclude(ch => ch.DapAnList)
-					.ToList();
+    [Area("Teacher")]
+    [Authorize(Roles = VaiTro.Role_Teach)]
+    public class ExamController : Controller
+    {
+        private readonly ApplicationDbContext _db;
+        public ExamController(ApplicationDbContext db)
+        {
+            _db = db;
+        }
+        public IActionResult Index()
+        {
+            var cd = _db.ChuDe
+                    .Include(c => c.CauHoiList)
+                    .ThenInclude(ch => ch.DapAnList)
+                    .ToList();
 
-			return PartialView("Index", cd);
-		}
-		public async Task<IActionResult> XuLyUpload(IFormFile examFile)
-		{
-			if (examFile == null || examFile.Length == 0)
-			{
-				return BadRequest("File không hợp lệ.");
-			}
+            return PartialView("Index", cd);
+        }
+        public async Task<IActionResult> XuLyUpload(IFormFile examFile)
+        {
+            if (examFile == null || examFile.Length == 0)
+            {
+                return BadRequest("File không hợp lệ.");
+            }
 
-			var cauHoiList = new List<CauHoi>();
+            var cauHoiList = new List<CauHoi>();
 
-			using (var stream = new MemoryStream())
-			{
-				await examFile.CopyToAsync(stream);
-				stream.Position = 0;
+            using (var stream = new MemoryStream())
+            {
+                await examFile.CopyToAsync(stream);
+                stream.Position = 0;
 
-				using (var doc = DocX.Load(stream))
-				{
-					var paragraphs = doc.Paragraphs;
-					CauHoi currentCauHoi = null;
-					char[] optionLetters = { 'A', 'B', 'C', 'D' };
-					int answerIndex = 0;
+                using (var doc = DocX.Load(stream))
+                {
+                    var paragraphs = doc.Paragraphs;
+                    CauHoi currentCauHoi = null;
+                    char[] optionLetters = { 'A', 'B', 'C', 'D' };
+                    int answerIndex = 0;
 
-					foreach (var paragraph in paragraphs)
-					{
-						string text = paragraph.Text.Trim();
-						if (string.IsNullOrWhiteSpace(text)) continue;
+                    foreach (var paragraph in paragraphs)
+                    {
+                        string rawText = paragraph.Text;
+                        if (string.IsNullOrWhiteSpace(rawText)) continue;
 
-						// Nhận diện câu hỏi
-						var matchQuestion = Regex.Match(text, @"^\d+\.\s*(.+)");
-						if (matchQuestion.Success)
-						{
-							if (currentCauHoi != null && currentCauHoi.DapAnList.Any())
-								cauHoiList.Add(currentCauHoi);
+                        // Cắt nhỏ nếu có xuống dòng (Shift+Enter)
+                        var lines = rawText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-							currentCauHoi = new CauHoi
-							{
-								NoiDung = matchQuestion.Groups[1].Value.Trim(),
-								DapAnList = new List<DapAn>()
-							};
-							answerIndex = 0;
-							continue;
-						}
+                        foreach (var line in lines)
+                        {
+                            string text = line.Trim();
+                            if (string.IsNullOrWhiteSpace(text)) continue;
 
-						// Xử lý đáp án A/B/C/D, chấp nhận có hoặc không dấu * đầu dòng
-						if (currentCauHoi != null && answerIndex < 4 && Regex.IsMatch(text, @"^\*?[A-D]\."))
-						{
-							bool isCorrect = false;
-							string content = text;
+                            // Nhận diện câu hỏi
+                            var matchQuestion = Regex.Match(text, @"^\d+\.\s*(.+)");
+                            if (matchQuestion.Success)
+                            {
+                                if (currentCauHoi != null && currentCauHoi.DapAnList.Any())
+                                    cauHoiList.Add(currentCauHoi);
 
-							// Kiểm tra và loại bỏ dấu *
-							if (content.StartsWith("*"))
-							{
-								isCorrect = true;
-								content = content.Substring(1).Trim(); // Bỏ dấu *
-							}
+                                currentCauHoi = new CauHoi
+                                {
+                                    NoiDung = matchQuestion.Groups[1].Value.Trim(),
+                                    DapAnList = new List<DapAn>()
+                                };
+                                answerIndex = 0;
+                                continue;
+                            }
 
-							// Kiểm tra màu đỏ
-							foreach (var run in paragraph.MagicText)
-							{
-								if (run?.formatting?.FontColor.HasValue == true &&
-									run.formatting.FontColor.Value.ToArgb() == ColorTranslator.FromHtml("#EE0000").ToArgb())
-								{
-									isCorrect = true;
-									break;
-								}
-							}
+                            // Nhận diện đáp án
+                            if (currentCauHoi != null && answerIndex < 4 && Regex.IsMatch(text, @"^\*?[A-D]\."))
+                            {
+                                bool isCorrect = false;
+                                string content = text;
 
-							// Bỏ tiền tố A./B./... sau khi xử lý *
-							content = Regex.Replace(content, @"^[A-D]\.", "").Trim();
+                                if (content.StartsWith("*"))
+                                {
+                                    isCorrect = true;
+                                    content = content.Substring(1).Trim();
+                                }
 
-							currentCauHoi.DapAnList.Add(new DapAn
-							{
-								NoiDung = content,
-								DungSai = isCorrect
-							});
+                                // Kiểm tra màu đỏ
+                                foreach (var run in paragraph.MagicText)
+                                {
+                                    if (run?.formatting?.FontColor.HasValue == true &&
+                                        run.formatting.FontColor.Value.ToArgb() == ColorTranslator.FromHtml("#EE0000").ToArgb())
+                                    {
+                                        isCorrect = true;
+                                        break;
+                                    }
+                                }
 
-							answerIndex++;
-							continue;
-						}
-					}
+                                // Loại bỏ tiền tố A./B./...
+                                content = Regex.Replace(content, @"^[A-D]\.", "").Trim();
 
-					if (currentCauHoi != null && currentCauHoi.DapAnList.Any())
-					{
-						cauHoiList.Add(currentCauHoi);
-					}
-				}
-			}
+                                currentCauHoi.DapAnList.Add(new DapAn
+                                {
+                                    NoiDung = content,
+                                    DungSai = isCorrect
+                                });
 
-			return PartialView("_DeThiUploaded", cauHoiList);
-		}
+                                answerIndex++;
+                            }
+                        }
+                    }
 
-		[HttpPost, ActionName("CreateExam")]
-		public bool CreateExam()
-		{
-			try
-			{
-				var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-				var form = Request.Form;
+                    //foreach (var paragraph in paragraphs)
+                    //{
+                    //	string text = paragraph.Text.Trim();
+                    //	if (string.IsNullOrWhiteSpace(text)) continue;
 
-				var idGiangVien = form["IdGiangVien"].ToString();
-				if (idGiangVien != currentUserId)
-				{
-					return false;
-				}
+                    //	// Nhận diện câu hỏi
+                    //	var matchQuestion = Regex.Match(text, @"^\d+\.\s*(.+)");
+                    //	if (matchQuestion.Success)
+                    //	{
+                    //		if (currentCauHoi != null && currentCauHoi.DapAnList.Any())
+                    //			cauHoiList.Add(currentCauHoi);
 
-				// Tạo mới DeThi (KHÔNG gán Id từ form)
-				var deThi = new DeThi
-				{
-					MaDe = form["MaDe"],
-					TieuDe = form["TieuDe"],
-					GioBD = DateTime.Parse(form["GioBD"]),
-					GioKT = DateTime.Parse(form["GioKT"]),
-					SoCauHoi = int.Parse(form["SoCauHoi"]),
-					ThoiGian = int.TryParse(form["ThoiGian"], out var thoiGian) ? thoiGian : 0,
-					IdGiangVien = idGiangVien,
-					DiemToiDa = int.TryParse(form["DiemToiDa"], out var diem) ? diem : 10,
-					RandomCauHoi = bool.TryParse(form["RandomCauHoi"], out var rc) && rc,
-					RandomDapAn = bool.TryParse(form["RandomDapAn"], out var rd) && rd,
-					ShowKQ = bool.TryParse(form["ShowKQ"], out var skq) && skq,
-				};
+                    //		currentCauHoi = new CauHoi
+                    //		{
+                    //			NoiDung = matchQuestion.Groups[1].Value.Trim(),
+                    //			DapAnList = new List<DapAn>()
+                    //		};
+                    //		answerIndex = 0;
+                    //		continue;
+                    //	}
 
-				_db.DeThi.Add(deThi);
-				_db.SaveChanges();
+                    //	// Xử lý đáp án A/B/C/D, chấp nhận có hoặc không dấu * đầu dòng
+                    //	if (currentCauHoi != null && answerIndex < 4 && Regex.IsMatch(text, @"^\*?[A-D]\."))
+                    //	{
+                    //		bool isCorrect = false;
+                    //		string content = text;
 
-				// Lấy danh sách câu hỏi từ form
-				var cauHoiListRaw = form["cauHoiObj"];
-				var cauHoiList = JsonConvert.DeserializeObject<List<CauHoi>>(cauHoiListRaw);
+                    //		// Kiểm tra và loại bỏ dấu *
+                    //		if (content.StartsWith("*"))
+                    //		{
+                    //			isCorrect = true;
+                    //			content = content.Substring(1).Trim(); // Bỏ dấu *
+                    //		}
 
-				var tenCD = form["ChuDe"].ToString();
-				var chuDe = _db.ChuDe.FirstOrDefault(cd => cd.TenCD == tenCD);
+                    //		// Kiểm tra màu đỏ
+                    //		foreach (var run in paragraph.MagicText)
+                    //		{
+                    //			if (run?.formatting?.FontColor.HasValue == true &&
+                    //				run.formatting.FontColor.Value.ToArgb() == ColorTranslator.FromHtml("#EE0000").ToArgb())
+                    //			{
+                    //				isCorrect = true;
+                    //				break;
+                    //			}
+                    //		}
 
-				var newCD = new ChuDe();
-				if (chuDe == null)
-				{
-					newCD.TenCD = tenCD;
-					_db.ChuDe.Add(newCD);
-					_db.SaveChanges();
-				}
+                    //		// Bỏ tiền tố A./B./... sau khi xử lý *
+                    //		content = Regex.Replace(content, @"^[A-D]\.", "").Trim();
 
-				foreach (var cauHoi in cauHoiList)
-				{
-					var dapAnList = cauHoi.DapAnList;
-					cauHoi.DapAnList = null;
+                    //		currentCauHoi.DapAnList.Add(new DapAn
+                    //		{
+                    //			NoiDung = content,
+                    //			DungSai = isCorrect
+                    //		});
 
-					cauHoi.ChuDeId = chuDe != null ? chuDe.Id : newCD.Id;
+                    //		answerIndex++;
+                    //		continue;
+                    //	}
+                    //}
 
-					var existingQuestion = _db.CauHoi
-						.FirstOrDefault(ch => ch.NoiDung == cauHoi.NoiDung && ch.ChuDeId == cauHoi.ChuDeId);
+                    if (currentCauHoi != null && currentCauHoi.DapAnList.Any())
+                    {
+                        cauHoiList.Add(currentCauHoi);
+                    }
+                }
+            }
 
-					if (existingQuestion == null)
-					{
-						_db.CauHoi.Add(cauHoi);
-						_db.SaveChanges();
+            return PartialView("_DeThiUploaded", cauHoiList);
+        }
 
-						foreach (var dapAn in dapAnList)
-						{
-							dapAn.CauHoiId = cauHoi.Id;
-							_db.DapAn.Add(dapAn);
-							_db.SaveChanges();
-						}
-					}
-					//luu cauhoi vao chitietdethi
-					var chiTietDT = new ChiTietDeThi
-					{
-						DeThiId = deThi.Id,
-						CauHoiId = existingQuestion == null ? cauHoi.Id : existingQuestion.Id
-					};
+        [HttpPost, ActionName("CreateExam")]
+        public bool CreateExam()
+        {
+            try
+            {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var form = Request.Form;
 
-					_db.ChiTietDeThi.Add(chiTietDT);
-					_db.SaveChanges();
-				}
+                var idGiangVien = form["IdGiangVien"].ToString();
+                if (idGiangVien != currentUserId)
+                {
+                    return false;
+                }
 
-				_db.SaveChanges();
+                // Tạo mới DeThi (KHÔNG gán Id từ form)
+                var deThi = new DeThi
+                {
+                    MaDe = form["MaDe"],
+                    TieuDe = form["TieuDe"],
+                    GioBD = DateTime.Parse(form["GioBD"]),
+                    GioKT = DateTime.Parse(form["GioKT"]),
+                    SoCauHoi = int.Parse(form["SoCauHoi"]),
+                    ThoiGian = int.TryParse(form["ThoiGian"], out var thoiGian) ? thoiGian : 0,
+                    IdGiangVien = idGiangVien,
+                    DiemToiDa = int.TryParse(form["DiemToiDa"], out var diem) ? diem : 10,
+                    RandomCauHoi = bool.TryParse(form["RandomCauHoi"], out var rc) && rc,
+                    RandomDapAn = bool.TryParse(form["RandomDapAn"], out var rd) && rd,
+                    ShowKQ = bool.TryParse(form["ShowKQ"], out var skq) && skq,
+                };
 
-				//tao thong bao admin
-				var tbAdmin = new AdminNotification
-				{
-					LoaiTB = "TaoDe",
-					TieuDe = deThi.TieuDe,
-					GioTB = DateTime.Now
-				};
+                _db.DeThi.Add(deThi);
+                _db.SaveChanges();
 
-				_db.ThongBaoAdmin.Add(tbAdmin);
-				_db.SaveChanges();
+                // Lấy danh sách câu hỏi từ form
+                var cauHoiListRaw = form["cauHoiObj"];
+                var cauHoiList = JsonConvert.DeserializeObject<List<CauHoi>>(cauHoiListRaw);
 
-				return true;
-			}
-			catch
-			{
-				return false;
-			}
-		}
+                var tenCD = form["ChuDe"].ToString();
+                var chuDe = _db.ChuDe.FirstOrDefault(cd => cd.TenCD == tenCD);
 
-		public IActionResult LoadQuestionFromBank(int? chuDeId)
-		{
-			var query = _db.ChuDe
-				.Include(cd => cd.CauHoiList)
-					.ThenInclude(ch => ch.DapAnList)
-				.AsQueryable();
+                var newCD = new ChuDe();
+                if (chuDe == null)
+                {
+                    newCD.TenCD = tenCD;
+                    _db.ChuDe.Add(newCD);
+                    _db.SaveChanges();
+                }
 
-			if (chuDeId != null && chuDeId > 0)
-			{
-				query = query.Where(cd => cd.Id == chuDeId);
-			}
+                foreach (var cauHoi in cauHoiList)
+                {
+                    var dapAnList = cauHoi.DapAnList;
+                    cauHoi.DapAnList = null;
 
-			var data = query.ToList();
+                    cauHoi.ChuDeId = chuDe != null ? chuDe.Id : newCD.Id;
 
-			return PartialView("_ListQuestionFromBank", data);
-		}
-	}
+                    var existingQuestion = _db.CauHoi
+                        .Include(ch => ch.DapAnList)
+                        .FirstOrDefault(ch => ch.NoiDung == cauHoi.NoiDung
+                        && ch.ChuDeId == cauHoi.ChuDeId);
+
+                    bool isSameDapAnList = existingQuestion != null
+                                        && existingQuestion.DapAnList.Count == dapAnList.Count
+                                        && !existingQuestion.DapAnList
+                                            .Where((da, i) => da.NoiDung != dapAnList[i].NoiDung
+                                                            || da.DungSai != dapAnList[i].DungSai)
+                                            .Any();
+
+
+                    if (existingQuestion == null || !isSameDapAnList)
+                    {
+                        _db.CauHoi.Add(cauHoi);
+                        _db.SaveChanges();
+
+                        foreach (var dapAn in dapAnList)
+                        {
+                            dapAn.CauHoiId = cauHoi.Id;
+                            _db.DapAn.Add(dapAn);
+                            _db.SaveChanges();
+                        }
+                    }
+                    //luu cauhoi vao chitietdethi
+                    var chiTietDT = new ChiTietDeThi
+                    {
+                        DeThiId = deThi.Id,
+                        CauHoiId = (existingQuestion == null || !isSameDapAnList) ? cauHoi.Id : existingQuestion.Id
+                    };
+
+                    _db.ChiTietDeThi.Add(chiTietDT);
+                    _db.SaveChanges();
+                }
+
+                _db.SaveChanges();
+
+                //tao thong bao admin
+                var tbAdmin = new AdminNotification
+                {
+                    LoaiTB = "TaoDe",
+                    TieuDe = deThi.TieuDe,
+                    GioTB = DateTime.Now
+                };
+
+                _db.ThongBaoAdmin.Add(tbAdmin);
+                _db.SaveChanges();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public IActionResult LoadQuestionFromBank(int? chuDeId)
+        {
+            var query = _db.ChuDe
+                .Include(cd => cd.CauHoiList)
+                    .ThenInclude(ch => ch.DapAnList)
+                .AsQueryable();
+
+            if (chuDeId != null && chuDeId > 0)
+            {
+                query = query.Where(cd => cd.Id == chuDeId);
+            }
+
+            var data = query.ToList();
+
+            return PartialView("_ListQuestionFromBank", data);
+        }
+    }
 }

@@ -100,7 +100,7 @@
                                                         <ul>
                                                             @foreach (var da in ct.CauHoi.DapAnList)
                                                             {
-                                                                var isSelected = ct.DapAnChon != null && ct.DapAnChon.Id == da.Id;
+                                                                var isSelected = ct.DapAnChons.Any(dc => dc.DapAnId == da.Id);
                                                                 var isCorrect = da.DungSai; // 1 = đúng
 
                                                                 var classes = "";

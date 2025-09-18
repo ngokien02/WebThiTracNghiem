@@ -253,7 +253,7 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 					.ThenInclude(ct => ct.CauHoi)
 						.ThenInclude(ch => ch.DapAnList)
 				.Include(k => k.ChiTietKQs)
-					.ThenInclude(ct => ct.DapAnChon)
+					.ThenInclude(ct => ct.DapAnChons)
 				.AsNoTracking()
 				.ToList() ?? new List<KetQua>();
 
