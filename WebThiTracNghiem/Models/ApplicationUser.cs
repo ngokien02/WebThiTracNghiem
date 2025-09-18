@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 using System.Runtime.CompilerServices;
 
 namespace WebThiTracNghiem.Models
@@ -57,6 +59,29 @@ namespace WebThiTracNghiem.Models
                     if (result.Succeeded)
                     {
                         await userManager.AddToRoleAsync(user, role);
+                    }
+                }
+            }
+
+            for (int i = 1; i <= 150; i++)
+            {
+                string username = $"TH{i:D3}"; 
+                string password = $"{username}K20toi@123";
+
+                var existingUser = await userManager.FindByNameAsync(username);
+                if (existingUser == null)
+                {
+                    var user = new ApplicationUser
+                    {
+                        UserName = username,
+                        Email = null,
+                        EmailConfirmed = true
+                    };
+
+                    var result = await userManager.CreateAsync(user, password);
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(user, VaiTro.Role_Stu);
                     }
                 }
             }

@@ -44,12 +44,14 @@ app.UseStaticFiles();
 using (var scope = app.Services.CreateScope())
 {
 	var services = scope.ServiceProvider;
-	await ApplicationUser.SeedUserAsync(services);
+    ApplicationUser.SeedUserAsync(services).GetAwaiter().GetResult();
 }
 
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapControllerRoute(
 	name: "areas",
@@ -60,7 +62,5 @@ app.MapControllerRoute(
 	pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
-
-app.UseSession();
 
 app.Run();
