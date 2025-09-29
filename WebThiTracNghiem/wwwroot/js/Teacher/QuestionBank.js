@@ -21,7 +21,7 @@
     loadingOverlay.show();
 
     $.ajax({
-        url: '/Teacher/Home/Import', 
+        url: '/Teacher/Home/Import',
         type: 'POST',
         data: formData,
         processData: false,
@@ -77,7 +77,7 @@ $(document).on('click', '#qb-modal-accept-btn', function () {
         }).then(() => {
             setTimeout(() => {
                 chuDeInput.focus(); // focus sau khi alert đóng
-            }, 10); 
+            }, 10);
         });
         return; // dừng tiếp tục
     }
@@ -184,4 +184,21 @@ $(document).on("change", "#questionTopic", function () {
             alert("Lỗi khi load câu hỏi!");
         }
     });
+});
+
+//xu ly phan trang questionbank
+let loadPage = (url) => {
+    $.get(url, function (data) {
+        $(".questions-list").fadeOut(100, function () {
+            $(".questions-list").html(data).fadeIn(100);
+        });
+    });
+}
+$(document).on("click", "button.btn-qb", function (e) {
+    e.preventDefault();
+    let pageUrl = $(this).attr("href");
+
+    if (pageUrl) {
+        loadPage(pageUrl);
+    }
 });

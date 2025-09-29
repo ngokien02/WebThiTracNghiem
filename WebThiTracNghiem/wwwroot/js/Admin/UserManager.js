@@ -138,6 +138,86 @@ function toggleSelectAll() {
     });
 }
 
+//import user from excel
+let usersFromExcel = [];
+
+function previewExcel(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+        usersFromExcel = [];
+        const tbody = document.getElementById("userTableBody");
+        tbody.innerHTML = "";
+
+        for (let i = 1; i < rows.length; i++) { // bỏ qua header
+            const [username, password, role] = rows[i];
+            if (!username || !password) continue;
+
+            usersFromExcel.push({ username, password, role: role || "Student" });
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${username}</td><td>${password}</td><td>${role || "Student"}</td>`;
+            tbody.appendChild(tr);
+        }
+
+        openModal();
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function openModal() {
+    document.getElementById("previewModal").style.display = "block";
+    document.getElementById("modalBackdrop").style.display = "block";
+}
+
+function closeModal() {
+    document.getElementById("previewModal").style.display = "none";
+    document.getElementById("modalBackdrop").style.display = "none";
+}
+
+function confirmImport() {
+    $.ajax({
+        url: "/admin/User/ImportUsers",
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(usersFromExcel),
+        success: function (res) {
+            // res là object JSON trả về từ Ok()
+            if (res && res.message) {
+                alert(res.message);
+            } else {
+                alert("Import thành công!");
+            }
+            closeModal();
+        },
+        error: function (xhr) {
+            let msg = "Import thất bại!";
+            try {
+                // Parse JSON từ BadRequest
+                let res = JSON.parse(xhr.responseText);
+                if (res.message) {
+                    msg = res.message;
+                    if (res.details && res.details.length > 0) {
+                        msg += "\nChi tiết lỗi:\n- " + res.details.join("\n- ");
+                    }
+                }
+            } catch (e) {
+                console.error("Không parse được JSON lỗi:", e);
+            }
+            alert(msg);
+        }
+    });
+}
+
+
+
 // ====== Export ======
 // Xuất Excel (dùng SheetJS)
 function exportUsers() {
@@ -176,3 +256,21 @@ function exportUsers() {
 function showNotification(message, type = 'info') {
     alert(message);
 }
+
+
+//xu ly phan trang user
+let loadPage = (url) => {
+    $.get(url, function (data) {
+        $(".main-content").fadeOut(100, function () {
+            $(".main-content").html(data).fadeIn(100);
+        });
+    });
+}
+$(document).on("click", "button.btn-page", function (e) {
+    e.preventDefault();
+    let pageUrl = $(this).attr("href");
+
+    if (pageUrl) {
+        loadPage(pageUrl);
+    }
+});

@@ -50,14 +50,25 @@ namespace WebThiTracNghiem.Areas.Admin.Controllers
 
 			var thongBao = _db.ThongBaoAdmin
 							.OrderByDescending(tb => tb.GioTB)
+							.Take(6)
 							.ToList();
 
 			ViewData["Title"] = "Trang Quản trị";
 			return View(thongBao);
 		}
-		public async Task<IActionResult> UserManager()
+		public async Task<IActionResult> UserManager(int page = 1)
 		{
-			var users = await _userManager.Users.AsNoTracking().ToListAsync();
+			int pageSize = 5;
+			var totalUsers = _userManager.Users.Count();
+
+
+			var users = await _userManager.Users
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
+				.AsNoTracking().ToListAsync();
+
+			ViewBag.TotalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
+			ViewBag.CurrentPage = page;
 
 			foreach (var u in users)
 			{

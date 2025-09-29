@@ -10,13 +10,16 @@ namespace WebThiTracNghiem.Areas.Admin.Controllers
 	{
 		private readonly ApplicationDbContext _db;
 		private readonly UserManager<ApplicationUser> _userManager;
+		private readonly RoleManager<IdentityRole> _roleManager;
 
-		public UserController(ApplicationDbContext db, UserManager<ApplicationUser> userManager)
+		public UserController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
 		{
 			_db = db;
 			_userManager = userManager;
+			_roleManager = roleManager;
 		}
-		public async Task<IActionResult> CreateUser(string role, string username, string hoTen,	string password)
+
+		public async Task<IActionResult> CreateUser(string role, string username, string hoTen, string password)
 		{
 			var existingUser = await _userManager.FindByNameAsync(username);
 			if (existingUser != null)
@@ -60,5 +63,61 @@ namespace WebThiTracNghiem.Areas.Admin.Controllers
 				message = "Tạo người dùng mới thành công!"
 			});
 		}
+
+		[HttpPost]
+		public async Task<IActionResult> ImportUsers([FromBody] List<Dictionary<string, string>> users)
+		{
+			if (users == null || !users.Any())
+				return BadRequest("Không có dữ liệu.");
+
+			if (!await _roleManager.RoleExistsAsync("student"))
+			{
+				await _roleManager.CreateAsync(new IdentityRole("student"));
+			}
+
+			var errors = new List<string>();
+
+			foreach (var u in users)
+			{
+				var username = u.ContainsKey("username") ? u["username"] : null;
+				var password = u.ContainsKey("password") ? u["password"] : null;
+
+				if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+				{
+					errors.Add($"Dữ liệu không hợp lệ cho user {username}");
+					continue;
+				}
+
+				var existingUser = await _userManager.FindByNameAsync(username);
+				if (existingUser != null)
+				{
+					errors.Add($"User {username} đã tồn tại.");
+					continue;
+				}
+
+				var newUser = new ApplicationUser
+				{
+					UserName = username,
+					Email = $"{username}@example.com"
+				};
+
+				var result = await _userManager.CreateAsync(newUser, password);
+
+				if (result.Succeeded)
+				{
+					await _userManager.AddToRoleAsync(newUser, "student");
+				}
+				else
+				{
+					errors.Add($"Không tạo được user {username}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+				}
+			}
+
+			if (errors.Any())
+				return BadRequest(new { message = "Có lỗi khi import", details = errors });
+
+			return Ok(new { message = "Import thành công tất cả user" });
+		}
+
 	}
 }

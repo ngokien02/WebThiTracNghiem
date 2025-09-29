@@ -26,22 +26,56 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 			return View();
 		}
 
-		public async Task<IActionResult> QuestionBank(int? chuDeId)
+		public async Task<IActionResult> QuestionBank(int? chuDeId, int page = 1)
 		{
-			var query = _db.ChuDe
-					.Include(cd => cd.CauHoiList)
-					.ThenInclude(cd => cd.DapAnList)
-					.AsQueryable();
+			//int pageSize = 10;
 
-			if (chuDeId != null || chuDeId > 0)
+			//var query = _db.ChuDe
+			//		.Include(cd => cd.CauHoiList)
+			//		.ThenInclude(cd => cd.DapAnList)
+			//		.OrderBy(cd => cd.TenCD)
+			//		.AsQueryable();
+
+			//if (chuDeId != null || chuDeId > 0)
+			//{
+			//	query = query.Where(q => q.Id == chuDeId);
+			//}
+
+			//var totalQuestions = query.Count();
+			//ViewBag.TotalPages = (int)Math.Ceiling((double)totalQuestions / pageSize);
+			//ViewBag.CurrentPage = page;
+			int pageSize = 10;
+
+			var query = _db.CauHoi
+				.Include(ch => ch.DapAnList)
+				.Include(ch => ch.ChuDe)
+				.AsQueryable();
+
+			if (chuDeId.HasValue && chuDeId > 0)
 			{
-				query = query.Where(q => q.Id == chuDeId);
+				query = query.Where(ch => ch.ChuDeId == chuDeId.Value);
 			}
 
-			var data = query.ToList();
+			var totalQuestions = await query.CountAsync();
+
+			var data = await query
+				.OrderBy(ch => ch.Id)
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
+				.ToListAsync();
+
+			ViewBag.TotalPages = (int)Math.Ceiling((double)totalQuestions / pageSize);
+			ViewBag.CurrentPage = page;
+
+			var chuDes = _db.ChuDe.ToList();
+
+			ViewData["ChuDes"] = chuDes;
+			ViewBag.ChuDeId = chuDeId;
 
 			return PartialView("_QuestionBank", data);
 		}
+
+
 		[HttpPost]
 		public async Task<IActionResult> Import(IFormFile examFile)
 		{
@@ -260,19 +294,31 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 			return PartialView("_Results", ketQuas);
 		}
 
-		public IActionResult LoadQuestionByTopic(int? chuDeId)
+		public async Task<IActionResult> LoadQuestionByTopic(int? chuDeId, int page = 1)
 		{
-			var query = _db.ChuDe
-				.Include(cd => cd.CauHoiList)
-					.ThenInclude(ch => ch.DapAnList)
+			int pageSize = 10;
+
+			var query = _db.CauHoi
+				.Include(ch => ch.DapAnList)
+				.Include(ch => ch.ChuDe)
 				.AsQueryable();
 
-			if (chuDeId != null && chuDeId > 0)
+			if (chuDeId.HasValue && chuDeId > 0)
 			{
-				query = query.Where(cd => cd.Id == chuDeId);
+				query = query.Where(ch => ch.ChuDeId == chuDeId.Value);
 			}
 
-			var data = query.ToList();
+			var totalQuestions = await query.CountAsync();
+
+			var data = await query
+				.OrderBy(ch => ch.Id)
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
+				.ToListAsync();
+
+			ViewBag.TotalPages = (int)Math.Ceiling((double)totalQuestions / pageSize);
+			ViewBag.CurrentPage = page;
+			ViewBag.ChuDeId = chuDeId;
 
 			return PartialView("_ListQuestionByTopic", data);
 		}
