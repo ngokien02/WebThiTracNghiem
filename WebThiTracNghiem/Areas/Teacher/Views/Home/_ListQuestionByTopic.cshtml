@@ -6,21 +6,6 @@
 }
 else
 {
-	var chuDeId = ViewBag.ChuDeId;
-	<div class="pagination">
-		<button class="btn-page btn-qb" @(ViewBag.CurrentPage == 1 ? "disabled" : "") href="/teacher/home/LoadQuestionByTopic?ChuDeId=@chuDeId&page=1">
-			<i class="fas fa-chevron-left"></i>
-		</button>
-
-		@for (int i = 1; i <= ViewBag.TotalPages; i++)
-		{
-			<button class="btn-page btn-qb @(ViewBag.CurrentPage == i ? "active" : "")" href="/teacher/home/LoadQuestionByTopic?ChuDeId=@chuDeId&page=@i">@i</button>
-		}
-
-		<button class="btn-page btn-qb" @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "") href="/teacher/home/LoadQuestionByTopic?ChuDeId=@chuDeId&page=@ViewBag.TotalPages">
-			<i class="fas fa-chevron-right"></i>
-		</button>
-	</div>
 	@foreach (var ch in Model)
 	{
 		<div class="question-card">
@@ -45,18 +30,19 @@ else
 			</div>
 		</div>
 	}
-		<div class="pagination">
-			<button class="btn-page btn-qb" @(ViewBag.CurrentPage == 1 ? "disabled" : "") href="/teacher/home/LoadQuestionByTopic?ChuDeId=@chuDeId&page=1">
-				<i class="fas fa-chevron-left"></i>
-			</button>
+	var chuDeId = ViewBag.ChuDeId;
+	<div class="pagination">
+		<button class="btn-page btn-qb" @(ViewBag.CurrentPage == 1 ? "disabled" : "") href="/teacher/home/LoadQuestionByTopic?ChuDeId=@chuDeId&page=1">
+			<i class="fas fa-chevron-left"></i>
+		</button>
 
-			@for (int i = 1; i <= ViewBag.TotalPages; i++)
-			{
-				<button class="btn-page btn-qb @(ViewBag.CurrentPage == i ? "active" : "")" href="/teacher/home/LoadQuestionByTopic?ChuDeId=@chuDeId&page=@i">@i</button>
-			}
+		@for (int i = ViewBag.FromPage; i <= ViewBag.ToPage; i++)
+		{
+			<button class="btn-page btn-qb @(ViewBag.CurrentPage == i ? "active" : "")" href="/teacher/home/LoadQuestionByTopic?ChuDeId=@chuDeId&page=@i">@i</button>
+		}
 
-			<button class="btn-page btn-qb" @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "") href="/teacher/home/LoadQuestionByTopic?ChuDeId=@chuDeId&page=@ViewBag.TotalPages">
-				<i class="fas fa-chevron-right"></i>
-			</button>
-		</div>
+		<button class="btn-page btn-qb" @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "") href="/teacher/home/LoadQuestionByTopic?ChuDeId=@chuDeId&page=@ViewBag.TotalPages">
+			<i class="fas fa-chevron-right"></i>
+		</button>
+	</div>
 }

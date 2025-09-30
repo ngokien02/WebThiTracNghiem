@@ -8,3 +8,13 @@ $(document).on("click", "a.History", function (e) {
     $('a').removeClass('active');
     $('a.History').addClass('active');
 });
+
+$(document).on("click", "a.Guide", function (e) {
+    e.preventDefault();
+    var url = $(this).attr("href");
+    $.get(url, function (data) {
+        $(".main-content").html(data);
+    });
+    $('a').removeClass('active');
+    $('a.Guide').addClass('active');
+});

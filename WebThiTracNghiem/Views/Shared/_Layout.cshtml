@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
@@ -11,6 +14,7 @@
 	<link rel="stylesheet" href="~/css/student/DoExam.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/student/student-history.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/guide.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/Teacher/QuestionBank.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/Teacher/Report.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/Teacher/Active.css" asp-append-version="true" />
@@ -35,13 +39,15 @@
 					<input type="text" placeholder="Tìm kiếm...">
 					<button><i class="fas fa-search"></i></button>
 				</div>
-				<div class="help-button">
-					<a href="guide.html" style="text-decoration: none; color: inherit;">
-						<i class="fas fa-question-circle"></i>
-						<span>Hướng dẫn</span>
-					</a>
-				</div>
-
+				@if (SignInManager.IsSignedIn(User))
+				{
+					<div class="help-button">
+						<a href="/Home/Guide" style="text-decoration: none; color: inherit;" class="GuideLink">
+							<i class="fas fa-question-circle"></i>
+							<span>Hướng dẫn</span>
+						</a>
+					</div>
+				}
 				<partial name="_LoginPartial" />
 
 			</div>

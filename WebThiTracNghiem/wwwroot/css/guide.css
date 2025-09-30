@@ -1,0 +1,53 @@
+/* Hướng dẫn - Guide Page */
+.guide-accordion {
+  margin: 32px 0 0 0;
+  max-width: 700px;
+  width: 100%;
+}
+.accordion-item {
+  border-radius: 8px;
+  background: #f7f7f7;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.04);
+  overflow: hidden;
+}
+.accordion-header {
+  width: 100%;
+  text-align: left;
+  background: #e3f0fd;
+  color: #1976d2;
+  border: none;
+  outline: none;
+  font-size: 17px;
+  font-weight: 600;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.accordion-header:hover {
+  background: #bbdefb;
+}
+.accordion-content {
+  padding: 0 20px 16px 20px;
+  background: #fff;
+  color: #333;
+  font-size: 15px;
+  display: none;
+}
+.accordion-item.active .accordion-content {
+  display: block;
+}
+@media (max-width: 800px) {
+  .guide-accordion {
+    max-width: 100%;
+    margin: 18px 0 0 0;
+  }
+  .accordion-header {
+    font-size: 15px;
+    padding: 12px 12px;
+  }
+  .accordion-content {
+    font-size: 14px;
+    padding: 0 12px 12px 12px;
+  }
+} 

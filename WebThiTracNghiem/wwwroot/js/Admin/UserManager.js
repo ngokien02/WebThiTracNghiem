@@ -20,8 +20,6 @@ $(document).on("submit", "#userForm", function (e) {
 })
 
 
-
-
 // ====== Filter & Form Elements ======
 let roleFilter, statusFilter, searchInput, selectAllCheckbox;
 
@@ -41,13 +39,18 @@ document.addEventListener('DOMContentLoaded', () => {
     userForm?.addEventListener('submit', handleUserFormSubmit);
 });
 
-// ====== Modal Functions ======
-function showAddUserModal() {
+//xu ly modal add user thu cong
+window.showAddUserModal = function () {
     const modal = document.getElementById('userModal');
     modal.querySelector('h2').textContent = 'Thêm người dùng mới';
     document.getElementById('userForm').reset();
     modal.style.display = 'block';
-}
+};
+
+window.closeModal = function (modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.style.display = 'none';
+};
 
 function showEditUserModal(userData) {
     const modal = document.getElementById('userModal');
@@ -61,10 +64,7 @@ function showEditUserModal(userData) {
     modal.style.display = 'block';
 }
 
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) modal.style.display = 'none';
-}
+
 
 window.onclick = (event) => {
     const userModal = document.getElementById('userModal');
@@ -167,21 +167,32 @@ function previewExcel(event) {
             tbody.appendChild(tr);
         }
 
-        openModal();
+        openPreviewModal();
     };
     reader.readAsArrayBuffer(file);
 }
 
-function openModal() {
-    document.getElementById("previewModal").style.display = "block";
-    document.getElementById("modalBackdrop").style.display = "block";
+// Hàm mở modal excel
+function openPreviewModal() {
+    $("#previewModal").show();
+    $("#modalBackdrop").show();
 }
 
-function closeModal() {
-    document.getElementById("previewModal").style.display = "none";
-    document.getElementById("modalBackdrop").style.display = "none";
+// Hàm đóng modal excel
+function closePreviewModal() {
+    $("#previewModal").hide();
+    $("#modalBackdrop").hide();
 }
 
+$(document).on("click", "#modalBackdrop", function () {
+    closePreviewModal();
+});
+
+$(document).on("click", "#previewModal .close", function () {
+    closePreviewModal();
+});
+
+//xu ly import users
 function confirmImport() {
     $.ajax({
         url: "/admin/User/ImportUsers",
@@ -215,7 +226,6 @@ function confirmImport() {
         }
     });
 }
-
 
 
 // ====== Export ======
@@ -266,7 +276,7 @@ let loadPage = (url) => {
         });
     });
 }
-$(document).on("click", "button.btn-page", function (e) {
+$(document).on("click", "button.page-userManager", function (e) {
     e.preventDefault();
     let pageUrl = $(this).attr("href");
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using WebThiTracNghiem.Models;
 
 namespace WebThiTracNghiem.Areas.Identity.Pages.Account.Manage
@@ -24,6 +25,31 @@ namespace WebThiTracNghiem.Areas.Identity.Pages.Account.Manage
                 return NotFound();
 
             return Page();
+        }
+        public async Task<JsonResult> OnGetCheckExistAsync(string type, string value)
+        {
+            if (string.IsNullOrEmpty(type) || string.IsNullOrEmpty(value))
+                return new JsonResult(false);
+
+            bool exists = false;
+
+            var user = await _userManager.GetUserAsync(User);
+            switch (type.ToLower())
+            {
+                case "email":
+                    var existingEmail = await _userManager.FindByEmailAsync(value);
+                    exists = existingEmail != null && existingEmail.Id != user.Id;
+                    break;
+                case "cmnd":
+                    exists = await _userManager.Users.AnyAsync(u => u.CCCD == value && u.Id != user.Id);
+                    break;
+                case "phonenumber":
+                    var existingPhone = await _userManager.Users.AnyAsync(u => u.PhoneNumber == value && u.Id != user.Id);
+                    exists = existingPhone;
+                    break;
+            }
+
+            return new JsonResult(exists);
         }
     }
 }

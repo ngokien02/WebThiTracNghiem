@@ -141,9 +141,9 @@ function isNumberKey(evt) {
     return charCode >= 48 && charCode <= 57; // chỉ cho 0–9
 }
 async function checkExist(field, value) {
-    const res = await fetch(`/api/profile/check-exist?type=${field}&value=${encodeURIComponent(value)}`);
+    const res = await fetch(`?handler=CheckExist&type=${field}&value=${encodeURIComponent(value)}`);
     if (!res.ok) return false;
-    return await res.json(); // true nếu tồn tại
+    return await res.json();
 }
 
 async function validateProfileData(data) {
@@ -161,6 +161,11 @@ async function validateProfileData(data) {
         errors.push("Email không đúng định dạng.");
         highlightInput("Email");
     }
+    const emailExists = await checkExist("email", data.Email);
+    if (emailExists) {
+        errors.push("Email đã tồn tại trong hệ thống.");
+        highlightInput("Email");
+    }
 
     const birthYear = new Date(data.NgaySinh).getFullYear();
     const currentYear = new Date().getFullYear();
@@ -170,7 +175,7 @@ async function validateProfileData(data) {
         highlightInput("NgaySinh");
     }
 
-    data.NgaySinh = formatDateTo_ISO(data.NgaySinh); // ➜ gửi dạng ISO
+    data.NgaySinh = formatDateTo_ISO(data.NgaySinh); 
 
     if (data.CMND && !/^\d{12}$/.test(data.CMND)) {
         errors.push("CCCD phải gồm đúng 12 chữ số.");

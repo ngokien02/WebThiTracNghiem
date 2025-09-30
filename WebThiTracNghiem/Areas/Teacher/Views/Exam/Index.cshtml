@@ -146,19 +146,17 @@
 
 <!-- Modal (ẩn mặc định) -->
 <div class="qb-modal" id="qb-modal">
-	<div class="qb-overlay" data-action="close"></div>
 	<div class="qb-content" role="dialog" aria-modal="true" aria-label="Ngân hàng câu hỏi">
 		<div class="qb-body">
 			<div class="qb-grid" id="qb-grid">
 				<!-- Các câu hỏi ở đây -->
 				<div class="qb-modal is-open">
-					<div class="qb-overlay" data-action="close"></div>
+					<div class="qb-overlay"></div>
 					<div class="qb-content" role="dialog" aria-modal="true" aria-label="Ngân hàng câu hỏi">
 
 						<!-- Header -->
 						<div class="qb-header">
 							<div class="qb-title">Ngân hàng câu hỏi</div>
-							<button class="qb-close" data-action="close">×</button>
 						</div>
 
 						<!-- Toolbar -->
@@ -187,7 +185,7 @@
 										@foreach (var ch in cd.CauHoiList)
 										{
 											<div class="qb-item">
-												<input type="checkbox">
+												<input class="qb-chkAdd" type="checkbox">
 												<div>
 													<div class="qb-question">
 														@ch.NoiDung
@@ -213,22 +211,13 @@
 						<div class="qb-footer">
 							<div class="qb-count" id="qb-count">Đã chọn: 0</div>
 							<div class="qb-actions">
-								<button class="btnQBModal" data-action="close">Hủy</button>
-								<button class="btnQBModal btn-primary" id="qb-confirm">Thêm vào đề</button>
+								<button class="btnQBModal btnUncheckQB" data-action="close">Hủy</button>
+								<button class="btnQBModal btn-primary btnAddQB" id="qb-confirm" data-action="close">Thêm vào đề</button>
 							</div>
 						</div>
 
 					</div>
 				</div>
-
-			</div>
-		</div>
-
-		<div class="qb-footer">
-			<div class="qb-count" id="qb-count">Đã chọn: 0</div>
-			<div class="qb-actions">
-				<button class="btn" data-action="close">Hủy</button>
-				<button class="btn btn-primary" id="qb-confirm">Thêm vào đề</button>
 			</div>
 		</div>
 	</div>

@@ -444,8 +444,8 @@
         function validateExamTime(gioBD, gioKT, showError = true) {
 
             if (thoiGianLamBai === '') {
-                if (showError) $('#errTime').text('');
-                return true;
+                if (showError) $('#errTime').text('Vui lòng nhập thời gian làm bài');
+                return false;
             }
 
             const intValue = parseInt(thoiGianLamBai, 10);
@@ -575,7 +575,6 @@
         return div;
     }
 
-
     //xu ly load ngan hang cau hoi theo chu de
     $(document).on("change", "#qb-topic", function () {
         let selectedId = $(this).val();
@@ -595,6 +594,17 @@
         });
     });
 
+    //thao tac voi tao de bang ngan hang cau hoi
+    $(document).on("click", "button.btnUncheckQB", function () {
+        $(".qb-chkAdd").prop("checked", false);
+        $("#qb-count").text("Đã chọn: 0");
+    });
+
+    //dem so cau hoi duoc check trong ngan hang cau hoi
+    $(document).on("change", ".qb-chkAdd", function () {
+        let count = $(".qb-chkAdd:checked").length;
+        $("#qb-count").text("Đã chọn: " + count);
+    });
 
     //xu ly submit de thi
     $(document).on('click', '#modal-confirm-btn', function (e) {

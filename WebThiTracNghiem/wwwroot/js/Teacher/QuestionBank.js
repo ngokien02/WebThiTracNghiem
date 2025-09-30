@@ -187,7 +187,7 @@ $(document).on("change", "#questionTopic", function () {
 });
 
 //xu ly phan trang questionbank
-let loadPage = (url) => {
+let loadPageQB = (url) => {
     $.get(url, function (data) {
         $(".questions-list").fadeOut(100, function () {
             $(".questions-list").html(data).fadeIn(100);
@@ -199,6 +199,6 @@ $(document).on("click", "button.btn-qb", function (e) {
     let pageUrl = $(this).attr("href");
 
     if (pageUrl) {
-        loadPage(pageUrl);
+        loadPageQB(pageUrl);
     }
 });

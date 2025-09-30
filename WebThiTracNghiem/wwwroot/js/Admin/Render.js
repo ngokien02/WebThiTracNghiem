@@ -19,5 +19,7 @@
     handleAjaxNav("a.UserManager");
     handleAjaxNav("a.ExamManager");
     handleAjaxNav("a.Post");
+    handleAjaxNav("a.GuideLink");
+    handleAjaxNav("a.GuideAdmin");
 
 });

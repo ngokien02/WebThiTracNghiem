@@ -42,5 +42,11 @@ namespace WebThiTracNghiem.Areas.Student.Controllers
 
             return PartialView("_History", listKetQua);
         }
-    }
+
+		public IActionResult Guide()
+		{
+			ViewData["Title"] = "Trang hướng dẫn";
+			return PartialView("_Guide");
+		}
+	}
 }

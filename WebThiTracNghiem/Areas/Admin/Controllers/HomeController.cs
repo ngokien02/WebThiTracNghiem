@@ -89,6 +89,11 @@ namespace WebThiTracNghiem.Areas.Admin.Controllers
 			return PartialView("_Post");
 		}
 
+		public IActionResult Guide()
+		{
+			ViewData["Title"] = "Trang hướng dẫn";
+			return PartialView("_Guide");
+		}
 	}
 }
 

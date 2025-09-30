@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using WebThiTracNghiem.Models;
@@ -37,6 +38,28 @@ namespace WebThiTracNghiem.Controllers
 			ViewBag.HoTen = hoTen;
 			@ViewData["Title"] = "Trang chủ";
 			return View();
+		}
+
+		[Authorize]
+		public async Task<IActionResult> Guide()
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null) return Unauthorized();
+
+			var roles = await _userManager.GetRolesAsync(user);
+
+			if (roles.Contains(VaiTro.Role_Admin))
+				return PartialView("~/Areas/Admin/Views/Home/_Guide.cshtml");
+
+			if (roles.Contains(VaiTro.Role_Teach))
+				return PartialView("~/Areas/Teacher/Views/Home/_Guide.cshtml");
+
+			if (roles.Contains(VaiTro.Role_Stu))
+				return PartialView("~/Areas/Student/Views/Home/_Guide.cshtml");
+			else
+			{
+				return View();
+			}
 		}
 
 		public IActionResult Privacy()

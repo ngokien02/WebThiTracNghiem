@@ -9,7 +9,7 @@ using Xceed.Words.NET;
 namespace WebThiTracNghiem.Areas.Teacher.Controllers
 {
 	[Area("Teacher")]
-	[Authorize(Roles = VaiTro.Role_Teach)]
+	[Authorize(Roles = $"Admin, Teacher")]
 	public class HomeController : Controller
 	{
 		private readonly ApplicationDbContext _db;
@@ -28,23 +28,7 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 
 		public async Task<IActionResult> QuestionBank(int? chuDeId, int page = 1)
 		{
-			//int pageSize = 10;
-
-			//var query = _db.ChuDe
-			//		.Include(cd => cd.CauHoiList)
-			//		.ThenInclude(cd => cd.DapAnList)
-			//		.OrderBy(cd => cd.TenCD)
-			//		.AsQueryable();
-
-			//if (chuDeId != null || chuDeId > 0)
-			//{
-			//	query = query.Where(q => q.Id == chuDeId);
-			//}
-
-			//var totalQuestions = query.Count();
-			//ViewBag.TotalPages = (int)Math.Ceiling((double)totalQuestions / pageSize);
-			//ViewBag.CurrentPage = page;
-			int pageSize = 10;
+			int pageSize = 5;
 
 			var query = _db.CauHoi
 				.Include(ch => ch.DapAnList)
@@ -71,6 +55,9 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 
 			ViewData["ChuDes"] = chuDes;
 			ViewBag.ChuDeId = chuDeId;
+
+			ViewBag.FromPage = Math.Max(1, ViewBag.CurrentPage - 2);
+			ViewBag.ToPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2);
 
 			return PartialView("_QuestionBank", data);
 		}
@@ -296,7 +283,7 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 
 		public async Task<IActionResult> LoadQuestionByTopic(int? chuDeId, int page = 1)
 		{
-			int pageSize = 10;
+			int pageSize = 5;
 
 			var query = _db.CauHoi
 				.Include(ch => ch.DapAnList)
@@ -320,7 +307,16 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 			ViewBag.CurrentPage = page;
 			ViewBag.ChuDeId = chuDeId;
 
+			ViewBag.FromPage = Math.Max(1, ViewBag.CurrentPage - 2);
+			ViewBag.ToPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2);
+
 			return PartialView("_ListQuestionByTopic", data);
+		}
+
+		public IActionResult Guide()
+		{
+			ViewData["Title"] = "Trang hướng dẫn";
+			return PartialView("_Guide");
 		}
 	}
 }
