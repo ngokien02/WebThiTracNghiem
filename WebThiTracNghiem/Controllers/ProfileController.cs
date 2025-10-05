@@ -85,7 +85,7 @@ namespace WebThiTracNghiem.Controllers
         private string SaveImage(IFormFile img)
         {
             var fileName = Guid.NewGuid().ToString() + Path.GetExtension(img.FileName);
-            var path = Path.Combine(_hosting.WebRootPath, @"images/");
+            var path = Path.Combine(_hosting.WebRootPath, @"images/avatar/");
             var saveFile = Path.Combine(path, fileName);
             using (var filestream = new FileStream(saveFile, FileMode.Create))
             {

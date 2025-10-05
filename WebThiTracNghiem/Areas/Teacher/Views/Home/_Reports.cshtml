@@ -1,52 +1,43 @@
 ﻿@model List<DeThi>
 @{
 	ViewData["Title"] = "Báo cáo thống kê";
+	var thongKe = ViewBag.ThongKe;
 }
 
-<!-- Main Content -->
 <main class="main-content">
 	<div class="page-header">
 		<h1>Báo cáo thống kê</h1>
 	</div>
 
+	<!-- 🔍 Bộ lọc -->
+	@{
+		var examTitles = ViewBag.ExamTitles as List<string> ?? new List<string>();
+	}
+
 	<div class="filter-section">
-		<select class="filter-select">
+		<select id="examFilter" class="filter-select">
 			<option value="">Tất cả kỳ thi</option>
-			@foreach (var item in Model.Select(m => m.TieuDe).Distinct())
+			@foreach (var title in examTitles)
 			{
-				<option value="@item">@item</option>
+				<option value="@title">@title</option>
 			}
 		</select>
 		<button class="filter-button"><i class="fas fa-filter"></i> Lọc</button>
 	</div>
-	@{
-		var thongKe = ViewBag.ThongKe;
-	}
 
+	<!-- 📊 Số liệu -->
 	<div class="stats-grid">
-		<div class="stat-card">
-			<h3>Người tham gia:</h3>
-			<p>@thongKe.TongNguoi</p>
-		</div>
-		<div class="stat-card">
-			<h3>Điểm trung bình:</h3>
-			<p>@thongKe.DiemTB.ToString("0.00")</p>   
-		</div>
-
-		<div class="stat-card">
-			<h3>Tỷ lệ trên TB:</h3>
-			<p>@thongKe.TyLeTrenTB.ToString("0.00")%</p>  
-		</div>
-		<div class="stat-button">
-			<button class="btn-detail">
-				Xem Chi tiết kết quả
-			</button>
-		</div>
+		<div class="stat-card"><h3>Người tham gia:</h3><p>@thongKe.TongNguoi</p></div>
+		<div class="stat-card"><h3>Điểm trung bình:</h3><p>@thongKe.DiemTB.ToString("0.00")</p></div>
+		<div class="stat-card"><h3>Tỷ lệ trên TB:</h3><p>@thongKe.TyLeTrenTB.ToString("0.00")%</p></div>
 	</div>
+
+	<!-- 🧭 Biểu đồ -->
 	<div class="chart-section">
 		<div id="examChart" style="width:100%; height:350px;"></div>
 	</div>
 
+	<!-- 📑 Danh sách đề -->
 	<div class="reports-table-wrapper">
 		<table class="reports-table">
 			<thead>
@@ -59,7 +50,7 @@
 					<th>Thời gian</th>
 					<th>Số câu hỏi</th>
 					<th>Giảng viên</th>
-					<th>Hiển thị kết quả?</th>
+					<th>Hiển thị KQ?</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -82,28 +73,29 @@
 		</table>
 	</div>
 
+	<!-- 📄 Phân trang -->
 	<div class="pagination">
-		<button class="page-btn active">1</button>
-		<button class="page-btn">2</button>
-		<button class="page-btn">3</button>
-		<button class="page-btn">...</button>
-		<button class="page-btn">10</button>
+		<button class="btn-page page-Reports" data-page="@(ViewBag.CurrentPage - 1)" @(ViewBag.CurrentPage == 1 ? "disabled" : "")>
+			<i class="fas fa-chevron-left"></i>
+		</button>
+
+		@for (int i = 1; i <= ViewBag.TotalPages; i++)
+		{
+			<button class="btn-page page-Reports @(ViewBag.CurrentPage == i ? "active" : "")" data-page="@i">@i</button>
+		}
+
+		<button class="btn-page page-Reports" data-page="@(ViewBag.CurrentPage + 1)" @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")>
+			<i class="fas fa-chevron-right"></i>
+		</button>
 	</div>
 </main>
 
+<!-- Hidden inputs cho chart -->
 @{
-	var diemTB = ((double)ViewBag.ThongKe.DiemTB).ToString("0.##");
-	var tyLeTrenTB = ((double)ViewBag.ThongKe.TyLeTrenTB).ToString("0.##");
-	var nguoiThamGia = ViewBag.ThongKe.TongNguoi;
+	var diemTB = ((double)thongKe.DiemTB).ToString("0.##");
+	var tyLeTrenTB = ((double)thongKe.TyLeTrenTB).ToString("0.##");
+	var nguoiThamGia = thongKe.TongNguoi;
 }
-
 <input type="hidden" id="diemTB" value="@diemTB" />
 <input type="hidden" id="tyLeTrenTB" value="@tyLeTrenTB" />
 <input type="hidden" id="nguoiThamGia" value="@nguoiThamGia" />
-
-
-
-
-
-
-

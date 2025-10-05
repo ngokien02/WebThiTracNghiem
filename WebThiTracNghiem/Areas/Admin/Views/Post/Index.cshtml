@@ -1,0 +1,52 @@
+﻿@model List<WebThiTracNghiem.Areas.Admin.Models.Post>
+
+<main class="main-content">
+	<div class="page-header">
+		<h1>Danh sách bài viết</h1>
+		<div class="header-actions" style="background-color: var(--primary-color);">
+			<a href="/admin/post/createpost" class="side-link CreatePost">
+				<i class="fas fa-plus-circle" style="color:white"></i>
+				<span style="color:white">Tạo bài viết mới</span>
+			</a>
+		</div>
+	</div>
+
+	<div class="postList">
+		<!-- School News Section -->
+		@if (Model != null && Model.Any())
+		{
+			foreach (var post in Model)
+			{
+				var imageUrl = post.DeMucs
+				.Where(dm => !string.IsNullOrEmpty(dm.ImageUrl))
+				.Select(dm => dm.ImageUrl)
+				.FirstOrDefault() ?? "default.jpg";
+				<section class="news-section" style="margin-bottom:20px;">
+					<div class="latest-news">
+						<div class="news-card">
+							<div class="news-image">
+								<a href="/admin/post/getpostbyid/@post.Id" class="postById">
+									<img src="/Images/post/@imageUrl" alt="@post.TieuDe">
+								</a>
+							</div>
+							<div class="news-content">
+								<a href="/admin/post/getpostbyid/@post.Id" class="postById">
+									<h3>@post.TieuDe</h3>
+								</a>
+								<p>@post.TomTat</p>
+								<div class="news-footer">
+									<span class="contact-info">Người đăng: @post.User?.HoTen</span>
+									<span class="hotline">Ngày đăng: @post.ThoiGian.ToString("dd/MM/yyyy HH:mm")</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+			}
+		}
+		else
+		{
+			<h3 class="text-muted">Hiện chưa có bài viết nào.</h3>
+		}
+	</div>
+</main>

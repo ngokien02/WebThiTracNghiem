@@ -12,6 +12,7 @@ using System.Security.Claims;
 using WebThiTracNghiem.Areas.Admin.Models;
 using System.Dynamic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace WebThiTracNghiem.Areas.Teacher.Controllers
 {
@@ -20,9 +21,14 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
     public class ExamController : Controller
     {
         private readonly ApplicationDbContext _db;
-        public ExamController(ApplicationDbContext db)
+		private readonly UserManager<ApplicationUser> _userManager;
+		private readonly RoleManager<IdentityRole> _roleManager;
+
+		public ExamController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
+            _userManager = userManager;
             _db = db;
+            _roleManager = roleManager;
         }
         public IActionResult Index()
         {
@@ -258,5 +264,95 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 
             return PartialView("_ListQuestionFromBank", data);
         }
-    }
+
+		[HttpGet]
+		public async Task<IActionResult> GetEditExam(int id)
+		{
+			var currentUser = await _userManager.GetUserAsync(User);
+
+			var deThi = await _db.DeThi.FirstOrDefaultAsync(d => d.Id == id);
+
+			if (deThi == null)
+				return NotFound();
+
+			if (currentUser.Id.ToString() != deThi.IdGiangVien)
+			{
+				return Json(new
+				{
+					success = false,
+                    message = "Bạn không thể chỉnh sửa bài thi của người khác!"
+				});
+			}
+
+			// Map dữ liệu cơ bản sang JSON, không cần câu hỏi
+			var result = new
+			{
+				Id = deThi.Id,
+				TieuDe = deThi.TieuDe,
+				MaDe = deThi.MaDe,
+				GioBD = deThi.GioBD.ToString("yyyy-MM-ddTHH:mm"),
+				GioKT = deThi.GioKT.ToString("yyyy-MM-ddTHH:mm"),
+				ThoiGian = deThi.ThoiGian,
+				RandomCauHoi = deThi.RandomCauHoi,
+				RandomDapAn = deThi.RandomDapAn,
+				ShowKQ = deThi.ShowKQ
+			};
+
+			return Json(result);
+		}
+		[HttpPost]
+		public IActionResult EditExam([FromBody] DeThi model)
+		{
+			if (model == null || model.Id <= 0)
+				return Json(new { success = false, message = "Dữ liệu không hợp lệ." });
+
+			var deThi = _db.DeThi.FirstOrDefault(d => d.Id == model.Id);
+			if (deThi == null)
+				return Json(new { success = false, message = "Không tìm thấy đề thi." });
+
+			// Cập nhật
+			deThi.TieuDe = model.TieuDe;
+			deThi.MaDe = model.MaDe;
+			deThi.GioBD = model.GioBD;
+			deThi.GioKT = model.GioKT;
+			deThi.ThoiGian = model.ThoiGian;
+			deThi.RandomCauHoi = model.RandomCauHoi;
+			deThi.RandomDapAn = model.RandomDapAn;
+			deThi.ShowKQ = model.ShowKQ;
+
+			_db.SaveChanges();
+
+			return Json(new { success = true, message = "Cập nhật đề thi thành công!" });
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> DeleteExam(int id)
+		{
+			var currentUser = await _userManager.GetUserAsync(User);
+
+			var deThi = await _db.DeThi.FirstOrDefaultAsync(d => d.Id == id);
+
+			if (deThi == null)
+				return Json(new { success = false, message = "Không tìm thấy đề thi." });
+
+			if (currentUser.Id.ToString() != deThi.IdGiangVien)
+			{
+				return Json(new
+				{
+					success = false,
+					message = "Bạn không thể xóa bài thi của người khác!"
+				});
+			}
+
+			if (_db.KetQua.Any(k => k.DeThiId == id))
+			{
+				return Json(new { success = false, message = "Không thể xóa vì đề thi đã có kết quả!" });
+			}
+
+			_db.DeThi.Remove(deThi);
+            await _db.SaveChangesAsync();
+
+			return Json(new { success = true, message = "Xóa đề thi thành công!" });
+		}
+	}
 }

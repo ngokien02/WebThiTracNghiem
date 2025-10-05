@@ -179,6 +179,67 @@ namespace WebThiTracNghiem.Migrations
                     b.ToTable("ThongBaoAdmin");
                 });
 
+            modelBuilder.Entity("WebThiTracNghiem.Areas.Admin.Models.DeMuc", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NoiDung")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("STT")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TieuDe")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("DeMuc");
+                });
+
+            modelBuilder.Entity("WebThiTracNghiem.Areas.Admin.Models.Post", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ThoiGian")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TieuDe")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TomTat")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Post");
+                });
+
             modelBuilder.Entity("WebThiTracNghiem.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -553,6 +614,28 @@ namespace WebThiTracNghiem.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WebThiTracNghiem.Areas.Admin.Models.DeMuc", b =>
+                {
+                    b.HasOne("WebThiTracNghiem.Areas.Admin.Models.Post", "Post")
+                        .WithMany("DeMucs")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("WebThiTracNghiem.Areas.Admin.Models.Post", b =>
+                {
+                    b.HasOne("WebThiTracNghiem.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WebThiTracNghiem.Models.CauHoi", b =>
                 {
                     b.HasOne("WebThiTracNghiem.Models.ChuDe", "ChuDe")
@@ -660,6 +743,11 @@ namespace WebThiTracNghiem.Migrations
                     b.Navigation("DeThi");
 
                     b.Navigation("SinhVien");
+                });
+
+            modelBuilder.Entity("WebThiTracNghiem.Areas.Admin.Models.Post", b =>
+                {
+                    b.Navigation("DeMucs");
                 });
 
             modelBuilder.Entity("WebThiTracNghiem.Models.ApplicationUser", b =>

@@ -32,7 +32,7 @@
     }
 
 /* Các section của form */
-.admin-posts-form-section {
+.admin-posts-form-section, .admin-summary-form-section {
     margin-bottom: 2.5rem;
     padding: 1.5rem;
     background: #f8f9fa;

@@ -62,7 +62,6 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 			return PartialView("_QuestionBank", data);
 		}
 
-
 		[HttpPost]
 		public async Task<IActionResult> Import(IFormFile examFile)
 		{
@@ -225,49 +224,78 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 
 			return View(ketQuaList);
 		}
-		public IActionResult Reports()
+		[HttpGet]
+		public IActionResult Reports(int page = 1, string examTitle = "")
 		{
-
-			var deThis = _db.DeThi
+			int pageSize = 10;
+			var query = _db.DeThi
 				.Include(d => d.GiangVien)
 				.Include(d => d.KetQuaList)
-				.AsNoTracking()
+				.AsQueryable();
+
+			if (!string.IsNullOrEmpty(examTitle))
+				query = query.Where(d => d.TieuDe.Contains(examTitle));
+
+			var total = query.Count();
+			var totalPages = (int)Math.Ceiling(total / (double)pageSize);
+
+			var deThis = query
+				.OrderByDescending(d => d.GioBD)
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
 				.ToList();
 
-			// Gom tất cả kết quả từ các đề
 			var ketQuas = _db.KetQua
-			.Include(k => k.SinhVien)
-			.Include(k => k.DeThi)
-			.AsNoTracking()
-			.ToList();
+				.Include(k => k.SinhVien)
+				.Include(k => k.DeThi)
+				.Where(k => examTitle == "" || k.DeThi.TieuDe.Contains(examTitle))
+				.ToList();
 
 			var diemList = ketQuas.Where(k => k.Diem.HasValue).Select(k => k.Diem.Value).ToList();
 			var diemTB = diemList.Any() ? diemList.Average() : 0;
 			var trenTB = diemList.Count(d => d > diemTB);
 			var tyle = diemList.Count > 0 ? (trenTB * 100.0 / diemList.Count) : 0;
 			var soNguoiThamGia = ketQuas.Select(k => k.IdSinhVien).Distinct().Count();
-			ViewBag.ThongKe = new
-			{
-				TongNguoi = soNguoiThamGia,
-				DiemTB = diemTB,
-				TyLeTrenTB = tyle
-			};
+
+			ViewBag.ThongKe = new { TongNguoi = soNguoiThamGia, DiemTB = diemTB, TyLeTrenTB = tyle };
+			ViewBag.CurrentPage = page;
+			ViewBag.TotalPages = totalPages;
+			ViewBag.ExamTitles = _db.DeThi
+			.Select(d => d.TieuDe)
+			.Distinct()
+			.ToList();
 
 			return PartialView("_Reports", deThis);
 		}
-		public IActionResult ActiveExam()
+
+		public IActionResult ActiveExam(int page = 1)
 		{
-			var danhSachDeThi = _db.DeThi
+			int pageSize = 5;
+			var query = _db.DeThi
 				.Where(dt => dt.GioKT > DateTime.Now)
 				.Include(dt => dt.GiangVien)
-				.OrderByDescending(dt => dt.GioBD)
+				.OrderByDescending(dt => dt.GioBD);
+
+			int totalItems = query.Count();
+			int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+			var danhSachDeThi = query
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
 				.ToList();
+
+			ViewBag.CurrentPage = page;
+			ViewBag.TotalPages = totalPages;
 
 			return PartialView("_ActiveExam", danhSachDeThi);
 		}
-		public IActionResult Results()
+
+		[HttpGet]
+		public async Task<IActionResult> Results(int page = 1, string keyword = "", DateTime? fromDate = null, DateTime? toDate = null, string exam = "")
 		{
-			var ketQuas = _db.KetQua
+			int pageSize = 10;
+
+			var query = _db.KetQua
 				.Include(k => k.SinhVien)
 				.Include(k => k.DeThi)
 				.Include(k => k.ChiTietKQs)
@@ -276,7 +304,44 @@ namespace WebThiTracNghiem.Areas.Teacher.Controllers
 				.Include(k => k.ChiTietKQs)
 					.ThenInclude(ct => ct.DapAnChons)
 				.AsNoTracking()
-				.ToList() ?? new List<KetQua>();
+				.AsQueryable();
+
+			// 🔍 Lọc theo từ khóa (Tên SV, Username, Kỳ thi)
+			if (!string.IsNullOrWhiteSpace(keyword))
+			{
+				keyword = keyword.ToLower();
+				query = query.Where(k =>
+					(k.SinhVien.HoTen != null && k.SinhVien.HoTen.ToLower().Contains(keyword)) ||
+					(k.SinhVien.UserName != null && k.SinhVien.UserName.ToLower().Contains(keyword)) ||
+					(k.DeThi.TieuDe != null && k.DeThi.TieuDe.ToLower().Contains(keyword))
+				);
+			}
+			if (!string.IsNullOrEmpty(exam))
+				query = query.Where(k => k.DeThi != null && k.DeThi.TieuDe != null && k.DeThi.TieuDe.Contains(exam));
+
+
+			// 📅 Lọc theo ngày làm bài
+			if (fromDate.HasValue)
+				query = query.Where(k => k.GioNop >= fromDate.Value);
+			if (toDate.HasValue)
+				query = query.Where(k => k.GioNop <= toDate.Value);
+
+			// 📄 Tổng số kết quả
+			var total = await query.CountAsync();
+
+			// 🧩 Dữ liệu trang hiện tại
+			var ketQuas = await query
+				.OrderByDescending(k => k.GioLam)
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
+				.ToListAsync();
+
+			ViewBag.TotalPages = (int)Math.Ceiling((double)total / pageSize);
+			ViewBag.CurrentPage = page;
+			ViewBag.Keyword = keyword;
+			ViewBag.FromDate = fromDate?.ToString("yyyy-MM-dd");
+			ViewBag.ToDate = toDate?.ToString("yyyy-MM-dd");
+			ViewBag.Exams = _db.DeThi.Select(d => d.TieuDe).Distinct().ToList();
 
 			return PartialView("_Results", ketQuas);
 		}

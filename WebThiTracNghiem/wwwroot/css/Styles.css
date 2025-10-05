@@ -289,6 +289,10 @@ body {
         line-height: 1.4;
     }
 
+    .news-content a {
+        text-decoration:none;
+    }
+
 .news-time {
     color: #666;
     font-size: 0.9rem;
@@ -308,8 +312,9 @@ body {
 }
 
     .news-card .news-image {
-        width: 40%;
-        height: auto;
+        width: 20%;
+        height: 200px;
+        object-fit:contain;
     }
 
     .news-card .news-content {
@@ -1183,7 +1188,6 @@ body {
     .activity-item i {
         font-size: 1.5rem;
         color: #4a90e2;
-        margin-right: 1rem;
     }
 
 .activity-info h4 {

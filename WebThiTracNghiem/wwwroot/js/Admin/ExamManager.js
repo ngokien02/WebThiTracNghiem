@@ -54,46 +54,129 @@
   }
 
   // ===== Export =====
-  function exportExams() {
-    const rows = qsa('.data-table tbody tr').filter(tr => tr.style.display !== 'none');
-    const data = rows.map(tr => {
-      const cells = tr.querySelectorAll('td');
-      return {
-        STT:       (cells[0]?.innerText || '').trim(),
-        TenKyThi:  (cells[1]?.innerText || '').trim(),
-        MonHoc:    (cells[2]?.innerText || '').trim(),
-        TrangThai: (cells[3]?.innerText || '').trim()
-      };
-    }).filter(x => x.TenKyThi);
+    function exportExams() {
+        const keyword = $("#examSearchInput").val().trim();
+        const status = $("#examStatusFilter").val();
 
-    if (!data.length) { alert('Không có dữ liệu để export!'); return; }
+        $.ajax({
+            url: "/Admin/Exam/GetAllExams",
+            type: "GET",
+            data: { keyword, status },
+            success: function (exams) {
+                if (!exams || exams.length === 0) {
+                    showNotification('Không có dữ liệu để export!', 'error');
+                    return;
+                }
 
-    if (typeof XLSX !== 'undefined' && XLSX.utils && XLSX.writeFile) {
-      const ws = XLSX.utils.json_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Exams');
-      XLSX.writeFile(wb, 'exams.xlsx');
-      alert('Export Excel thành công!');
-      return;
+                const data = exams.map(e => {
+                    const now = new Date();
+                    let trangThai = '';
+                    const gioBD = new Date(e.gioBD);
+                    const gioKT = new Date(e.gioKT);
+
+                    if (gioBD <= now && gioKT > now) trangThai = 'Đang diễn ra';
+                    else if (gioBD > now) trangThai = 'Sắp diễn ra';
+                    else trangThai = 'Đã kết thúc';
+
+                    return {
+                        TieuDe: e.tieuDe,
+                        MaDe: e.maDe,
+                        GioBD: e.gioBD,
+                        GioKT: e.gioKT,
+                        TrangThai: trangThai
+                    };
+                });
+
+                const ws = XLSX.utils.json_to_sheet(data, { header: ["TieuDe", "MaDe", "GioBD", "GioKT", "TrangThai"] });
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Exams");
+                XLSX.writeFile(wb, "exams.xlsx");
+
+                showNotification('Export Excel thành công!', 'success');
+            },
+            error: function () {
+                showNotification('Xuất Excel thất bại!', 'error');
+            }
+        });
     }
-
-    // Fallback CSV nếu chưa nhúng SheetJS
-    const headers = Object.keys(data[0]);
-    const csv = [
-      headers.join(','), 
-      ...data.map(row => headers.map(h => {
-        const v = String(row[h] ?? '');
-        return /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
-      }).join(','))
-    ].join('\n');
-
-    const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url; a.download = 'exams.csv';
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
-    alert('Export CSV thành công (chưa có SheetJS)!');
-  }
   window.exportExams = exportExams;
 })();
+// ===== Biến giữ trạng thái filter =====
+var examStatus = "";
+var examKeyword = "";
+
+// ===== Cập nhật biến khi filter thay đổi =====
+$(document).on("change", "#examStatusFilter", function () {
+    examStatus = $(this).val();
+});
+$(document).on("input", "#examSearchInput", function () {
+    examKeyword = $(this).val().trim();
+});
+
+// ===== Hàm load page phân trang =====
+let loadExamPage = (url) => {
+    $.get(url, function (data) {
+        const tempDom = $("<div>").html(data);
+
+        // Lấy table và pagination mới
+        const newTable = tempDom.find(".table-container").html();
+        const newPagination = tempDom.find(".pagination").html();
+
+        if (newTable) $(".table-container").html(newTable);
+        if (newPagination) $(".pagination").html(newPagination);
+
+        // Giữ lại filter và từ khóa
+        $("#examStatusFilter").val(examStatus);
+        $("#examSearchInput").val(examKeyword);
+    });
+};
+
+// ===== Xử lý click phân trang =====
+$(document).on("click", "button.page-examManager", function (e) {
+    e.preventDefault();
+
+    const pageUrl = $(this).attr("href");
+    if (!pageUrl) return;
+
+    // Thêm filter & keyword vào URL
+    const urlWithParams = pageUrl + `&status=${examStatus}&keyword=${encodeURIComponent(examKeyword)}`;
+    loadExamPage(urlWithParams);
+});
+
+// ===== Xử lý tìm kiếm =====
+$(document).on("click", "#btnExamSearch", function () {
+    const keyword = $("#examSearchInput").val().trim();
+    const status = $("#examStatusFilter").val();
+
+    // Cập nhật biến toàn cục
+    examKeyword = keyword;
+    examStatus = status;
+
+    $.ajax({
+        url: "/admin/home/ExamManager",
+        type: "GET",
+        data: {
+            page: 1,
+            status: status,
+            keyword: keyword
+        },
+        success: function (data) {
+            const tempDom = $("<div>").html(data);
+
+            const newTable = tempDom.find(".table-container").html();
+            const newPagination = tempDom.find(".pagination").html();
+
+            if (newTable) $(".table-container").html(newTable);
+            if (newPagination) $(".pagination").html(newPagination);
+
+            // Giữ lại filter và từ khóa
+            $("#examStatusFilter").val(status);
+            $("#examSearchInput").val(keyword);
+        },
+        error: function () {
+            showNotification("Không thể tải dữ liệu tìm kiếm.", "error");
+        }
+    });
+});
+
+

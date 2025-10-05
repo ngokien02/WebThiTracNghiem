@@ -33,7 +33,7 @@
 						}
 					</div>
 					<div class="exam-info">
-						<h3>@de.TieuDe (@de.MaDe)</h3>
+						<h3 id="made">@de.TieuDe (@de.MaDe)</h3>
 						<div class="exam-details">
 							<p>
 								<i class="fas fa-calendar"></i>
@@ -46,8 +46,8 @@
 						</div>
 					</div>
 					<div class="exam-actions">
-						<a class="btn secondary" asp-action="Edit" asp-route-id="@de.Id">Chỉnh sửa</a>
-						<a class="btn danger" asp-action="KetThuc" asp-route-id="@de.Id">Kết thúc</a>
+						<a href="javascript:;" class="btn secondary btn-editExam" data-id="@de.Id">Chỉnh sửa</a>
+						<a href="javascript:;" class="btn danger btn-deleteExam" data-id="@de.Id">Kết thúc</a>
 					</div>
 				</div>
 			}
@@ -57,4 +57,77 @@
 			<p class="text-muted">Hiện không có đề thi nào đang diễn ra.</p>
 		}
 	</div>
+		<div class="pagination">
+			<button class="btn-page page-ActiveExam" data-page="@(ViewBag.CurrentPage - 1)" @(ViewBag.CurrentPage == 1 ? "disabled" : "")>
+				<i class="fas fa-chevron-left"></i>
+			</button>
+
+			@for (int i = 1; i <= ViewBag.TotalPages; i++)
+			{
+				<button class="btn-page page-ActiveExam @(ViewBag.CurrentPage == i ? "active" : "")" data-page="@i">@i</button>
+			}
+
+			<button class="btn-page page-ActiveExam" data-page="@(ViewBag.CurrentPage + 1)" @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")>
+				<i class="fas fa-chevron-right"></i>
+			</button>
+		</div>
 </main>
+<!-- Modal Đề Thi -->
+<div class="modalUser" id="examModal" style="display:none;">
+	<div class="modal-user-content">
+		<div class="modal-user-header">
+			<h2>Chỉnh Sửa Đề Thi</h2>
+			<button type="button" class="close-btn" onclick="closeModal('examModal')">&times;</button>
+		</div>
+		<div class="modal-user-body">
+			<form id="examForm">
+				<div class="form-group_User">
+					<input type="hidden" id="examId" name="Id" />
+					<label for="examMaDe">Mã Đề</label>
+					<input type="text" id="examMaDe" name="MaDe" required />
+				</div>
+
+				<div class="form-group_User">
+					<label for="examTieuDe">Tiêu Đề</label>
+					<input type="text" id="examTieuDe" name="TieuDe" required />
+				</div>
+
+				<div class="form-group_User">
+					<label for="examGioBD">Giờ bắt đầu</label>
+					<input type="datetime-local" id="examGioBD" name="GioBD" required />
+				</div>
+
+				<div class="form-group_User">
+					<label for="examGioKT">Giờ kết thúc</label>
+					<input type="datetime-local" id="examGioKT" name="GioKT" required />
+				</div>
+
+				<div class="form-group_User">
+					<label for="examThoiGian">Thời Gian (phút)</label>
+					<input type="number" id="examThoiGian" name="ThoiGian" required />
+				</div>
+
+				<div class="form-group_User">
+					<input type="checkbox" id="examRandomCauHoi" name="RandomCauHoi" />
+					<label for="examRandomCauHoi">Random Câu hỏi</label>
+				</div>
+
+				<div class="form-group_User">
+					<input type="checkbox" id="examRandomDapAn" name="RandomDapAn" />
+					<label for="examRandomDapAn">Random Đáp án</label>
+				</div>
+
+				<div class="form-group_User">
+					<input type="checkbox" id="examShowKQ" name="ShowKQ" />
+					<label for="examShowKQ">Hiển thị kết quả</label>
+				</div>
+
+				<div class="form-user-actions">
+					<button type="button" class="btn btn-secondary" onclick="closeModal('examModal')">Hủy</button>
+					<button type="submit" class="btn btn-primary">Lưu đề thi</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+

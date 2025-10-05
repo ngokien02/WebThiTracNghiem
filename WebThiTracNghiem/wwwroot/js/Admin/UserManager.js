@@ -56,11 +56,10 @@ function showEditUserModal(userData) {
     const modal = document.getElementById('userModal');
     modal.querySelector('h2').textContent = 'Chỉnh sửa người dùng';
     const form = modal.querySelector('form');
-    //form.elements['role'].value = userData.role;
-    //form.elements['id'].value = userData.id;
-    //form.elements['name'].value = userData.name;
-    //form.elements['email'].value = userData.email;
-    //form.elements['password'].value = '';
+    form.elements['role'].value = userData.role;
+    form.elements['id'].value = userData.id;
+    form.elements['username'].value = userData.username;
+    form.elements['hoTen'].value = userData.hoTen;
     modal.style.display = 'block';
 }
 
@@ -83,7 +82,6 @@ function handleUserFormSubmit(event) {
         password: formData.get('password')
     };
     if (!validateUserData(userData)) return;
-    console.log('Submitting user data:', userData);
     closeModal('userModal');
     event.target.reset();
     showNotification('Lưu thông tin người dùng thành công!', 'success');
@@ -107,20 +105,52 @@ function isValidEmail(email) {
 
 // ====== Dummy Edit/Delete/Toggle ======
 function editUser(userId) {
-    console.log('Edit user:', userId);
-    const sample = { id: userId, role: 'student', name: 'Nguyễn Văn A', email: 'a@example.com' };
-    showEditUserModal(sample);
+    $.get(`/admin/user/getEditUser/${userId}`, function (data) {
+        showEditUserModal(data);
+        $("button.handleButton").addClass("editUserButton");
+    });
 }
 
-function toggleUserStatus(userId) {
-    console.log('Toggling status for user:', userId);
-    showNotification('Cập nhật trạng thái người dùng thành công!', 'success');
+let loadPageReusable = (url) => {
+    $.get(url, function (data) {
+        $(".main-content").fadeOut(100, function () {
+            $(".main-content").html(data).fadeIn(100);
+        });
+    });
 }
+
+$(document).on("click", "button.editUserButton", function (e) {
+    e.preventDefault();
+    var fd = $("#userForm").serialize();
+
+    $.ajax({
+        url: "/admin/user/edituser",
+        type: "POST",
+        data: fd,
+        success: function (res) {
+            if (res.success) {
+                showNotification("Cập nhật thành công!", "success");
+                closeModal('userModal');
+                loadPageReusable('/admin/home/UserManager?page=1');
+            }
+            else {
+                alert(res.message);
+            }
+        }
+    })
+})
 
 function deleteUser(userId) {
     if (confirm('Bạn có chắc chắn muốn xóa người dùng này?')) {
-        console.log('Deleting user:', userId);
-        showNotification('Xóa người dùng thành công!', 'success');
+        $.post(`/admin/user/deleteUser/${userId}`, function (data) {
+            if (data.success === true) {
+                showNotification('Xóa người dùng thành công!', 'success');
+                loadPageReusable('/admin/home/UserManager?page=1');
+            }
+            else {
+                showNotification(data.message, 'error');
+            }
+        });
     }
 }
 
@@ -129,7 +159,6 @@ function filterUsers() {
     const role = roleFilter.value;
     const status = statusFilter.value;
     const search = searchInput.value.toLowerCase();
-    console.log('Filtering users:', { role, status, search });
 }
 
 function toggleSelectAll() {
@@ -191,96 +220,212 @@ $(document).on("click", "#modalBackdrop", function () {
 $(document).on("click", "#previewModal .close", function () {
     closePreviewModal();
 });
+// ====== Load lại bảng user ======
+function loadUserTable() {
+    const keyword = $("#searchInput").val().trim();
+    const role = $("#roleFilter").val();
+    const status = $("#statusFilter").val();
+
+    $.ajax({
+        url: "/Admin/Home/UserManager",
+        type: "GET",
+        data: {
+            page: 1,
+            keyword: keyword,
+            role: role,
+            status: status
+        },
+        success: function (data) {
+            // Dùng jQuery parse chính xác HTML (tạo DOM tạm)
+            const tempDom = $("<div>").html(data);
+
+            // Tách phần table và phân trang từ DOM tạm
+            const newTable = tempDom.find(".table-container").html();
+            const newPagination = tempDom.find(".pagination").html();
+
+            // Nếu có thì cập nhật lại giao diện hiện tại
+            if (newTable) $(".table-container").html(newTable);
+            if (newPagination) $(".pagination").html(newPagination);
+        },
+        error: function () {
+            showNotification("Không thể tải lại bảng user.", "error");
+        }
+    });
+}
 
 //xu ly import users
+// Hàm gửi import
 function confirmImport() {
+    if (!usersFromExcel || usersFromExcel.length === 0) {
+        showNotification("Không có dữ liệu để import!", "error");
+        return;
+    }
+
+    const dataToSend = usersFromExcel.map(u => ({
+        username: u.username,
+        password: u.password,
+        role: u.role
+    }));
+
     $.ajax({
-        url: "/admin/User/ImportUsers",
+        url: "/Admin/User/ImportUsers",
         type: "POST",
         contentType: "application/json; charset=utf-8",
-        data: JSON.stringify(usersFromExcel),
+        data: JSON.stringify(dataToSend),
         success: function (res) {
-            // res là object JSON trả về từ Ok()
-            if (res && res.message) {
-                alert(res.message);
-            } else {
-                alert("Import thành công!");
-            }
-            closeModal();
+            let message = "Import thành công!";
+            if (res && res.message) message = res.message;
+
+            showNotification(message, "success");
+
+            usersFromExcel = [];
+            closePreviewModal();
+            loadUserTable();
         },
         error: function (xhr) {
             let msg = "Import thất bại!";
             try {
-                // Parse JSON từ BadRequest
-                let res = JSON.parse(xhr.responseText);
-                if (res.message) {
-                    msg = res.message;
-                    if (res.details && res.details.length > 0) {
-                        msg += "\nChi tiết lỗi:\n- " + res.details.join("\n- ");
-                    }
+                const res = JSON.parse(xhr.responseText);
+                if (res.message) msg = res.message;
+
+                if (res.details && res.details.length > 0) {
+                    const errorList = res.details.map((e, i) => `${i + 1}. ${e}`).join("\n");
+                    msg += "\nChi tiết lỗi:\n" + errorList;
                 }
             } catch (e) {
                 console.error("Không parse được JSON lỗi:", e);
             }
-            alert(msg);
+
+            showNotification(msg, "error");
         }
     });
 }
-
 
 // ====== Export ======
 // Xuất Excel (dùng SheetJS)
 function exportUsers() {
-    const rows = document.querySelectorAll('.data-table tbody tr');
-    const data = [];
+    const keyword = $("#searchInput").val().trim();
+    const role = $("#roleFilter").val();
+    const status = $("#statusFilter").val();
 
-    rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        if (cells.length >= 6) {
-            const roles = Array.from(cells[4].querySelectorAll('.badge')).map(b => b.textContent.trim()).join(', ');
-            const status = cells[5].textContent.trim();
+    $.ajax({
+        url: "/Admin/User/GetAllUsers",
+        type: "GET",
+        data: { keyword, role, status },
+        success: function (users) {
+            if (!users || users.length === 0) {
+                showNotification('Không có dữ liệu để export!', 'error');
+                return;
+            }
 
-            data.push({
-                MaSo: cells[1].textContent.trim(),
-                HoTen: cells[2].textContent.trim(),
-                Email: cells[3].textContent.trim(),
-                VaiTro: roles,
-                TrangThai: status
-            });
+            const data = users.map(u => ({
+                UserName: u.userName,
+                HoTen: u.hoTen,
+                Email: u.email,
+                VaiTro: u.vaiTro,
+                TrangThai: u.trangThai
+            }));
+            const ws = XLSX.utils.json_to_sheet(data, { header: ["UserName", "HoTen", "Email", "VaiTro", "TrangThai"] });
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Users");
+            XLSX.writeFile(wb, "users.xlsx");
+
+            showNotification('Export Excel thành công!', 'success');
+        },
+        error: function () {
+            showNotification('Xuất Excel thất bại!', 'error');
         }
     });
-
-    if (data.length === 0) {
-        showNotification('Không có dữ liệu để export!', 'error');
-        return;
-    }
-
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Users");
-    XLSX.writeFile(wb, "users.xlsx");
-    showNotification('Export Excel thành công!', 'success');
 }
 
 // ====== Utility ======
-function showNotification(message, type = 'info') {
-    alert(message);
-}
 
+function showNotification(message, type = "info") {
+    let icon = "info";
+    if (type === "success") icon = "success";
+    else if (type === "error") icon = "error";
 
-//xu ly phan trang user
-let loadPage = (url) => {
-    $.get(url, function (data) {
-        $(".main-content").fadeOut(100, function () {
-            $(".main-content").html(data).fadeIn(100);
-        });
+    Swal.fire({
+        text: message,
+        icon: icon,
+        showConfirmButton: true,
+        timerProgressBar: true,
+        allowOutsideClick: false,
+        allowEscapeKey: true
     });
 }
+//xu ly phan trang user
+
+var role1 = "";
+$(document).on("change", "#roleFilter", function () {
+    role1 = $("#roleFilter").val();
+})
+var status1 = "";
+$(document).on("change", "#statusFilter", function () {
+    status1 = $("#statusFilter").val();
+})
+
+var keyword1 = "";
+$(document).on("change", "#searchInput", function () {
+    keyword1 = $("#searchInput").val();
+})
 $(document).on("click", "button.page-userManager", function (e) {
     e.preventDefault();
-    let pageUrl = $(this).attr("href");
+
+    let pageUrl = $(this).attr("href") + `&role=${role1}` + `&status=${status1}` + `&keyword=${keyword1}`;
 
     if (pageUrl) {
         loadPage(pageUrl);
     }
+});
+
+let loadPage = (url) => {
+    $.get(url, function (data) {
+        const tempDom = $("<div>").html(data);
+
+        const newTable = tempDom.find(".table-container").html();
+        const newPagination = tempDom.find(".pagination").html();
+
+        if (newTable) $(".table-container").html(newTable);
+        if (newPagination) $(".pagination").html(newPagination);
+
+        $("#roleFilter").val(role1);
+        $("#statusFilter").val(status1);
+        $("#searchInput").val(keyword1);
+    });
+}
+
+// Xử lí tìm kiếm
+$(document).on("click", "#btnTimKiem", function () {
+    const keyword = $("#searchInput").val().trim();
+    const role = $("#roleFilter").val();
+    const status = $("#statusFilter").val();
+    $.ajax({
+        url: "/Admin/Home/UserManager",
+        type: "GET",
+        data: {
+            page: 1,
+            keyword: keyword,
+            role: role,
+            status: status
+        },
+        success: function (data) {
+
+            // Dùng jQuery parse chính xác HTML (tạo DOM tạm)
+            const tempDom = $("<div>").html(data);
+
+            // Tách phần table và phân trang từ DOM tạm
+            const newTable = tempDom.find(".table-container").html();
+            const newPagination = tempDom.find(".pagination").html();
+            // Nếu có thì cập nhật lại giao diện hiện tại
+            if (newTable) $(".table-container").html(newTable);
+            if (newPagination) $(".pagination").html(newPagination);
+
+            // Giữ lại từ khóa tìm kiếm
+            $("#searchInput").val(keyword);
+        },
+        error: function (xhr) {
+            alert("Không thể tải dữ liệu tìm kiếm.");
+        }
+    });
 });

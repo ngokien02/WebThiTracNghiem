@@ -2,13 +2,13 @@
 @model DeThiViewModel
 
 @{
-    var cauHoi1 = Model.CauHoiList.ToList()[0];
-    var totalQuestion = Model.CauHoiList.Count();
+	var cauHoi1 = Model.CauHoiList.ToList()[0];
+	var totalQuestion = Model.CauHoiList.Count();
 }
 
 <!-- Header với thông tin tiến độ và thời gian -->
 <div class="exam-page-header">
-    <div class="exam-page-progress" id="exam-page-progress">1 / @Model.CauHoiList.Count() câu</div>
+	<div class="exam-page-progress" id="exam-page-progress">1 / @Model.CauHoiList.Count() câu</div>
 	<div id="exam-timer" class="exam-page-timer"></div>
 </div>
 
@@ -67,72 +67,69 @@
 
 <!-- Modal kết quả thi -->
 <div id="examResultModalWrapper" class="exam-result-modal-wrapper">
-    <div class="exam-result-modal-backdrop"></div>
-    <div class="exam-result-modal-dialog">
-        <div class="exam-result-modal-header-section">
-            <h2>🎉 Kết quả bài thi</h2>
-            <button class="exam-result-modal-close-btn" onclick="closeExamResultModal()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
+	<div class="exam-result-modal-backdrop"></div>
+	<div class="exam-result-modal-dialog">
+		<div class="exam-result-modal-header-section">
+			<h2>🎉 Kết quả bài thi</h2>
+		</div>
 
-        <div class="exam-result-modal-content-section">
-            <div class="exam-result-details-list">
-                <div class="exam-result-detail-item">
-                    <i class="fas fa-file-alt"></i>
-                    <div class="exam-result-detail-content">
-                        <label>Tên đề thi:</label>
-                        <span id="examResultExamName">Kỹ thuật Sửa chữa Ô tô</span>
-                    </div>
-                </div>
+		<div class="exam-result-modal-content-section">
+			<div class="exam-result-details-list">
+				<div class="exam-result-detail-item">
+					<i class="fas fa-file-alt"></i>
+					<div class="exam-result-detail-content">
+						<label>Tên đề thi:</label>
+						<span id="examResultExamName">Kỹ thuật Sửa chữa Ô tô</span>
+					</div>
+				</div>
 
-                <div class="exam-result-detail-item">
-                    <i class="fas fa-user-graduate"></i>
-                    <div class="exam-result-detail-content">
-                        <label>Sinh viên:</label>
-                        <span id="examResultStudentName">Nguyễn Văn A</span>
-                    </div>
-                </div>
+				<div class="exam-result-detail-item">
+					<i class="fas fa-user-graduate"></i>
+					<div class="exam-result-detail-content">
+						<label>Sinh viên:</label>
+						<span id="examResultStudentName">Nguyễn Văn A</span>
+					</div>
+				</div>
 
-                <div class="exam-result-detail-item">
-                    <i class="fas fa-clock"></i>
-                    <div class="exam-result-detail-content">
-                        <label>Thời gian hoàn thành:</label>
-                        <span id="examResultCompletionTime">45 phút 30 giây</span>
-                    </div>
-                </div>
+				<div class="exam-result-detail-item">
+					<i class="fas fa-clock"></i>
+					<div class="exam-result-detail-content">
+						<label>Thời gian hoàn thành:</label>
+						<span id="examResultCompletionTime">45 phút 30 giây</span>
+					</div>
+				</div>
 
-                <div class="exam-result-detail-item">
-                    <i class="fas fa-check-circle"></i>
-                    <div class="exam-result-detail-content">
-                        <label>Số câu đúng:</label>
-                        <span id="examResultCorrectAnswers" class="exam-result-correct-count">12/15</span>
-                    </div>
-                </div>
+				<div class="exam-result-detail-item">
+					<i class="fas fa-check-circle"></i>
+					<div class="exam-result-detail-content">
+						<label>Số câu đúng:</label>
+						<span id="examResultCorrectAnswers" class="exam-result-correct-count">12/15</span>
+					</div>
+				</div>
 
-                <div class="exam-result-detail-item exam-result-score-highlight">
-                    <i class="fas fa-star"></i>
-                    <div class="exam-result-detail-content">
-                        <label>Điểm số:</label>
-                        <span id="examResultScore" class="exam-result-score-value">8.0/10</span>
-                    </div>
-                </div>
-            </div>
+				<div class="exam-result-detail-item exam-result-score-highlight">
+					<i class="fas fa-star"></i>
+					<div class="exam-result-detail-content">
+						<label>Điểm số:</label>
+						<span id="examResultScore" class="exam-result-score-value">8.0/10</span>
+					</div>
+				</div>
+			</div>
 
-            <div class="exam-result-message-section">
-                <p id="examResultMessage" class="exam-result-message-text exam-result-excellent">
-                    🎉 Xuất sắc! Bạn đã hoàn thành bài thi rất tốt!
-                </p>
-            </div>
-        </div>
+			<div class="exam-result-message-section">
+				<p id="examResultMessage" class="exam-result-message-text exam-result-excellent">
+					🎉 Xuất sắc! Bạn đã hoàn thành bài thi rất tốt!
+				</p>
+			</div>
+		</div>
 
-        <div class="exam-result-modal-footer-section">
-            <button class="exam-result-btn-primary">
-                <i class="fas fa-home"></i> Về trang chủ
-            </button>
-        </div>
-    </div>
-</div> 
+		<div class="exam-result-modal-footer-section">
+			<button class="exam-result-btn-primary">
+				<i class="fas fa-home"></i> Về trang chủ
+			</button>
+		</div>
+	</div>
+</div>
 
 <input type="hidden" id="IdDeThi" value="@Model.Id" />
 <input type="hidden" id="IdCauHoi" value="@cauHoi1.Id" />

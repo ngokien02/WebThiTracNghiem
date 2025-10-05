@@ -1,0 +1,94 @@
+﻿<div class="page-header">
+	<h1>Quản lý bài viết</h1>
+	<div class="header-actions">
+		<button class="admin-posts-btn admin-posts-btn-secondary PostList" href="/admin/post/index">
+			<i class="fas fa-list"></i> Danh sách bài viết
+		</button>
+	</div>
+</div>
+
+<!-- Post Creation Form -->
+<div class="admin-posts-form-container">
+	<form id="adminPostsForm" class="admin-posts-form">
+		<!-- Post Title Section -->
+		<div class="admin-posts-form-section">
+			<h3 class="admin-posts-section-title">
+				<i class="fas fa-heading"></i>
+				Tiêu đề bài viết
+			</h3>
+			<div class="admin-posts-form-group">
+				<label for="adminPostsTitle">Tiêu đề chính</label>
+				<input type="text" id="adminPostsTitle" name="TieuDe" class="admin-posts-form-control" placeholder="Nhập tiêu đề bài viết...">
+			</div>
+		</div>
+
+		<div class="admin-summary-form-section">
+			<h3 class="admin-posts-section-title">
+				<i class="fa-solid fa-list"></i>
+				Tóm tắt
+			</h3>
+			<div class="admin-posts-form-group">
+				<label for="adminPostSummary">Tóm tắt</label>
+				<input type="text" id="adminPostSummary" name="TomTat" class="admin-posts-form-control" placeholder="Nhập tóm tắt bài viết...">
+			</div>
+		</div>
+
+		<div id="postSections">
+			<!-- Section 1 -->
+			<div class="admin-posts-form-section">
+				<h3 class="admin-posts-section-title">
+					<i class="fas fa-edit"></i>
+					Phần 1
+				</h3>
+				<div class="admin-posts-form-group">
+					<label for="adminPostsSection1Title">Đề mục phần 1</label>
+					<input type="text" id="adminPostsSection1Title" name="section1Title" class="admin-posts-form-control" placeholder="Nhập đề mục phần 1...">
+				</div>
+				<div class="admin-posts-form-group">
+					<label for="adminPostsSection1Image">Ảnh phần 1</label>
+					<img src="" alt="imgpreview" id="postImgPreview" width="300" />
+					<div class="admin-posts-image-upload-slot" data-slot="section1">
+						<div class="admin-posts-upload-placeholder">
+							<i class="fas fa-plus"></i>
+							<span>Thêm ảnh cho phần 1</span>
+						</div>
+						<input type="file" id="postImgInput" class="admin-posts-image-input" accept="image/*">
+					</div>
+				</div>
+				<div class="admin-posts-form-group">
+					<label for="adminPostsSection1Content">Nội dung phần 1</label>
+					<textarea id="adminPostsSection1Content" name="section1Content" class="admin-posts-form-control" rows="6" placeholder="Nhập nội dung phần 1..."></textarea>
+				</div>
+			</div>
+		</div>
+
+		<button type="button" class="btn btn-primary btnAddSection">
+			<i class="fas fa-plus"></i> Thêm đề mục
+		</button>
+
+		<!-- Form Actions -->
+		<div class="admin-posts-form-actions">
+			<button type="reset" class="admin-posts-btn admin-posts-btn-secondary">
+				<i class="fas fa-undo"></i> Làm mới
+			</button>
+			<button type="submit" class="admin-posts-btn admin-posts-btn-primary">
+				<i class="fas fa-save"></i> Lưu bài viết
+			</button>
+		</div>
+	</form>
+</div>
+
+<!-- Success Modal -->
+<div id="adminPostsSuccessModal" class="admin-posts-modal">
+	<div class="admin-posts-modal-content">
+		<div class="admin-posts-modal-header">
+			<h3><i class="fas fa-check-circle"></i> Thành công!</h3>
+		</div>
+		<div class="admin-posts-modal-body">
+			<p>Bài viết đã được lưu thành công!</p>
+		</div>
+		<div class="admin-posts-modal-footer">
+			<button class="admin-posts-btn admin-posts-btn-primary" onclick="closeSuccessModal()">Đóng</button>
+		</div>
+	</div>
+</div>

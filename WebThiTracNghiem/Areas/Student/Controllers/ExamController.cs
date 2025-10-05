@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +13,8 @@ using WebThiTracNghiem.Models;
 namespace WebThiTracNghiem.Areas.Student.Controllers
 {
     [Area("Student")]
-    public class ExamController : Controller
+	[Authorize(Roles = "Student")]
+	public class ExamController : Controller
     {
         private readonly ApplicationDbContext _db;
         private readonly ILogger<ExamController> _logger;
@@ -25,21 +27,41 @@ namespace WebThiTracNghiem.Areas.Student.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
-        {
-            var dsDeThi = await _db.DeThi
-                .Where(d => d.GioKT >= DateTime.Now)
-                .OrderByDescending(d => d.GioBD)
-                .Include(d => d.GiangVien)
-                .ToListAsync();
+		public async Task<IActionResult> Index(int page = 1, string keyword = "")
+		{
+			int pageSize = 6;
 
-            return PartialView("Index", dsDeThi);
-        }
+			var query = _db.DeThi
+				.Include(d => d.GiangVien)
+				.Where(d => d.GioKT >= DateTime.Now);
 
-        [HttpGet]
+			if (!string.IsNullOrWhiteSpace(keyword))
+			{
+				query = query.Where(d => EF.Functions.Like(d.TieuDe, $"%{keyword}%"));
+			}
+
+			query = query.OrderByDescending(d => d.GioBD);
+
+			var totalExams = await query.CountAsync();
+			var exams = await query
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
+				.AsNoTracking()
+				.ToListAsync();
+
+			ViewBag.TotalPages = (int)Math.Ceiling((double)totalExams / pageSize);
+			ViewBag.CurrentPage = page;
+			return PartialView("Index", exams);
+		}
+
+		[HttpGet]
         public async Task<IActionResult> StartExam(int id)
         {
+            var user = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             var kq = await _db.KetQua
+                            .AsNoTracking()
+                            .Where(kq => kq.IdSinhVien == user)
                             .FirstOrDefaultAsync(k => k.DeThiId == id);
 
             if (kq?.TrangThai == "HoanThanh")

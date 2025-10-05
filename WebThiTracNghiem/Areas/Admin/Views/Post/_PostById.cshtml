@@ -1,0 +1,41 @@
+﻿@model WebThiTracNghiem.Areas.Admin.Models.Post
+
+<div class="news-main-wrapper">
+	<!-- Main Article -->
+	<article class="news-article-main">
+		<header class="news-article-header">
+			<h1 class="news-article-title">@Model.TieuDe</h1>
+
+			<div class="news-article-meta">
+				<div class="news-meta-left">
+					<span class="news-meta-item">
+						<i class="fas fa-calendar-alt"></i>
+						@Model.ThoiGian.ToString("HH:mm dd/MM/yyyy")
+					</span>
+					<span class="news-meta-item">
+						<i class="fas fa-user"></i>
+						@Model.User?.HoTen
+					</span>
+				</div>
+			</div>
+		</header>
+
+		<div class="news-article-body">
+			@if (!string.IsNullOrEmpty(Model.TomTat))
+			{
+				<h3>@Model.TomTat</h3>
+			}
+
+			@foreach (var dm in Model.DeMucs.OrderBy(d => d.STT))
+			{
+				<h2>@dm.STT. @dm.TieuDe</h2>
+				<p>@dm.NoiDung</p>
+
+				@if (!string.IsNullOrEmpty(dm.ImageUrl))
+				{
+					<img src="/Images/post/@dm.ImageUrl" alt="@dm.TieuDe" style="max-width:500px; border-radius:10px; margin:10px 0;" />
+				}
+			}
+		</div>
+	</article>
+</div>

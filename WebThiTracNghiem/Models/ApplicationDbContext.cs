@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WebThiTracNghiem.Areas.Admin.Models;
+using Xceed.Document.NET;
 
 namespace WebThiTracNghiem.Models
 {
@@ -18,6 +19,8 @@ namespace WebThiTracNghiem.Models
         public DbSet<ChiTietKQ> ChiTietKQ { get; set; }
         public DbSet<ChiTietKQ_DapAn> ChiTietKQ_DapAn { get; set; }
         public DbSet<ChuDe> ChuDe { get; set; }
+        public DbSet<Post> Post { get; set; }
+        public DbSet<DeMuc> DeMuc { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebThiTracNghiem.Models;
@@ -6,6 +7,7 @@ using WebThiTracNghiem.Models;
 namespace WebThiTracNghiem.Areas.Admin.Controllers
 {
 	[Area("Admin")]
+	[Authorize(Roles = "Admin")]
 	public class HomeController : Controller
 	{
 		private readonly ApplicationDbContext _db;
@@ -56,37 +58,116 @@ namespace WebThiTracNghiem.Areas.Admin.Controllers
 			ViewData["Title"] = "Trang Quản trị";
 			return View(thongBao);
 		}
-		public async Task<IActionResult> UserManager(int page = 1)
+		public async Task<IActionResult> UserManager(int page = 1, string keyword = "", string role = "", string status = "")
 		{
-			int pageSize = 5;
-			var totalUsers = _userManager.Users.Count();
+			try
+			{
+				int pageSize = 5;
+				var query = _userManager.Users.AsQueryable();
+
+				// 🔍 Lọc theo keyword
+				if (!string.IsNullOrWhiteSpace(keyword))
+				{
+					keyword = keyword.ToLower();
+					query = query.Where(u =>
+						(u.HoTen != null && u.HoTen.ToLower().Contains(keyword)) ||
+						(u.Email != null && u.Email.ToLower().Contains(keyword)) ||
+						(u.UserName != null && u.UserName.ToLower().Contains(keyword))
+					);
+				}
+
+				// ⚙️ Lọc role
+				if (!string.IsNullOrEmpty(role))
+				{
+					var usersInRole = await _userManager.GetUsersInRoleAsync(role);
+					var userIds = usersInRole.Select(u => u.Id).ToList();
+
+					query = query.Where(u => userIds.Contains(u.Id));
+				}
+
+				// ⚙️ Lọc trạng thái
+				if (!string.IsNullOrEmpty(status))
+				{
+					if (status == "active")
+						query = query.Where(u => !u.LockoutEnd.HasValue || u.LockoutEnd <= DateTimeOffset.UtcNow);
+					else if (status == "inactive")
+						query = query.Where(u => u.LockoutEnd.HasValue && u.LockoutEnd > DateTimeOffset.UtcNow);
+				}
+
+				// Phân trang
+				var totalUsers = await query.CountAsync();
+				var users = await query
+					.Skip((page - 1) * pageSize)
+					.Take(pageSize)
+					.AsNoTracking()
+					.ToListAsync();
+
+				// ⚠️ Chỗ dễ lỗi NullReference
+				foreach (var u in users)
+				{
+					u.Roles = (await _userManager.GetRolesAsync(u)).ToList();
+				}
+
+				ViewBag.TotalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
+				ViewBag.CurrentPage = page;
+				ViewBag.FromPage = Math.Max(1, page - 2);
+				ViewBag.ToPage = Math.Min(ViewBag.TotalPages, page + 2);
+
+				return PartialView("_UserManager", users);
+			}
+			catch (Exception ex)
+			{
+				// Ghi log ra console
+				Console.WriteLine("❌ ERROR in UserManager: " + ex.Message);
+				Console.WriteLine(ex.StackTrace);
+
+				return StatusCode(500, "Internal server error: " + ex.Message);
+			}
+		}
 
 
-			var users = await _userManager.Users
+		public async Task<IActionResult> ExamManager(int page = 1, string keyword = "", string status = "")
+		{
+			int pageSize = 5; // số lượng exam mỗi trang
+			var query = _db.DeThi.AsQueryable();
+
+			// 🔍 Lọc theo keyword
+			if (!string.IsNullOrWhiteSpace(keyword))
+			{
+				keyword = keyword.ToLower();
+				query = query.Where(d =>
+		 (d.TieuDe != null && d.TieuDe.ToLower().Contains(keyword)) ||
+		 (d.MaDe != null && d.MaDe.ToLower().Contains(keyword))
+	 );
+			}
+			var now = DateTime.Now;
+			if (!string.IsNullOrEmpty(status))
+			{
+				if (status == "running")
+					query = query.Where(d => d.GioBD <= now && d.GioKT > now);
+				else if (status == "upcoming")
+					query = query.Where(d => d.GioBD > now);
+				else if (status == "finished")
+					query = query.Where(d => d.GioKT <= now);
+			}
+
+			// Phân trang
+			var totalExams = await query.CountAsync();
+			var exams = await query
+				.OrderBy(d => d.Id)
 				.Skip((page - 1) * pageSize)
 				.Take(pageSize)
-				.AsNoTracking().ToListAsync();
+				.AsNoTracking()
+				.ToListAsync();
 
-			ViewBag.TotalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
+			// Truyền thông tin phân trang xuống view
+			ViewBag.TotalPages = (int)Math.Ceiling((double)totalExams / pageSize);
 			ViewBag.CurrentPage = page;
-
-			foreach (var u in users)
-			{
-				var roles = await _userManager.GetRolesAsync(u);
-				u.Roles = roles.ToList();
-			}
-			return PartialView("_UserManager", users);
-		}
-
-		public IActionResult ExamManager()
-		{
-			var danhSachKyThi = _db.DeThi.AsNoTracking().ToList();
-			return PartialView("_ExamManager", danhSachKyThi);
-		}
-
-		public IActionResult Post()
-		{
-			return PartialView("_Post");
+			ViewBag.Keyword = keyword;
+			ViewBag.Status = status;
+			ViewBag.FromPage = Math.Max(1, ViewBag.CurrentPage - 2);
+			ViewBag.ToPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2);
+			return PartialView("_ExamManager", exams);
 		}
 
 		public IActionResult Guide()

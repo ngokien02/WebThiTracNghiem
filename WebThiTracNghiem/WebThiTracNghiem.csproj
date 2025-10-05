@@ -32,7 +32,7 @@
     <Folder Include="Areas\Teacher\Models\" />
     <Folder Include="Data\" />
     <Folder Include="Views\Shared\" />
-    <Folder Include="wwwroot\Images\" />
+    <Folder Include="wwwroot\Images\Avatar\" />
     <Folder Include="wwwroot\lib\bootstrap\" />
     <Folder Include="wwwroot\lib\bootstrap\dist\css\" />
     <Folder Include="wwwroot\lib\bootstrap\dist\js\" />

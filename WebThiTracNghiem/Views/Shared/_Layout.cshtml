@@ -23,6 +23,7 @@
 	<link rel="stylesheet" href="~/css/Teacher/result-detail-modal.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/Admin/UserManager.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/Admin/Post.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/Admin/News.css" asp-append-version="true" />
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -133,9 +134,9 @@
 			</div>
 		</div>
 	</footer>
-	<a href="#" class="contact-fab" title="Liên hệ với nhà trường">
+@* 	<a href="#" class="contact-fab" title="Liên hệ với nhà trường">
 		<i class="fas fa-comments"></i>
-	</a>
+	</a> *@
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -146,16 +147,19 @@
 	<script src="~/js/Teacher/Exam.js" asp-append-version="true"></script>
 	<script src="~/js/Student/Exam.js" asp-append-version="true"></script>
 	<script src="~/js/Student/History.js" asp-append-version="true"></script>
+	<script src="~/js/Student/ExamList.js" asp-append-version="true"></script>
 	<script src="~/js/Profile.js" asp-append-version="true"></script>
 	<script src="~/js/Teacher/Render.js" asp-append-version="true"></script>
 	<script src="~/js/Teacher/ChartExam.js" asp-append-version="true"></script>
 	<script src="~/js/Teacher/question-bank-modal.js" asp-append-version="true"></script>
 	<script src="~/js/Teacher/QuestionBank.js" asp-append-version="true"></script>
+	<script src="~/js/Teacher/Results.js" asp-append-version="true"></script>
+	<script src="~/js/Teacher/ActiveExam.js" asp-append-version="true"></script>
 	<script src="~/js/Admin/Dashboard.js" asp-append-version="true"></script>
 	<script src="~/js/Admin/Render.js" asp-append-version="true"></script>
 	<script src="~/js/Admin/UserManager.js" asp-append-version="true"></script>
 	<script src="~/js/Admin/ExamManager.js" asp-append-version="true"></script>
-	@* <script src="~/js/Admin/Post.js" asp-append-version="true"></script> *@
+	<script src="~/js/Admin/Post.js" asp-append-version="true"></script>
 	@await RenderSectionAsync("Scripts", required: false)
 	@await RenderSectionAsync("ProfileStyle", required: false);
 </body>

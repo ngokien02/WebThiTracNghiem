@@ -26,9 +26,9 @@
 		<label>Vai trò:</label>
 		<select id="roleFilter">
 			<option value="">Tất cả</option>
-			<option value="student">Sinh viên</option>
-			<option value="teacher">Giảng viên</option>
-			<option value="admin">Quản trị viên</option>
+			<option value="Student">Sinh viên</option>
+			<option value="Teacher">Giảng viên</option>
+			<option value="Admin">Quản trị viên</option>
 		</select>
 	</div>
 	<div class="filter-group">
@@ -42,6 +42,7 @@
 	<div class="filter-group">
 		<label>Tìm kiếm:</label>
 		<input type="text" id="searchInput" placeholder="Tên, email, mã số...">
+		<button type="button" class="btn-primary btn btn-secondary" id="btnTimKiem">Tìm Kiếm </button>
 	</div>
 </div>
 
@@ -51,7 +52,7 @@
 		<thead>
 			<tr>
 				<th><input type="checkbox" id="selectAll" /></th>
-				<th>Mã số</th>
+				<th>Tài khoản</th>
 				<th>Họ và tên</th>
 				<th>Email</th>
 				<th>Vai trò</th>
@@ -116,9 +117,6 @@
 							<a href="javascript:void(0)" class="btn-icon" title="Sửa" onclick="editUser('@u.Id')">
 								<i class="fas fa-edit"></i>
 							</a>
-							<a href="javascript:void(0)" class="btn-icon" title="Khóa/Mở" onclick="toggleUserStatus('@u.Id')">
-								<i class="fas fa-lock"></i>
-							</a>
 							<a href="javascript:void(0)" class="btn-icon" title="Xóa" onclick="deleteUser('@u.Id')">
 								<i class="fas fa-trash"></i>
 							</a>
@@ -132,11 +130,11 @@
 
 <!-- Pagination -->
 <div class="pagination">
-	<button class="btn-page page-userManager page-item" @(ViewBag.CurrentPage == 1 ? "disabled" : "") href="/admin/home/UserManager?page=1">
+	<button class="btnFirstPage btn-page page-userManager page-item" @(ViewBag.CurrentPage == 1 ? "disabled" : "") href="/admin/home/UserManager?page=1">
 		<i class="fas fa-chevron-left"></i>
 	</button>
 
-	@for (int i = 1; i <= ViewBag.TotalPages; i++)
+	@for (int i = ViewBag.FromPage; i <= ViewBag.ToPage; i++)
 	{
 		<button class="btn-page page-userManager page-item @(ViewBag.CurrentPage == i ? "active" : "")" href="/admin/home/UserManager?page=@i">@i</button>
 	}
@@ -158,11 +156,12 @@
 				<div class="form-group_User">
 					<label>Vai trò</label>
 					<select name="role" required>
-						<option value="student">Sinh viên</option>
-						<option value="teacher">Giảng viên</option>
-						<option value="admin">Quản trị viên</option>
+						<option value="Student">Sinh viên</option>
+						<option value="Teacher">Giảng viên</option>
+						<option value="Admin">Quản trị viên</option>
 					</select>
 				</div>
+				<input type="hidden" name="id" value="" />
 				<div class="form-group_User">
 					<label>Mã số</label>
 					<input type="text" name="username" required />
@@ -177,40 +176,12 @@
 				</div>
 				<div class="form-user-actions">
 					<button type="button" class="btn btn-secondary" onclick="closeModal('userModal')">Hủy</button>
-					<button type="submit" class="btn btn-primary">Lưu</button>
+					<button type="submit" class="btn btn-primary handleButton">Lưu</button>
 				</div>
 			</form>
 		</div>
 	</div>
 </div>
-
-@* <!-- Backdrop -->
-<div id="modalBackdrop" class="modal-backdrop"></div>
-
-<!-- Modal -->
-<div id="previewModal" class="modal">
-	<div class="modal-content">
-		<div class="modal-header">
-			<h2>Danh sách User từ Excel</h2>
-			<span class="close" onclick="closeModal()">&times;</span>
-		</div>
-		<div class="modal-body">
-			<table>
-				<thead>
-					<tr>
-						<th>Username</th>
-						<th>Password</th>
-						<th>Role</th>
-					</tr>
-				</thead>
-				<tbody id="userTableBody"></tbody>
-			</table>
-		</div>
-		<div class="modal-footer">
-			<button onclick="confirmImport()">Xác nhận</button>
-		</div>
-	</div>
-</div> *@
 
 <!-- Backdrop -->
 <div id="modalBackdrop" class="modal-backdrop"></div>
