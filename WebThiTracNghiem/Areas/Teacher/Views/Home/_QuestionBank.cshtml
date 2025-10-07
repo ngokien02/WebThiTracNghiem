@@ -1,100 +1,165 @@
 ﻿@model IEnumerable<CauHoi>
 
 <div class="main-content">
-	<div class="question-page">
-		<h1>Ngân hàng câu hỏi</h1>
-		<div class="header-actions">
-			<form id="import-form" enctype="multipart/form-data">
-				<label for="qbexam-file" class="btn secondary">
-					<i class="fas fa-file-import"></i> Nhập từ file
-				</label>
-				<input type="file" id="qbexam-file" name="examFile" accept=".doc,.docx,.pdf" style="display:none" />
-			</form>
-			<!-- Modal hiển thị câu hỏi sau khi import -->
-			<div id="qb-question-modal" style="display:none;">
-				<div class="modal-content">
-					<h3>Danh sách câu hỏi được import</h3>
-					<div id="modal-question-list"></div>
-					<div class="modal-actions">
-						<button id="qb-modal-accept-btn" class="btn primary">Lưu vào ngân hàng</button>
-						<button id="qb-modal-cancel-btn" class="btn secondary">Hủy</button>
-					</div>
-				</div>
-			</div>
+    <div class="question-page">
+        <h1>Ngân hàng câu hỏi</h1>
+        <div class="header-actions">
+            <form id="import-form" enctype="multipart/form-data">
+                <label for="qbexam-file" class="btn secondary">
+                    <i class="fas fa-file-import"></i> Nhập từ file
+                </label>
+                <input type="file" id="qbexam-file" name="examFile" accept=".doc,.docx,.pdf" style="display:none" />
+            </form>
+            <!-- Modal hiển thị câu hỏi sau khi import -->
+            <div id="qb-question-modal" style="display:none;">
+                <div class="modal-content">
+                    <h3>Danh sách câu hỏi được import</h3>
+                    <div id="modal-question-list"></div>
+                    <div class="modal-actions">
+                        <button id="qb-modal-accept-btn" class="btn primary">Lưu vào ngân hàng</button>
+                        <button id="qb-modal-cancel-btn" class="btn secondary">Hủy</button>
+                    </div>
+                </div>
+            </div>
 
-			<div id="loading-overlay" style="display:none;">
-				<div class="loading-box">
-					<div class="spinner"></div>
-					<p>Đang xử lý file...</p>
-				</div>
-			</div>
+            <div id="loading-overlay" style="display:none;">
+                <div class="loading-box">
+                    <div class="spinner"></div>
+                    <p>Đang xử lý file...</p>
+                </div>
+            </div>
+            <a href="javascript:" id="btn-add-question" class="btn primary AddQuestion">
+                <i class="fas fa-plus"></i> Thêm câu hỏi mới
+            </a>
+            <button type="button" id="btn-ExportFormat" class="btn primary ExportFormat">
+                <i class="fas fa-file-download"></i> File mẫu câu hỏi chuẩn định dạng
+            </button>
+        </div>
 
-		</div>
-	</div>
+    </div>
 
-	<div class="questionbank-section" style="background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(25,118,210,0.08);padding:2.5rem 2rem;max-width:1200px;margin:2rem auto;">
+    <div class="questionbank-section" style="background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(25,118,210,0.08);padding:2.5rem 2rem;max-width:1200px;margin:2rem auto;">
 
-		<!-- Bộ lọc -->
-		<div class="filters-section">
-			<div class="filter-group">
-				<label for="subject">Chủ đề:</label>
-				<select id="questionTopic">
-					@{
-						var cds = ViewData["ChuDes"] as List<ChuDe>;
-					}
-					<option value="0">Tất cả chủ đề</option>
-					@foreach (var cd in cds)
-					{
-						<option value="@cd.Id">@cd.TenCD</option>
-					}
-				</select>
-			</div>
-		</div>
+        <!-- Bộ lọc -->
+        <div class="filters-section">
+            <div class="filter-group">
+                <label for="subject">Chủ đề:</label>
+                <select id="questionTopic">
+                    @{
+                        var cds = ViewData["ChuDes"] as List<ChuDe>;
+                    }
+                    <option value="0">Tất cả chủ đề</option>
+                    @foreach (var cd in cds)
+                    {
+                        <option value="@cd.Id">@cd.TenCD</option>
+                    }
+                </select>
+            </div>
+        </div>
 
-		<div class="questions-list">
-			@{
-				var chuDeId = ViewBag.ChuDeId;
-			}
+        <div class="questions-list">
+            @{
+                var chuDeId = ViewBag.ChuDeId;
+            }
 
-			@foreach (var ch in Model)
-			{
-				<div class="question-card">
-					<div class="question-header">
-						<span class="question-type">@(ch.Loai == "TracNghiem" ? "Trắc nghiệm" : "Nhiều đáp án")</span>
-						<div class="question-actions">
-							<a asp-action="Edit" asp-route-id="@ch.Id" class="btn-icon"><i class="fas fa-edit"></i></a>
-							<a asp-action="Delete" asp-route-id="@ch.Id" class="btn-icon danger"><i class="fas fa-trash"></i></a>
-						</div>
-					</div>
-					<div class="question-content">
-						<p class="question-text">@ch.NoiDung</p>
-						<div class="answer-options">
-							@foreach (var da in ch.DapAnList)
-							{
-								<div class="answer-option @(da.DungSai ? "correct" : "")">
-									<span class="option-label">@da.Id</span>
-									<span class="option-text">@da.NoiDung</span>
-								</div>
-							}
-						</div>
-					</div>
-				</div>
-			}
-			<div class="pagination">
-				<button class="btn-page btn-qb" @(ViewBag.CurrentPage == 1 ? "disabled" : "") href="/teacher/home/LoadQuestionByTopic?ChuDeId=@ViewBag.ChuDeId&page=1">
-					<i class="fas fa-chevron-left"></i>
-				</button>
+            @foreach (var ch in Model)
+            {
+                <div class="question-card">
+                    <div class="question-header">
+                        <span class="question-type">@(ch.Loai == "TracNghiem" ? "Trắc nghiệm" : "Nhiều đáp án")</span>
+                        <div class="question-actions">
+                            <!-- Nút Edit câu hỏi -->
+                            <a href="javascript:" class="button btn-icon btn-editQuestionBank" data-id="@ch.Id">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="javascript:" data-id="@ch.Id" class="btn-icon danger btn-deleteQuestionBank">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="question-content">
+                        <p class="question-text">@ch.NoiDung</p>
+                        <div class="answer-options">
+                            @foreach (var da in ch.DapAnList)
+                            {
+                                <div class="answer-option @(da.DungSai ? "correct" : "")">
+                                    <span class="option-label">@da.Id</span>
+                                    <span class="option-text">@da.NoiDung</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="pagination">
+                <button class="btn-page btn-qb" @(ViewBag.CurrentPage == 1 ? "disabled" : "") href="/teacher/home/LoadQuestionByTopic?ChuDeId=@ViewBag.ChuDeId&page=1">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
 
-				@for (int i = ViewBag.FromPage; i <= ViewBag.ToPage; i++)
-				{
-					<button class="btn-page btn-qb @(ViewBag.CurrentPage == i ? "active" : "")" href="/teacher/home/LoadQuestionByTopic?ChuDeId=@ViewBag.ChuDeId&page=@i">@i</button>
-				}
+                @for (int i = ViewBag.FromPage; i <= ViewBag.ToPage; i++)
+                {
+                    <button class="btn-page btn-qb @(ViewBag.CurrentPage == i ? "active" : "")" href="/teacher/home/LoadQuestionByTopic?ChuDeId=@ViewBag.ChuDeId&page=@i">@i</button>
+                }
 
-				<button class="btn-page btn-qb" @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "") href="/teacher/home/LoadQuestionByTopic?ChuDeId=@ViewBag.ChuDeId&page=@ViewBag.TotalPages">
-					<i class="fas fa-chevron-right"></i>
-				</button>
-			</div>
-		</div>
+                <button class="btn-page btn-qb" @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "") href="/teacher/home/LoadQuestionByTopic?ChuDeId=@ViewBag.ChuDeId&page=@ViewBag.TotalPages">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
 
-	</div>
+    </div>
+</div>
+
+<!-- Modal chỉnh sửa câu hỏi -->
+<div id="qb-edit-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3>Chỉnh sửa câu hỏi</h3>
+        <form id="qb-edit-form">
+            <input type="hidden" id="qb-edit-id" />
+            <div class="form-group">
+                <label for="qb-edit-chude">Chủ đề</label>
+                <select id="qb-edit-chude"></select>
+            </div>
+            <div class="form-group">
+                <label for="qb-edit-noidung">Nội dung câu hỏi</label>
+                <textarea id="qb-edit-noidung" required></textarea>
+            </div>
+
+            <div class="form-group" id="qb-edit-dapan-list">
+                <!-- Danh sách đáp án render bằng JS -->
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit" class="btn primary" id="qb-edit-save-btn">Lưu</button>
+                <button type="button" id="qb-edit-cancel-btn" class="btn secondary">Hủy</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Modal thêm câu hỏi mới -->
+<div id="qb-add-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <h3>Thêm câu hỏi mới</h3>
+        <form id="qb-add-form">
+            <div class="form-group">
+                <label for="add-chude">Chủ đề</label>
+                <select id="add-chude"></select>
+            </div>
+            <div class="form-group">
+                <label for="add-noidung">Nội dung câu hỏi</label>
+                <input type="text" id="add-noidung" required placeholder="Nhập nội dung câu hỏi" />
+            </div>
+
+            <div class="form-group">
+                <label>Danh sách đáp án</label>
+                <div id="add-dapan-list"></div>
+            </div>
+            <button type="button" id="add-dapan-btn" class="btn primary">Thêm đáp án</button>
+
+            <div class="modal-actions">
+                <button type="submit" class="btn primary">Lưu</button>
+                <button type="button" id="qb-add-cancel-btn" class="btn secondary">Hủy</button>
+            </div>
+        </form>
+    </div>
 </div>
