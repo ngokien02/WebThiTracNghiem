@@ -598,12 +598,14 @@
     $(document).on("click", "button.btnUncheckQB", function () {
         $(".qb-chkAdd").prop("checked", false);
         $("#qb-count").text("Đã chọn: 0");
+        $(".chosenQuestionNumber").text(0);
     });
 
     //dem so cau hoi duoc check trong ngan hang cau hoi
     $(document).on("change", ".qb-chkAdd", function () {
         let count = $(".qb-chkAdd:checked").length;
         $("#qb-count").text("Đã chọn: " + count);
+        $(".chosenQuestionNumber").text(count);
     });
 
     //xu ly submit de thi

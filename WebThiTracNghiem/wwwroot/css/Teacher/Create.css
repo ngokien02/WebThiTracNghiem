@@ -436,8 +436,8 @@
     }
 
 .errMessage {
-    color:red;
-    font-size:medium;
+    color: red;
+    font-size: medium;
 }
 
 .correct-answers {
@@ -461,4 +461,17 @@
         border: 2px solid #ddd;
         border-radius: 3px;
         cursor: pointer;
+    }
+
+.chosenQuestionCount {
+    display: flex;
+    background-color: #e3f0fd;
+    border-radius: 10px;
+    align-items: center;
+    padding: 20px;
+    margin-bottom: 10px;
+}
+
+    .chosenQuestionCount h3 {
+        margin: 0 10px 0;
     }
